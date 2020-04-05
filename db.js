@@ -1,4 +1,6 @@
-const db = require('gun')();
+const db = require('gun')({
+    file: 'database.json'
+});
 const USERS = 'users';
 const REQUEST_LIST = 'request_list';
 const INVITE_LIST = 'invite_list';
@@ -125,6 +127,16 @@ function leaveFellowship(leaveId, targetId) {
         return e
     }
     return "You have left %s's fellowship."
+}
+
+function reset(id){
+    try{
+        getUser(id).put({
+            streak: 0,
+        });
+    } catch(e){
+        return e
+    }
 }
 
 function listAllUsers() {
