@@ -9,6 +9,10 @@ const FELLOWSHIP = 'fellowship';
 
 // All these functions return strings
 
+function getUser(id) {
+    let user = db.get(USERS).get(id).not(throw "Specified user %s does not exist.");
+}
+
 function addUser(id, streak) {
     db.get(USERS).get(id).not(function (id) {
         let user = db.get(id).put({
@@ -18,10 +22,6 @@ function addUser(id, streak) {
         return "User added to database."
     });
     return "User already exists in database."
-}
-
-function getUser(id) {
-    let user = db.get(USERS).get(id).not(throw "Specified user %s does not exist.");
 }
 
 function deleteUser(id) {
@@ -162,3 +162,7 @@ function listFellowship(id) {
     db.get(id).get(FELLOWSHIP).map().once(v => users.push(v));
     return users;
 }
+
+export { addUser, deleteUser, requestToJoinFellowship, inviteToJoinFellowship,
+         answerRequest, answerInvite, kickFromFellowship, leaveFellowship,
+         reset, listAllUsers, listRequests, listInvites, listFellowship }
