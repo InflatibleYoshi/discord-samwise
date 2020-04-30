@@ -39,7 +39,7 @@ registration.registerSubcommand("silent", (msg) => {
     }
 );
 
-registration.registerSubcommand("date", (msg, args) => {
+registration.registerSubcommand("date", async (msg, args) => {
         console.log("date");
         const text = args.join(" "); // Make a string of the text after the command label
         console.log(text);
@@ -55,7 +55,7 @@ registration.registerSubcommand("date", (msg, args) => {
         let failureHandler = function(reason) {
             bot.emit("messageReturn", msg, reason);
         }
-        dbConnection.addUser(msg.author.id, streak, true, successHandler, failureHandler);
+        await dbConnection.addUser(msg.author.id, streak, true, successHandler, failureHandler);
 
     }, {
         description: "Register user - tracking",
@@ -63,14 +63,5 @@ registration.registerSubcommand("date", (msg, args) => {
             " in the format 'DD Mon YYYY HH:mm:ss TZ' (01 Jan 1970 00:00:00 GMT)."
     }
 );
-
-bot.registerCommand("unregister", (msg) => {
-        dbConnection.deleteUser(msg.author.id);
-        return "Your user has been unregistered."
-    },
-    {
-        description: "Unregister User",
-        fullDescription: "Unregister user from the Samwise bot.",
-    });
 
 bot.connect();

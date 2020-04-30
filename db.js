@@ -12,15 +12,19 @@ class database {
         this.db = new Gun();
     }
 
-    getUser(id) {
-        if(this.db.get(USERS).is(id)){
-            return this.db.get(USERS).get(id).promise();
-        }
+    getUsers(ids) {
+        return ids.map(x => this.db.get(USERS).get(x).promise((resolved) =>{
+            if(resolved.put === undefined) {
+                throw new Error(x);
+            } else {
+                return resolved.gun
+            }
+        }));
     }
 
-    addUser(id, streak, isTracking, successHandler, failureHandler) {
+    async addUser(id, streak, isTracking, successHandler, failureHandler) {
         let db = this.db;
-        db.get(USERS).get(id).promise((resolved) => {
+        await db.get(USERS).get(id).promise((resolved) => {
             if(resolved.put === undefined){
                 let user = db.get(id).put({
                     streak: streak,
@@ -40,15 +44,22 @@ class database {
         }).then(successHandler, failureHandler);
     }
 
-    requestToJoinFellowship(requestingId, targetId) {
-        try {
-            let requestingUser = this.getUser(requestingId);
-            let targetUser = this.getUser(targetId);
-            targetUser.get(REQUEST_LIST).set(requestingUser);
-        } catch (e) {
-            throw e
-        }
-        return "Request sent to join %s's fellowship."
+    async requestToJoinFellowship(ids, successHandler, failureHandler) {
+
+        await Promise.all(this.getUsers(ids)).then((users) => {
+            let requestingUser = users.shift();
+            users.forEach((user) => {
+                user.get(REQUEST_LIST).promise((resolved) => {
+                    if(resolved.put.get(requestingUser)){
+                        throw "You have already requested %s for an invite."
+                    } else {
+                        resolved.put.set(requestingUser);
+                    }
+                })
+            })
+                .then(successHandler)
+                .catch(failureHandler)
+        });
     }
 
     inviteToJoinFellowship(invitingId, targetId) {
