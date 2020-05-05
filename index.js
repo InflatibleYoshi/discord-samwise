@@ -14,9 +14,11 @@ bot.on("ready", () => {
     console.log("Ready!");
 });
 
-bot.on("messageReturn", (msg, msgToReturn) => {
-    bot.createMessage(msg.channel.id, msgToReturn);
+bot.on("messageReturn", async(id, msgToReturn) => {
+    await bot.createMessage(id, msgToReturn);
 })
+
+// export emit for get user
 
 const registration = bot.registerCommand("register", () => {
         return "In order to register, type '!register silent' to register without tracking your clean days." +
@@ -63,5 +65,32 @@ registration.registerSubcommand("date", async (msg, args) => {
             " in the format 'DD Mon YYYY HH:mm:ss TZ' (01 Jan 1970 00:00:00 GMT)."
     }
 );
+
+bot.registerCommand("request", async(msg) => {
+
+        let successHandler = function(value) {
+            bot.emit("messageReturn", msg.channel.id, "You have requested to join the fellowship of" + value);
+
+        }
+        let failureHandler = function(value) {
+            bot.emit("messageReturn", msg.channel.id, reason);
+        }
+
+        for( const user in msg.mentions )  {
+            await dbConnection.requestToJoinFellowship(msg.author.id, user.id, successHandler(user.username), failureHandler(user.username));
+        }
+
+
+
+    return "In order to register, type '!register silent' to register without tracking your clean days." +
+            "\nIf you would like to track your clean days, type '!register date \"timestamp\" filling" +
+            "\n\"timestamp\" with the last day you partook in your 'habit' in the format: " +
+            "\n'DD Mon YYYY HH:mm:ss TZ' (01 Jan 1970 00:00:00 GMT).\""
+    },
+    {
+        description: "Register User",
+        fullDescription: "Register user to the Samwise bot.",
+    });
+
 
 bot.connect();

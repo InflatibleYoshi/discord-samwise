@@ -12,14 +12,14 @@ class database {
         this.db = new Gun();
     }
 
-    getUsers(ids) {
-        return ids.map(x => this.db.get(USERS).get(x).promise((resolved) =>{
+    getUser(id) {
+        return this.db.get(USERS).get(id).promise((resolved) =>{
             if(resolved.put === undefined) {
-                throw new Error(x);
+                throw new Error(id);
             } else {
-                return resolved.gun
+                return resolved
             }
-        }));
+        });
     }
 
     async addUser(id, streak, isTracking, successHandler, failureHandler) {
@@ -44,22 +44,22 @@ class database {
         }).then(successHandler, failureHandler);
     }
 
-    async requestToJoinFellowship(ids, successHandler, failureHandler) {
-
-        await Promise.all(this.getUsers(ids)).then((users) => {
-            let requestingUser = users.shift();
-            users.forEach((user) => {
-                user.get(REQUEST_LIST).promise((resolved) => {
-                    if(resolved.put.get(requestingUser)){
-                        throw "You have already requested %s for an invite."
-                    } else {
-                        resolved.put.set(requestingUser);
-                    }
-                })
-            })
-                .then(successHandler)
-                .catch(failureHandler)
-        });
+    async requestToJoinFellowship(requestingId, targetId, successHandler, failureHandler) {
+        let targetUser;
+        let requestingUser;
+        try {
+            requestingUser = await this.getUser(requestingId);
+            targetUser = await this.getUser(targetId);
+            await targetUser.get(REQUEST_LIST).get(requestingId).promise((resolved) => {
+                if(resolved.put === undefined){
+                    targetUser.get(REQUEST_LIST).set(requestingUser.put);
+                } else {
+                    throw targetId;
+                }
+            }).then(successHandler, failureHandler);
+        } catch (e) {
+            throw e
+        }
     }
 
     inviteToJoinFellowship(invitingId, targetId) {
