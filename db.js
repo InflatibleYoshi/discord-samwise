@@ -48,16 +48,17 @@ class database {
 
     async requestToJoinFellowship(requestingUser, targetUser, successHandler, failureHandler) {
         console.log("dbRequest");
+        let db = this.db;
         await Promise.all([this.getDBUser(requestingUser), this.getDBUser(targetUser)]).then((users) => {
             const requester = users[0];
             const target = users[1];
-            return target.get(REQUEST_LIST).get(requestingUser.id).promise((resolved) => {
+            return db.get(target.gun).get(REQUEST_LIST).get(requestingUser.id).promise((resolved) => {
                 if (resolved.put === undefined) {
-                    targetUser.get(REQUEST_LIST).set(requester.gun);
-                    return targetUser;
+                    db.get(target.gun).get(REQUEST_LIST).set(requester.gun);
                 } else {
-                    throw `You have already requested to join the fellowship of ${targetUser.username}`
+                    throw "You have already requested to join this fellowship."
                 }
+                return targetUser;
             })
         }).then(successHandler, failureHandler);
     }
