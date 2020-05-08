@@ -18,7 +18,6 @@ bot.on("messageReturn", async (id, msgToReturn) => {
     await bot.createMessage(id, msgToReturn);
 })
 
-// export emit for get user
 function getUsers(args) {
     const users = bot.users;
     return users.filter(user => args.includes(user.id) || args.includes(user.username))
@@ -69,8 +68,10 @@ registration.registerSubcommand("date", async (msg, args) => {
 bot.registerCommand("request", async (msg, args) => {
         console.log("request");
         let successHandler = function (user) {
-            bot.emit("messageReturn", msg.channel.id, "You have requested to join the fellowship of " + user.username);
-            bot.emit("messageReturn", bot.getDMChannel(user), msg.author.username + " has asked to join your fellowship!");
+            bot.emit("messageReturn", msg.channel.id, "You have requested to join the fellowship of " + user.username + "!");
+            bot.getDMChannel(user.id).then((channel) => {
+                channel.createMessage(msg.author.username + " has asked to join your fellowship!")
+            })
         }
         let failureHandler = function (reason) {
             bot.emit("messageReturn", msg.channel.id, reason);
