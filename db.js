@@ -12,12 +12,12 @@ class database {
         this.db = new Gun();
     }
 
-    async getDBUser(user) {
-        await this.db.get(USERS).get(user.id).promise((resolved) =>{
+    getDBUser(user) {
+        return this.db.get(USERS).get(user.id).promise((resolved) =>{
             console.log(user.username);
             console.log(resolved);
             if(resolved.put === undefined) {
-                throw user.username + "has not registered with the Samwise App."
+                throw user.username + " has not registered with the Samwise App."
             }
             return resolved
         });
@@ -48,22 +48,18 @@ class database {
 
     async requestToJoinFellowship(requestingUser, targetUser, successHandler, failureHandler) {
         console.log("dbRequest");
-        try {
-            const requester = await this.getDBUser(requestingUser);
-            console.log(requester);
-            const target = await this.getDBUser(targetUser);
-            console.log(target);
-            await target.get(REQUEST_LIST).get(requestingUser.id).promise((resolved) => {
-                if(resolved.put === undefined){
-                    targetUser.get(REQUEST_LIST).set(requester.put);
+        await Promise.all([this.getDBUser(requestingUser), this.getDBUser(targetUser)]).then((users) => {
+            const requester = users[0];
+            const target = users[1];
+            return target.get(REQUEST_LIST).get(requestingUser.id).promise((resolved) => {
+                if (resolved.put === undefined) {
+                    targetUser.get(REQUEST_LIST).set(requester.gun);
                     return targetUser;
                 } else {
-                    throw targetUser;
+                    throw `You have already requested to join the fellowship of ${targetUser.username}`
                 }
-            }).then(successHandler, failureHandler);
-        } catch (e) {
-            throw e
-        }
+            })
+        }).then(successHandler, failureHandler);
     }
 
     inviteToJoinFellowship(invitingId, targetId) {

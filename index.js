@@ -69,18 +69,20 @@ registration.registerSubcommand("date", async (msg, args) => {
 bot.registerCommand("request", async (msg, args) => {
         console.log("request");
         let successHandler = function (user) {
-            bot.emit("messageReturn", msg.channel.id, "You have requested to join the fellowship of" + user.username);
+            bot.emit("messageReturn", msg.channel.id, "You have requested to join the fellowship of " + user.username);
             bot.emit("messageReturn", bot.getDMChannel(user), msg.author.username + " has asked to join your fellowship!");
         }
-        let failureHandler = function (user) {
-            bot.emit("messageReturn", msg.channel.id, "You have already requested to join the fellowship of" + user.username);
+        let failureHandler = function (reason) {
+            bot.emit("messageReturn", msg.channel.id, reason);
         }
-        let users = getUsers(args);
+        const users = getUsers(args);
         console.log(users);
         if(users.length > 0){
-            for (const user in users) {
-                await dbConnection.requestToJoinFellowship(msg.author, user, successHandler, failureHandler);
-            }
+            await Promise.all(
+                users.map((user) => {
+                    console.log(user.username);
+                    dbConnection.requestToJoinFellowship(msg.author, user, successHandler, failureHandler);
+                }));
         } else {
             bot.emit("messageReturn", msg.channel.id, "You did not match any users with your request.");
         }
