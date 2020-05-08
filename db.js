@@ -12,21 +12,23 @@ class database {
         this.db = new Gun();
     }
 
-    getUser(id) {
-        return this.db.get(USERS).get(id).promise((resolved) =>{
+    async getDBUser(user) {
+        await this.db.get(USERS).get(user.id).promise((resolved) =>{
+            console.log(user.username);
+            console.log(resolved);
             if(resolved.put === undefined) {
-                throw new Error(id);
-            } else {
-                return resolved
+                throw user.username + "has not registered with the Samwise App."
             }
+            return resolved
         });
     }
 
-    async addUser(id, streak, isTracking, successHandler, failureHandler) {
+    async addUser(user, streak, isTracking, successHandler, failureHandler) {
+        console.log("dbAddUser");
         let db = this.db;
-        await db.get(USERS).get(id).promise((resolved) => {
+        await db.get(USERS).get(user.id).promise((resolved) => {
             if(resolved.put === undefined){
-                let user = db.get(id).put({
+                let item = db.get(user.id).put({
                     streak: streak,
                     streak_max: streak,
                     isTracking: isTracking,
@@ -35,7 +37,7 @@ class database {
                     request_list: {},
                     invite_list: {},
                 });
-                db.get(USERS).set(user);
+                db.get(USERS).set(item);
             } else {
                 throw "User already exists in database."
             }
@@ -44,17 +46,19 @@ class database {
         }).then(successHandler, failureHandler);
     }
 
-    async requestToJoinFellowship(requestingId, targetId, successHandler, failureHandler) {
-        let targetUser;
-        let requestingUser;
+    async requestToJoinFellowship(requestingUser, targetUser, successHandler, failureHandler) {
+        console.log("dbRequest");
         try {
-            requestingUser = await this.getUser(requestingId);
-            targetUser = await this.getUser(targetId);
-            await targetUser.get(REQUEST_LIST).get(requestingId).promise((resolved) => {
+            const requester = await this.getDBUser(requestingUser);
+            console.log(requester);
+            const target = await this.getDBUser(targetUser);
+            console.log(target);
+            await target.get(REQUEST_LIST).get(requestingUser.id).promise((resolved) => {
                 if(resolved.put === undefined){
-                    targetUser.get(REQUEST_LIST).set(requestingUser.put);
+                    targetUser.get(REQUEST_LIST).set(requester.put);
+                    return targetUser;
                 } else {
-                    throw targetId;
+                    throw targetUser;
                 }
             }).then(successHandler, failureHandler);
         } catch (e) {
@@ -64,8 +68,8 @@ class database {
 
     inviteToJoinFellowship(invitingId, targetId) {
         try {
-            let invitingUser = this.getUser(invitingId);
-            let targetUser = this.getUser(targetId);
+            let invitingUser = this.getDBUser(invitingId);
+            let targetUser = this.getDBUser(targetId);
             targetUser.get(INVITE_LIST).set(invitingUser);
         } catch (e) {
             return e
@@ -75,8 +79,8 @@ class database {
 
     answerRequest(requestingId, targetId, isAccept) {
         try {
-            let requestingUser = this.getUser(requestingId);
-            let targetUser = this.getUser(targetId);
+            let requestingUser = this.getDBUser(requestingId);
+            let targetUser = this.getDBUser(targetId);
             targetUser.get(REQUEST_LIST).get(requestingId)
                 .not(() => {throw new Error("Request does not exist.")})
                 .once(function () {
@@ -98,8 +102,8 @@ class database {
 
     answerInvite(invitingId, targetId, isAccept) {
         try {
-            let invitingUser = this.getUser(invitingId);
-            let targetUser = this.getUser(targetId);
+            let invitingUser = this.getDBUser(invitingId);
+            let targetUser = this.getDBUser(targetId);
             targetUser.get(INVITE_LIST).get(invitingId)
                 .not(() => {throw new Error("Invite does not exist.")})
                 .once(function(){
@@ -121,8 +125,8 @@ class database {
 
     kickFromFellowship(kickedId, targetId) {
         try {
-            let kickedUser = this.getUser(kickedId);
-            let targetUser = this.getUser(targetId);
+            let kickedUser = this.getDBUser(kickedId);
+            let targetUser = this.getDBUser(targetId);
             targetUser.get(FELLOWSHIP).get(kickedId)
                 .not(() => { throw new Error("User %s is not in your fellowship.")})
                 .once(function () {
@@ -137,8 +141,8 @@ class database {
 
     leaveFellowship(leavingId, targetId) {
         try{
-            let leavingUser = this.getUser(leavingId);
-            let targetUser = this.getUser(targetId);
+            let leavingUser = this.getDBUser(leavingId);
+            let targetUser = this.getDBUser(targetId);
             targetUser.get(FELLOWSHIP).get(leavingId)
                 .not(() => {throw new Error("You are not in %s's fellowship")})
                 .once(function () {
@@ -153,7 +157,7 @@ class database {
 
     reset(id){
         try{
-            this.getUser(id).put({
+            this.getDBUser(id).put({
                 streak: 0,
             });
         } catch(e){

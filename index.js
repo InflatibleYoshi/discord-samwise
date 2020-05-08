@@ -11,14 +11,18 @@ let dbConnection;
 
 bot.on("ready", () => {
     dbConnection = new db.database();
-    console.log("Ready!");
+    console.log("Ready! Database initialized.");
 });
 
-bot.on("messageReturn", async(id, msgToReturn) => {
+bot.on("messageReturn", async (id, msgToReturn) => {
     await bot.createMessage(id, msgToReturn);
 })
 
 // export emit for get user
+function getUsers(args) {
+    const users = bot.users;
+    return users.filter(user => args.includes(user.id) || args.includes(user.username))
+}
 
 const registration = bot.registerCommand("register", () => {
         return "In order to register, type '!register silent' to register without tracking your clean days." +
@@ -30,34 +34,30 @@ const registration = bot.registerCommand("register", () => {
         description: "Register User",
         fullDescription: "Register user to the Samwise bot.",
     });
-
-registration.registerSubcommand("silent", (msg) => {
+registration.registerSubcommand("silent", async (msg) => {
         console.log("silent");
-        dbConnection.addUser(msg.author.id, 0, false);
-        },
+        await dbConnection.addUser(msg.author.id, 0, false);
+    },
     {
         description: "Register user - silent",
         fullDescription: "Register user to the Samwise bot without reporting.",
     }
 );
-
 registration.registerSubcommand("date", async (msg, args) => {
         console.log("date");
         const text = args.join(" "); // Make a string of the text after the command label
-        console.log(text);
         const results = Chrono.parse(text);
         const streak = Math.floor((results[0].ref.getTime() - results[0].start.date().getTime()) / (1000 * 3600 * 24));
-        console.log(streak);
 
-        let successHandler = function(value) {
-            bot.emit("messageReturn", msg, "This puts your current streak at " + value + " clean days.\n" +
+        let successHandler = function (value) {
+            bot.emit("messageReturn", msg.channel.id, "This puts your current streak at " + value + " clean days.\n" +
                 "Invite people to join your fellowship or ask people to join theirs!")
         }
 
-        let failureHandler = function(reason) {
-            bot.emit("messageReturn", msg, reason);
+        let failureHandler = function (reason) {
+            bot.emit("messageReturn", msg.channel.id, reason);
         }
-        await dbConnection.addUser(msg.author.id, streak, true, successHandler, failureHandler);
+        await dbConnection.addUser(msg.author, streak, true, successHandler, failureHandler);
 
     }, {
         description: "Register user - tracking",
@@ -66,31 +66,28 @@ registration.registerSubcommand("date", async (msg, args) => {
     }
 );
 
-bot.registerCommand("request", async(msg) => {
-
-        let successHandler = function(value) {
-            bot.emit("messageReturn", msg.channel.id, "You have requested to join the fellowship of" + value);
-
+bot.registerCommand("request", async (msg, args) => {
+        console.log("request");
+        let successHandler = function (user) {
+            bot.emit("messageReturn", msg.channel.id, "You have requested to join the fellowship of" + user.username);
+            bot.emit("messageReturn", bot.getDMChannel(user), msg.author.username + " has asked to join your fellowship!");
         }
-        let failureHandler = function(value) {
-            bot.emit("messageReturn", msg.channel.id, reason);
+        let failureHandler = function (user) {
+            bot.emit("messageReturn", msg.channel.id, "You have already requested to join the fellowship of" + user.username);
         }
-
-        for( const user in msg.mentions )  {
-            await dbConnection.requestToJoinFellowship(msg.author.id, user.id, successHandler(user.username), failureHandler(user.username));
+        let users = getUsers(args);
+        console.log(users);
+        if(users.length > 0){
+            for (const user in users) {
+                await dbConnection.requestToJoinFellowship(msg.author, user, successHandler, failureHandler);
+            }
+        } else {
+            bot.emit("messageReturn", msg.channel.id, "You did not match any users with your request.");
         }
-
-
-
-    return "In order to register, type '!register silent' to register without tracking your clean days." +
-            "\nIf you would like to track your clean days, type '!register date \"timestamp\" filling" +
-            "\n\"timestamp\" with the last day you partook in your 'habit' in the format: " +
-            "\n'DD Mon YYYY HH:mm:ss TZ' (01 Jan 1970 00:00:00 GMT).\""
     },
     {
-        description: "Register User",
-        fullDescription: "Register user to the Samwise bot.",
+        description: "Request to join",
+        fullDescription: "Request to join another user's fellowship.",
     });
-
 
 bot.connect();
