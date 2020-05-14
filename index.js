@@ -24,10 +24,11 @@ function getUsers(args) {
 }
 
 const registration = bot.registerCommand("register", () => {
-        return "In order to register, type '!register silent' to register without tracking your clean days." +
-            "\nIf you would like to track your clean days, type '!register date \"timestamp\" filling" +
+        return "If you would like to track the days you've spent dedicated towards a goal such as being free from addiction or reading your bible, " +
+            "\ntype '!register date \"timestamp\" filling" +
             "\n\"timestamp\" with the last day you partook in your 'habit' in the format: " +
-            "\n'DD Mon YYYY HH:mm:ss TZ' (01 Jan 1970 00:00:00 GMT).\""
+            "\n'DD Mon YYYY HH:mm:ss TZ' (01 Jan 1970 00:00:00 GMT).\"" +
+            "Otherwise, type '!register silent' to register without tracking your day.";
     },
     {
         description: "Register User",
@@ -67,22 +68,20 @@ registration.registerSubcommand("date", async (msg, args) => {
 
 bot.registerCommand("request", async (msg, args) => {
         console.log("request");
-        let successHandler = function (user) {
-            bot.emit("messageReturn", msg.channel.id, "You have requested to join the fellowship of " + user.username + "!");
-            bot.getDMChannel(user.id).then((channel) => {
-                channel.createMessage(msg.author.username + " has asked to join your fellowship!")
-            })
-        }
-        let failureHandler = function (reason) {
-            bot.emit("messageReturn", msg.channel.id, reason);
-        }
         const users = getUsers(args);
-        console.log(users);
         if(users.length > 0){
             await Promise.all(
                 users.map((user) => {
-                    console.log(user.username);
-                    dbConnection.requestToJoinFellowship(msg.author, user, successHandler, failureHandler);
+                    let successHandler = function (user) {
+                        bot.emit("messageReturn", msg.channel.id, "You have requested to join the fellowship of " + user.username + "!");
+                        bot.getDMChannel(user.id).then((channel) => {
+                            channel.createMessage(msg.author.username + " has requested to join your fellowship!")
+                        })
+                    }
+                    let failureHandler = function (reason) {
+                        bot.emit("messageReturn", msg.channel.id, reason);
+                    }
+                    dbConnection.requestToJoinFellowship(msg.author, user, successHandler, failureHandler)
                 }));
         } else {
             bot.emit("messageReturn", msg.channel.id, "You did not match any users with your request.");
@@ -92,5 +91,7 @@ bot.registerCommand("request", async (msg, args) => {
         description: "Request to join",
         fullDescription: "Request to join another user's fellowship.",
     });
+
+
 
 bot.connect();
