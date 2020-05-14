@@ -16,7 +16,7 @@ class database {
      * Get a GUN user's information from the GUN database using a Discord User Object.
      *
      * @param user User
-     * @returns {Promise<unknown>}
+     * @returns {Promise<>}
      */
     getDBUser(user) {
         return this.db.get(USERS).get(user.id).promise((resolved) =>{
@@ -37,7 +37,7 @@ class database {
      * @param set
      * @param isAddToSet
      * @param throwMessage
-     * @returns {Promise<unknown>}
+     * @returns {Promise<>}
      */
     addIfUserNotInList(owner, addingUser, addingUserId, set, isAddToSet, throwMessage){
         return this.db.get(owner.gun).get(set).get(addingUserId).promise((resolved) => {
@@ -63,7 +63,7 @@ class database {
      * @param set
      * @param isAccept
      * @param throwMessage
-     * @returns {Promise<unknown>}
+     * @returns {Promise<>}
      */
     moveUserToFellowship(owner, movingUser, movingUserId, set, isAccept, throwMessage){
         return this.db.get(owner.gun).get(set).get(movingUserId).promise((resolved) => {
@@ -88,7 +88,7 @@ class database {
      * @param removingUser
      * @param removingUserId
      * @param throwMessage
-     * @returns {Promise<unknown>}
+     * @returns {Promise<>}
      */
     removeUserFromFellowship(owner, removingUser, removingUserId, throwMessage){
         return this.db.get(owner.gun).get(FELLOWSHIP).get(removingUserId).promise((resolved) => {
@@ -103,23 +103,26 @@ class database {
     }
 
     /**
-     * Registers a GUN user to the database with a int streak defined.
+     * Registers a GUN user to the database with a int streak and date of starting point defined.
      *
      * @param user
+     * @param streakBegin
      * @param streak
      * @param isTracking
      * @param successHandler
      * @param failureHandler
      * @returns {Promise<int>}
      */
-    async addUser(user, streak, isTracking, successHandler, failureHandler) {
+    async addUser(user, streakBegin, streak, isTracking, successHandler, failureHandler) {
         console.log("dbAddUser");
         let db = this.db;
         await db.get(USERS).get(user.id).promise((resolved) => {
             if(resolved.put === undefined){
                 let item = db.get(user.id).put({
                     streak: streak,
+                    streak_date: streakBegin,
                     streak_max: streak,
+                    timezone: "",
                     isTracking: isTracking,
                     fellowship: {},
                     fellowship_member_of: {},
@@ -146,7 +149,7 @@ class database {
      * @param failureHandler
      * @returns {Promise<void>}
      */
-    async requestToJoinFellowship(requestingUser, targetUser, successHandler, failureHandler) {
+    async requestToJoin(requestingUser, targetUser, successHandler, failureHandler) {
         await Promise.all([this.getDBUser(requestingUser), this.getDBUser(targetUser)])
             .then((userInfo) => {
                 let target = userInfo[0];
@@ -173,7 +176,7 @@ class database {
      * @param failureHandler
      * @returns {Promise<void>}
      */
-    async inviteToJoinFellowShip(invitingUser, targetUser, successHandler, failureHandler){
+    async inviteToJoin(invitingUser, targetUser, successHandler, failureHandler){
         await Promise.all([this.getDBUser(invitingUser), this.getDBUser(targetUser)])
             .then((userInfo) => {
                 let target = userInfo[0];
@@ -216,7 +219,7 @@ class database {
     /**
      * INIT BY targetUser
      * Checks if the GUN user (invitingUser) is in the INVITES list of the specified GUN User (targetUser).
-     * If the targetUser accepts the request with isAccept = true, the requestingUser
+     * If the targetUser accepts the request with isAccept = true, the targetUser is added to the invitingUser's fellowship
      *
      * @param invitingUser
      * @param targetUser
@@ -236,14 +239,41 @@ class database {
     }
 
 
-    reset(id){
-        try{
-            this.getDBUser(id).put({
-                streak: 0,
-            });
-        } catch(e){
-            return e
-        }
+    /**
+     * INIT BY either targetUser or leavingUser
+     * Checks if the GUN user (leavingUser) is in the fellowship of the specified GUN User (targetUser).
+     * If so, the leavingUser is removed from the targetUser's fellowship.
+     *
+     * @param targetUser
+     * @param leavingUser
+     * @param successHandler
+     * @param failureHandler
+     * @returns {Promise<void>}
+     */
+    async leaveFellowship(targetUser, leavingUser, successHandler, failureHandler){
+        await Promise.all([this.getDBUser(targetUser), this.getDBUser(leavingUser)])
+            .then((userInfo) => {
+                let target = userInfo[0];
+                let leaving = userInfo[1];
+                // Check if target user is already in the fellowship of the inviting.
+                this.removeUserFromFellowship(target, leaving, leavingUser.id, `You are not a part of ${targetUser.username}'s fellowship.`)
+            })
+            .then(successHandler, failureHandler);
+    }
+
+    async reset(user, successHandler, failureHandler){
+        await this.db.get(USERS).get(user.id).promise((resolved) => {
+            if(resolved.put === undefined){
+                this.db.get(user.id).put({
+                    streak: 0,
+                    streak_date: streakBegin,
+                });
+            } else {
+                throw "User already exists in database."
+            }
+            return streak
+
+        }).then(successHandler, failureHandler);
     }
 
     getAllUsers() {
