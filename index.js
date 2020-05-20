@@ -1,12 +1,16 @@
+import {Command, Emoji, PossiblyUncachedMessage} from "eris";
+
 const Eris = require('eris');
 const Chrono = require('chrono-node');
+const text = require('./text.js')
 const db = require('./db.js');
 const {token} = require('./variables');
 const bot = new Eris.CommandClient(token, {}, {
-    description: "A discord bot that brings community within arm's reach when dealing with destructive habits, or just for giving life updates.",
-    owner: "InflatibleYoshi",
+    description: text.BOT_DESCRIPTION,
+    owner: text.BOT_OWNER,
     prefix: "!"
 });
+
 let dbConnection;
 
 bot.on("ready", () => {
@@ -20,71 +24,125 @@ bot.on("messageReturn", async (id, msgToReturn) => {
 
 function getUsers(args) {
     const users = bot.users;
-    return users.filter(user => args.includes(user.id) || args.includes(user.username))
+    users.filter(user => dbConnection.isUserExists(user));
+    if(args === null){
+        return users
+    }
+    else {
+        return users.filter(user => args.includes(user.id) || args.includes(user.username))
+    }
 }
 
-const registration = bot.registerCommand("register", () => {
-        return "If you would like to track the days you've spent dedicated towards a goal such as being free from addiction or reading your bible, " +
-            "\ntype '!register date \"timestamp\" filling" +
-            "\n\"timestamp\" with the last day you partook in your 'habit' in the format: " +
-            "\n'DD Mon YYYY HH:mm:ss TZ' (01 Jan 1970 00:00:00 GMT).\"" +
-            "Otherwise, type '!register silent' to register without tracking your day.";
+const registration = bot.registerCommand(text.REGISTER_COMMAND, () => {
+        return text.REGISTER_COMMAND_RESPONSE;
     },
     {
-        description: "Register User",
-        fullDescription: "Register user to the Samwise bot.",
+        description: text.REGISTER_COMMAND_DESCRIPTION,
+        fullDescription: text.REGISTER_COMMAND_FULL_DESCRIPTION,
     });
-registration.registerSubcommand("simple", async (msg) => {
-        console.log("simple");
-        await dbConnection.addUser(msg.author.id, "",0, false);
+registration.registerSubcommand(text.REGISTER_SILENT_SUBCOMMAND, (msg) => {
+        console.log(text.REGISTER_SILENT_SUBCOMMAND);
+        dbConnection.addUser(msg.author, 0, 0, 0, 0, false);
+        return text.REGISTER_COMMAND_USER_CREATED;
     },
     {
-        description: "Register user - silent",
-        fullDescription: "Register user to the Samwise bot without reporting.",
+        description: text.REGISTER_SILENT_SUBCOMMAND_DESCRIPTION,
+        fullDescription:  text.REGISTER_SILENT_SUBCOMMAND_FULL_DESCRIPTION,
+    })
+registration.registerSubcommand(text.REGISTER_DATE_SUBCOMMAND, async (msg, args) => {
+    console.log(text.REGISTER_DATE_SUBCOMMAND);
+    const parse = args.join(" ");
+    // Make a string of the text after the command label
+    const results = Chrono.parse(parse);
+    // Finding the difference in milliseconds and converting to days.
+    const streak = Math.floor((results[0].ref.getTime() - results[0].start.date().getTime()) / (1000 * 3600 * 24));
+    // return date that can is stored as a reference point for restoring streak data.
+    const date = results[0].start.date().getTime();
+
+    let userEventListener;
+
+    if(dbConnection.isUserExists(msg.author)){
+        bot.emit("messageReturn", msg.channel.id, text.REGISTER_DATE_SUBCOMMAND_ALREADY_REGISTERED_WARNING);
     }
-);
-registration.registerSubcommand("date", async (msg, args) => {
-        console.log("date");
-        const text = args.join(" "); // Make a string of the text after the command label
-        const results = Chrono.parse(text);
-        const streak = Math.floor((results[0].ref.getTime() - results[0].start.date().getTime()) / (1000 * 3600 * 24));
+    await bot.createMessage(msg.author.id, text.REGISTER_DATE_SUBCOMMAND_RETURN_STREAK(streak))
+        .then((message) => {
+                message.addReaction('✅');
+                message.addReaction('❌');
+                userEventListener = function (user_msg, emoji, id) {
+                    if (user_msg.id === message.id && id === msg.author.id) {
+                        if (emoji.name === "x") {
+                            bot.off("messageReactionAdd", userEventListener);
+                            bot.emit("messageReturn", msg.channel.id, text.REGISTER_COMMAND_USER_ABORTED);
+                        } else if (emoji.name === "white_check_mark") {
+                            bot.off("messageReactionAdd", userEventListener);
+                            dbConnection.addUser(msg.author, streak, date, date.getUTCHours(), date.getUTCMinutes(), true);
+                            bot.emit("messageReturn", msg.channel.id, text.REGISTER_COMMAND_USER_CREATED);
+                        }
+                    }
+                }
+                bot.on("messageReactionAdd", userEventListener);
+            }
+        );
+}, {
+    description: text.REGISTER_DATE_SUBCOMMAND_DESCRIPTION,
+    fullDescription: text.REGISTER_DATE_SUBCOMMAND_FULL_DESCRIPTION
+})
 
-        let successHandler = function (value) {
-            bot.emit("messageReturn", msg.channel.id, "This puts your current streak at " + value + " clean days.\n" +
-                "Invite people to join your fellowship or ask people to join theirs!")
+bot.registerCommand(text.RESET_COMMAND, async (msg, args) => {
+    console.log(text.RESET_COMMAND);
+    const date = Date.now();
+    dbConnection.addUser(msg.author, 0, date, date.getUTCHours(), date.getUTCMinutes(), true)
+})
+
+bot.registerCommand(text.REQUEST_COMMAND, async (msg, args) => {
+        console.log(text.REQUEST_COMMAND);
+        if(args === null){
+            return text.COMMAND_SELECT_NO_USERS_ERROR
         }
-
-        let failureHandler = function (reason) {
-            bot.emit("messageReturn", msg.channel.id, reason);
-        }
-        await dbConnection.addUser(msg.author, results[0].start.toString(),  streak, true, successHandler, failureHandler);
-
-    }, {
-        description: "Register user - tracking",
-        fullDescription: "Fill in the space to the right of 'date' with your starting point" +
-            " in the format 'DD Mon YYYY HH:mm:ss TZ' (01 Jan 1970 00:00:00 GMT)."
-    }
-);
-
-bot.registerCommand("request", async (msg, args) => {
-        console.log("request");
+        //Get list of all users included in the arguments.
         const users = getUsers(args);
-        if(users.length > 0){
+        //Remove all users who are already in the fellowship.
+        users.filter((user) => !dbConnection.isUserInFellowship(msg.author, user))
+        //Loop through all users and promisify them.
+        if (users.length > 0) {
             await Promise.all(
-                users.map((user) => {
-                    let successHandler = function (user) {
-                        bot.emit("messageReturn", msg.channel.id, "You have requested to join the fellowship of " + user.username + "!");
-                        bot.getDMChannel(user.id).then((channel) => {
-                            channel.createMessage(msg.author.username + " has requested to join your fellowship!")
+                users.map(async (user) => {
+
+                    let onFellowshipAdd;
+                    let failureHandler;
+                    let fellowshipEventListener;
+
+                    bot.emit("messageReturn", msg.channel.id, text.REQUEST_COMMAND_ON_FELLOWSHIP_ADDING_REQUEST(user.username));
+
+                    await bot.getDMChannel(user.id)
+                        .then((channel) => {
+                            onFellowshipAdd = function (user) {
+                                bot.emit("messageReturn", msg.channel.id, text.REQUEST_COMMAND_ON_FELLOWSHIP_ADDING_RESPONSE(user.username));
+                                bot.emit("messageReturn", channel.id, text.REQUEST_COMMAND_ON_FELLOWSHIP_TARGET_RESPONSE(msg.author));
+                            }
+                            failureHandler = function (_error) {
+                                bot.emit("messageReturn", channel.id, text.REQUEST_COMMAND_ALREADY_IN_FELLOWSHIP_ERROR(msg.author));
+                            }
+                            return channel.createMessage(text.REQUEST_COMMAND_ON_FELLOWSHIP_TARGET_REQUEST(msg.author.username))
                         })
-                    }
-                    let failureHandler = function (reason) {
-                        bot.emit("messageReturn", msg.channel.id, reason);
-                    }
-                    dbConnection.requestToJoin(msg.author, user, successHandler, failureHandler)
-                }));
+                        .then((user_message) => {
+                            user_message.addReaction('✅');
+                            user_message.addReaction('❌');
+                            fellowshipEventListener = async function (user_msg, emoji, id) {
+                                if (user_msg.id === user_message.id && id === user.id) {
+                                    if (emoji.name === "x") {
+                                        bot.off("messageReactionAdd", fellowshipEventListener);
+                                    } else if (emoji.name === "white_check_mark") {
+                                        bot.off("messageReactionAdd", fellowshipEventListener);
+                                        await dbConnection.addToFellowship(msg.author, user, onFellowshipAdd, failureHandler);
+                                    }
+                                }
+                            }
+                            bot.on("messageReactionAdd", fellowshipEventListener);
+                        })
+                }))
         } else {
-            bot.emit("messageReturn", msg.channel.id, "You did not match any users with your command.");
+            return "You did not match any registered users with your command who aren't already in your fellowship."
         }
     },
     {
@@ -95,23 +153,46 @@ bot.registerCommand("request", async (msg, args) => {
 
 bot.registerCommand("invite", async (msg, args) => {
         console.log("invite");
+        if(args === null){
+            return "You did not match any registered users with your command."
+        }
         const users = getUsers(args);
-        if(users.length > 0){
+        if (users.length > 0) {
             await Promise.all(
-                users.map((user) => {
-                    let successHandler = function (user) {
-                        bot.emit("messageReturn", msg.channel.id, `You have invited ${user.username} to join your fellowship!`);
-                        bot.getDMChannel(user.id).then((channel) => {
-                            channel.createMessage(`You have been invited to join ${msg.author.username}'s fellowship!`)
-                        })
+                users.map(async (user) => {
+                    let fellowshipEventListener;
+                    let onFellowshipAdd = function (user) {
+                        bot.emit("messageReturn", msg.channel.id, "You have been added to the fellowship of " + user.username + "!");
                     }
                     let failureHandler = function (reason) {
                         bot.emit("messageReturn", msg.channel.id, reason);
                     }
-                    dbConnection.inviteToJoin(msg.author, user, successHandler, failureHandler)
-                }));
+
+                    bot.emit("messageReturn", msg.channel.id, "You have invited " + user.username + "to join your fellowship!");
+                    await bot.getDMChannel(user.id)
+                        .then((channel) => {
+                            return channel.createMessage(msg.author.username + " has asked you to join his/her/its fellowship!\n" +
+                                "Use the reaction buttons to choose whether or not to accept or decline the invite!")
+                        })
+                        .then((user_message) => {
+                            user_message.addReaction('✅');
+                            user_message.addReaction('❌');
+                            fellowshipEventListener = async function (user_msg, emoji, id) {
+                                if (user_msg.id === user_message.id && id === user.id) {
+                                    if (emoji.name === "x") {
+                                        bot.off("messageReactionAdd", fellowshipEventListener);
+                                    } else if (emoji.name === "white_check_mark") {
+                                        bot.off("messageReactionAdd", fellowshipEventListener);
+                                        await dbConnection.addToFellowship(user, msg.author, onFellowshipAdd, failureHandler);
+                                    }
+                                }
+                                bot.on("messageReactionAdd", fellowshipEventListener);
+                            }
+                        })
+                })
+            )
         } else {
-            bot.emit("messageReturn", msg.channel.id, "You did not match any users with your command.");
+            return "You did not match any registered users with your command."
         }
     },
     {
@@ -120,108 +201,25 @@ bot.registerCommand("invite", async (msg, args) => {
             "of user id's or usernames separated by space to the right of the !invite command",
     });
 
-bot.registerCommand("acceptRequest", async (msg, args) => {
-        console.log("acceptRequest");
-        const users = getUsers(args);
-        if(users.length > 0){
-            await Promise.all(
-                users.map((user) => {
-                    let successHandler = function (user) {
-                        bot.emit("messageReturn", msg.channel.id, `You have accepted ${user.username}'s request to join your fellowship!`);
-                        bot.getDMChannel(user.id).then((channel) => {
-                            channel.createMessage(`You are now part of ${msg.author.username}'s fellowship!`)
-                        })
-                    }
-                    let failureHandler = function (reason) {
-                        bot.emit("messageReturn", msg.channel.id, reason);
-                    }
-                    dbConnection.answerRequest(msg.author, user.id, true, successHandler, failureHandler)
-                }));
-        } else {
-            bot.emit("messageReturn", msg.channel.id, "You did not match any users with your command.");
-        }
-    },
-    {
-        description: "Accept Request to join",
-        fullDescription: "Accept the request from another fellowship by typing any amount " +
-            "of user id's or usernames separated by space to the right of the !acceptRequest command",
-    });
+bot.registerCommand("kick", (msg, args) => {
+    
+});
+
+bot.registerCommand("leave",(msg, args)=>{
+
+})
+
+bot.registerCommand("getRegisteredUsers", (msg) => {
+
+});
 
 
-bot.registerCommand("acceptInvite", async (msg, args) => {
-        console.log("acceptInvite");
-        const users = getUsers(args);
-        if(users.length > 0){
-            await Promise.all(
-                users.map((user) => {
-                    let successHandler = function (user) {
-                        bot.emit("messageReturn", msg.channel.id, `You have accepted the invite to join ${user.username}'s fellowship!`);
-                        bot.getDMChannel(user.id).then((channel) => {
-                            channel.createMessage(`${msg.author.username}'s is now a part of your fellowship!`)
-                        })
-                    }
-                    let failureHandler = function (reason) {
-                        bot.emit("messageReturn", msg.channel.id, reason);
-                    }
-                    dbConnection.answerRequest(msg.author, user.id, true, successHandler, failureHandler)
-                }));
-        } else {
-            bot.emit("messageReturn", msg.channel.id, "You did not match any users with your command.");
-        }
-    },
-    {
-        description: "Accept Invite to join",
-        fullDescription: "Accept the invite from another fellowship by typing any amount " +
-            "of user id's or usernames separated by space to the right of the !acceptInvite command",
-    });
+bot.registerCommand("listFellowships", (msg) => {
 
-bot.registerCommand("rejectRequest", async (msg, args) => {
-        console.log("rejectRequest");
-        const users = getUsers(args);
-        if(users.length > 0){
-            await Promise.all(
-                users.map((user) => {
-                    let successHandler = function (user) {
-                        bot.emit("messageReturn", msg.channel.id, `You have rejected ${user.username}'s request to join your fellowship!`);
-                    }
-                    let failureHandler = function (reason) {
-                        bot.emit("messageReturn", msg.channel.id, reason);
-                    }
-                    dbConnection.answerRequest(msg.author, user.id, true, successHandler, failureHandler)
-                }));
-        } else {
-            bot.emit("messageReturn", msg.channel.id, "You did not match any users with your command.");
-        }
-    },
-    {
-        description: "Reject Request to join",
-        fullDescription: "Reject the request from another fellowship by typing any amount " +
-            "of user id's or usernames separated by space to the right of the !rejectRequest command",
-    });
+});
 
+bot.registerCommand("listMemberships",  (msg) => {
 
-bot.registerCommand("rejectInvite", async (msg, args) => {
-        console.log("rejectInvite");
-        const users = getUsers(args);
-        if(users.length > 0){
-            await Promise.all(
-                users.map((user) => {
-                    let successHandler = function (user) {
-                        bot.emit("messageReturn", msg.channel.id, `You have rejected the invite to join ${user.username}'s fellowship!`);
-                    }
-                    let failureHandler = function (reason) {
-                        bot.emit("messageReturn", msg.channel.id, reason);
-                    }
-                    dbConnection.answerRequest(msg.author, user.id, true, successHandler, failureHandler)
-                }));
-        } else {
-            bot.emit("messageReturn", msg.channel.id, "You did not match any users with your command.");
-        }
-    },
-    {
-        description: "Reject Invite to join",
-        fullDescription: "Reject the invite from another fellowship by typing any amount " +
-            "of user id's or usernames separated by space to the right of the !rejectInvite command",
-    });
+});
 
 bot.connect();
