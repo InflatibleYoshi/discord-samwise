@@ -33,6 +33,7 @@ class database {
      *
      * @param user
      * @param streak_duration
+     * @param streak_start
      * @param utc_streak_hour
      * @param utc_streak_min
      * @param isTracking
@@ -40,9 +41,9 @@ class database {
     addUser(user, streak_duration, streak_start, utc_streak_hour, utc_streak_min, isTracking) {
         console.log("dbAddUser");
         let item;
-        if(this.isUserExists(user)){
+        if(!this.isUserExists(user)){
             item = this.db.get(user.id).put({
-                id: user.id,
+                name: user.username,
                 streak: streak_duration,
                 streak_date: streak_start,
                 utc_streak_hour: utc_streak_hour,
@@ -54,7 +55,7 @@ class database {
             });
         } else {
             item = this.db.get(user.id).put({
-                id: user.id,
+                name: user.username,
                 streak: streak_duration,
                 streak_date: streak_start,
                 utc_streak_hour: utc_streak_hour,
@@ -63,6 +64,7 @@ class database {
             });
         }
         this.db.get(USERS).set(item);
+        this.addTracker(user);
     }
 
     isUserExists(user){
@@ -83,12 +85,11 @@ class database {
     }
 
     streakUpdate(user){
+        let date = this.db.get(user.id).get('date').once((date) => {return date});
+        let streak = Math.floor((Date.now().getTime() - date) / (1000 * 3600 * 24));
         let newMax;
-        this.db.get(user.id).get('streak').once((currentStreak) => {
-            this.db.get(user.id).put({
-                streak: currentStreak + 1
-            })
-            newMax = currentStreak + 1;
+        this.db.get(user.id).put({
+            streak: streak
         })
         this.db.get(user.id).get('streak_max').once((currentMax) => {
             if(currentMax < newMax){
@@ -99,8 +100,14 @@ class database {
         })
     }
 
-    scheduleStreakUpdate(){
-
+    addTracker(user){
+        let utc_streak_hour = this.db.get(user.id).get('utc_streak_hour').once((hour) => {return hour});
+        let utc_streak_min = this.db.get(user.id).get('utc_streak_min').once((min) => {return min});
+        if(trackedUsers.has(user.id)){
+            trackedUsers.get(user.id).reschedule(`${utc_streak_min} ${utc_streak_hour} * * *`);
+        }
+        let job = Schedule.scheduleJob(`${utc_streak_min} ${utc_streak_hour} * * *`, this.streakUpdate(user));
+        trackedUsers.set(user.id, job);
     }
 
     /**
@@ -110,7 +117,6 @@ class database {
      *
      * @param addingUser
      * @param targetUser
-     * @param errorChannel
      * @param successHandler
      * @param failureHandler
      * @returns {Promise<void>}
@@ -147,29 +153,30 @@ class database {
         // Check if target user is already in the fellowship of the inviting.
         await this.db.get(target.gun).get(FELLOWSHIP).get(leavingUser.id).promise((resolved) => {
             if (resolved.put === undefined) {
-                throw ""
+                throw leavingUser
             } else {
                 this.db.get(target.gun).get(FELLOWSHIP).unset(leaving.gun);
                 this.db.get(leaving.gun).get(FELLOWSHIP_MEMBER_OF).unset(target.gun);
+                return leavingUser
             }
         }).then(successHandler, failureHandler);
     }
 
-    getAllUsers(id) {
+    getAllUsers() {
         let users = [];
-        this.db.get(id).get(USERS).map().once(v => users.push(v));
+        this.db.get(USERS).map().get('name');
         return users;
     }
 
     getFellowship(id) {
         let users = [];
-        this.db.get(id).get(FELLOWSHIP).map().once(v => users.push(v));
+        this.db.get(id).get(FELLOWSHIP).map().get('name');
         return users;
     }
 
     getMembership(id) {
         let users = [];
-        this.db.get(id).get(FELLOWSHIP_MEMBER_OF).map().once(v => users.push(v));
+        this.db.get(id).get(FELLOWSHIP_MEMBER_OF).map().get('name');
         return users;
     }
 }
