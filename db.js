@@ -1,7 +1,7 @@
 const Schedule = require('node-schedule');
 const Gun = require( "gun" );
-require('gun/lib/then.js')
-require('gun/lib/unset.js')
+require('gun/lib/then.js');
+require('gun/lib/unset.js');
 const USERS = 'users';
 const FELLOWSHIP_MEMBER_OF = "fellowship_member_of"
 const FELLOWSHIP = 'fellowship';
@@ -28,6 +28,16 @@ class database {
         });
     }
 
+    getDBUserFellowship(target, user) {
+        return this.db.get(USERS).get(target.id).get(FELLOWSHIP).get(user.id).promise((resolved) =>{
+            if(resolved.put === undefined) {
+                return false
+            }
+            return true
+        });
+    }
+
+
     /**
      * Registers a GUN user to the database with a int streak and date of starting point defined.
      *
@@ -35,79 +45,60 @@ class database {
      * @param streak_duration
      * @param streak_start
      * @param utc_streak_hour
-     * @param utc_streak_min
-     * @param isTracking
+     * @param isTracking?
      */
-    addUser(user, streak_duration, streak_start, utc_streak_hour, utc_streak_min, isTracking) {
+    addUser(user, streak_duration, streak_start, utc_streak_hour, isTracking) {
         console.log("dbAddUser");
-        let item;
-        if(!this.isUserExists(user)){
-            item = this.db.get(user.id).put({
-                name: user.username,
-                streak: streak_duration,
-                streak_date: streak_start,
-                utc_streak_hour: utc_streak_hour,
-                utc_streak_min: utc_streak_min,
-                streak_max: streak_duration,
-                isTracking: isTracking,
-                fellowship: {},
-                fellowship_member_of: {},
-            });
-        } else {
-            item = this.db.get(user.id).put({
-                name: user.username,
-                streak: streak_duration,
-                streak_date: streak_start,
-                utc_streak_hour: utc_streak_hour,
-                utc_streak_min: utc_streak_min,
-                isTracking: isTracking,
-            });
-        }
+        let item = this.db.get(user.id).put({
+            name: user.username,
+            streak: streak_duration,
+            streak_date: streak_start,
+            utc_streak_hour: utc_streak_hour });
         this.db.get(USERS).set(item);
-        this.addTracker(user);
+        if(isTracking){
+            this.addTracker(user);
+        }
     }
 
-    isUserExists(user){
-        return Gun.node.is(this.db.get(USERS).get(user.id))
-    }
-
-    isUserInFellowship(target, user){
-        return Gun.node.is(this.db.get(USERS).get(target.id).get(FELLOWSHIP).get(user.id))
-    }
-
-    reset(user, streak_start, utc_streak_hour, utc_streak_min){
+    reset(user, streak_start, utc_streak_hour){
         this.db.get(user.id).put({
             streak: 0,
             streak_date: streak_start,
             utc_streak_hour: utc_streak_hour,
-            utc_streak_min: utc_streak_min
         });
     }
 
     streakUpdate(user){
-        let date = this.db.get(user.id).get('date').once((date) => {return date});
-        let streak = Math.floor((Date.now().getTime() - date) / (1000 * 3600 * 24));
-        let newMax;
-        this.db.get(user.id).put({
-            streak: streak
-        })
-        this.db.get(user.id).get('streak_max').once((currentMax) => {
-            if(currentMax < newMax){
-                this.db.get(user.id).put({
-                    streak_max: newMax
-                })
-            }
-        })
+        let date = Date.now();
+        this.db.get(user.id).get('date').once((timestamp) => {
+            date = timestamp;
+            let streak = Math.floor((Date.now() - timestamp) / (1000 * 3600 * 24));
+            let newMax;
+            this.db.get(user.id).put({
+                streak: streak
+            })
+            this.db.get(user.id).get('streak_max').once((currentMax) => {
+                if(currentMax < newMax){
+                    this.db.get(user.id).put({
+                        streak_max: newMax
+                    })
+                }
+            })
+        });
     }
 
     addTracker(user){
-        let utc_streak_hour = this.db.get(user.id).get('utc_streak_hour').once((hour) => {return hour});
-        let utc_streak_min = this.db.get(user.id).get('utc_streak_min').once((min) => {return min});
-        if(trackedUsers.has(user.id)){
-            trackedUsers.get(user.id).reschedule(`${utc_streak_min} ${utc_streak_hour} * * *`);
-        }
-        let job = Schedule.scheduleJob(`${utc_streak_min} ${utc_streak_hour} * * *`, this.streakUpdate(user));
-        trackedUsers.set(user.id, job);
+        console.log("addTracker")
+        this.db.get(user.id).get('utc_streak_hour').once((hour) => {
+            if(trackedUsers.has(user.id)){
+                trackedUsers.get(user.id).reschedule(`* ${hour} * * *`);
+                console.log("jobReScheduled")
+            } else {
+                let job = Schedule.scheduleJob(`* ${hour} * * *`, this.streakUpdate(user));
+                trackedUsers.set(user.id, job);
+                console.log("jobScheduled")
+            }
+        });
     }
 
     /**
@@ -131,7 +122,7 @@ class database {
             } else {
                 this.db.get(target.gun).get(FELLOWSHIP).set(adding.gun);
                 this.db.get(adding.gun).get(FELLOWSHIP_MEMBER_OF).set(target.gun);
-                return targetUser;
+                return addingUser;
             }
         }).then(successHandler, failureHandler);
     }
@@ -164,19 +155,23 @@ class database {
 
     getAllUsers() {
         let users = [];
-        this.db.get(USERS).map().get('name');
+        this.db.get(USERS).map().get('name').map(x => users.push(x));
         return users;
     }
 
     getFellowship(id) {
         let users = [];
-        this.db.get(id).get(FELLOWSHIP).map().get('name');
+        this.db.get(id).get(FELLOWSHIP).map().get('name').map(x => users.push(x));
         return users;
+    }
+
+    getFellowshipIDs(id){
+        return this.db.get(id).get(FELLOWSHIP).map((value, key) => key)
     }
 
     getMembership(id) {
         let users = [];
-        this.db.get(id).get(FELLOWSHIP_MEMBER_OF).map().get('name');
+        this.db.get(id).get(FELLOWSHIP_MEMBER_OF).map().get('name').map(x => users.push(x));
         return users;
     }
 }
