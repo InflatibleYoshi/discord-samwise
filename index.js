@@ -21,12 +21,10 @@ bot.on("messageReturn", async (id, msgToReturn) => {
     await bot.createMessage(id, msgToReturn);
 })
 
-function getAllUsers() {
-    const users = bot.users;
-}
-
 function getSelectedUsers(args) {
+    console.log("getSelectedUsers");
     const users = bot.users;
+    console.log(users);
     return users.filter(user => args.includes(user.id) || args.includes(user.username))
 }
 
@@ -98,12 +96,10 @@ bot.registerCommand(text.RESET_COMMAND, async (msg, args) => {
 
 bot.registerCommand(text.REQUEST_COMMAND, async (msg, args) => {
         console.log(text.REQUEST_COMMAND);
-        if (args === null) {
-            return text.COMMAND_SELECT_NO_USERS_ERROR
-        }
         //Get list of all users included in the arguments.
         const users = getSelectedUsers(args);
         //Loop through all users and promisify them.
+        console.log(users);
         if (users.length > 0) {
             await Promise.all(
                 users.map(async (user) => {
@@ -161,9 +157,6 @@ bot.registerCommand(text.REQUEST_COMMAND, async (msg, args) => {
     });
 
 bot.registerCommand(text.INVITE_COMMAND, async (msg, args) => {
-        if (args === null) {
-            return text.COMMAND_SELECT_NO_USERS_ERROR
-        }
         //Get list of all users included in the arguments.
         const users = getSelectedUsers(args);
         //Loop through all users and promisify them.
@@ -310,17 +303,17 @@ bot.registerCommand(text.LEAVE_COMMAND, async (msg, args) => {
     });
 
 bot.registerCommand("getRegisteredUsers", (msg) => {
-    return getSelectedUsers(dbConnection.getAllUsers()).toString()
+    dbConnection.returnAllUsers(msg, bot)
+
 });
 
 
 bot.registerCommand("listFellowship", (msg) => {
-    return getSelectedUsers(dbConnection.getFellowship(msg.author.id)).toString()
-
+    dbConnection.returnFellowship(msg.author.id, msg, bot)
 });
 
 bot.registerCommand("listMemberships", (msg) => {
-    return getSelectedUsers(dbConnection.getMembership(msg.author.id)).toString()
+    dbConnection.returnMembership(msg.author.id, msg, bot)
 });
 
 bot.connect();

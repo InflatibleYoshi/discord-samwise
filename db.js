@@ -113,6 +113,7 @@ class database {
      * @returns {Promise<void>}
      */
     async addToFellowship(targetUser, addingUser, successHandler, failureHandler){
+        console.log("addToFellowship");
         let target = await this.getDBUser(targetUser);
         let adding = await this.getDBUser(addingUser);
         // Check if target user is already in the fellowship of the inviting.
@@ -153,26 +154,16 @@ class database {
         }).then(successHandler, failureHandler);
     }
 
-    getAllUsers() {
-        let users = [];
-        this.db.get(USERS).map().get('name').map(x => users.push(x));
-        return users;
+    returnAllUsers(msg, bot) {
+        this.db.get(USERS).map().get('name').map(x => bot.emit("messageReturn", msg.channel.id, x));
     }
 
-    getFellowship(id) {
-        let users = [];
-        this.db.get(id).get(FELLOWSHIP).map().get('name').map(x => users.push(x));
-        return users;
+    returnFellowship(id, msg, bot) {
+        this.db.get(id).get(FELLOWSHIP).map().get('name').map(x => bot.emit("messageReturn", msg.channel.id, x));
     }
 
-    getFellowshipIDs(id){
-        return this.db.get(id).get(FELLOWSHIP).map((value, key) => key)
-    }
-
-    getMembership(id) {
-        let users = [];
-        this.db.get(id).get(FELLOWSHIP_MEMBER_OF).map().get('name').map(x => users.push(x));
-        return users;
+    returnMembership(id, msg, bot) {
+        this.db.get(id).get(FELLOWSHIP_MEMBER_OF).map().get('name').map(x => bot.emit("messageReturn", msg.channel.id, x));
     }
 }
 
