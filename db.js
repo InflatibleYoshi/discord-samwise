@@ -1,169 +1,97 @@
-const Schedule = require('node-schedule');
-const Gun = require( "gun" );
-require('gun/lib/then.js');
-require('gun/lib/unset.js');
+const Redis = require('ioredis');
 const USERS = 'users';
-const FELLOWSHIP_MEMBER_OF = "fellowship_member_of"
-const FELLOWSHIP = 'fellowship';
-
-const trackedUsers = new Map();
+const FELLOWSHIP = "_fellowship";
+const MEMBERSHIP = "_membership";
+const ZERO = "0";
+const ONE = "1";
 
 class database {
     constructor(){
-        this.db = new Gun();
-    }
-
-    /**
-     * Get a GUN user's information from the GUN database using a Discord User Object.
-     *
-     * @param user User
-     * @returns {Promise<>}
-     */
-    getDBUser(user) {
-        return this.db.get(USERS).get(user.id).promise((resolved) =>{
-            if(resolved.put === undefined) {
-                throw user.username + " has not registered with the Samwise App."
-            }
-            return resolved
+        this.client = new Redis();
+        this.client.on("message", function (channel, message) {
+            console.log("Receive message %s from channel %s", message, channel);
         });
     }
 
-    getDBUserFellowship(target, user) {
-        return this.db.get(USERS).get(target.id).get(FELLOWSHIP).get(user.id).promise((resolved) =>{
-            if(resolved.put === undefined) {
-                return false
-            }
-            return true
+    async isUserExists(user){
+        console.log("dbGetUser");
+        await this.client.exists(user.id).then((result) => {
+            return result === ONE
         });
     }
 
+    async isUserInFellowship(user, target){
+        console.log("dbGetUser");
+        await this.client.sismember(target.id, user.id).then((result) => {
+            return result === ONE
+        });
+    }
 
-    /**
-     * Registers a GUN user to the database with a int streak and date of starting point defined.
-     *
-     * @param user
-     * @param streak_duration
-     * @param streak_start
-     * @param utc_streak_hour
-     * @param isTracking?
-     */
-    addUser(user, streak_duration, streak_start, utc_streak_hour, isTracking) {
+    getDaysDifference(timestamp){
+        return Math.floor((Date.now().getTime() - timestamp) / (1000 * 3600 * 24));
+    }
+
+    async addUser(user) {
         console.log("dbAddUser");
-        let item = this.db.get(user.id).put({
-            name: user.username,
-            streak: streak_duration,
-            streak_date: streak_start,
-            utc_streak_hour: utc_streak_hour });
-        this.db.get(USERS).set(item);
-        if(isTracking){
-            this.addTracker(user);
-        }
+        await this.client.hset(user.id, "streak_current", -1, "streak_max", -1);
+        await this.client.sadd(USERS, user.id);
     }
 
-    reset(user, streak_start, utc_streak_hour){
-        this.db.get(user.id).put({
-            streak: 0,
-            streak_date: streak_start,
-            utc_streak_hour: utc_streak_hour,
-        });
+    async addUser(user, streak_start, streak_length) {
+        console.log("dbAddUser");
+        await this.client.hset(user.id, "streak_current", streak_start, "streak_max", streak_length);
+        await this.client.sadd(USERS, user.id);
     }
 
-    streakUpdate(user){
-        let date = Date.now();
-        this.db.get(user.id).get('date').once((timestamp) => {
-            date = timestamp;
-            let streak = Math.floor((Date.now() - timestamp) / (1000 * 3600 * 24));
-            let newMax;
-            this.db.get(user.id).put({
-                streak: streak
-            })
-            this.db.get(user.id).get('streak_max').once((currentMax) => {
-                if(currentMax < newMax){
-                    this.db.get(user.id).put({
-                        streak_max: newMax
-                    })
-                }
-            })
-        });
+    async addToFellowship(target, user, successHandler, failureHandler){
+        console.log("dbAddToFellowship");
+        this.client.sadd(user.id + FELLOWSHIP, target.id).then((result) => {
+            if(result === ZERO) throw ''
+            return this.client.sadd(target.id + "_membership", user.id);
+        }).then((result) =>{
+            if(result === ZERO) throw '';
+        }).then(successHandler, failureHandler);
+
     }
 
-    addTracker(user){
-        console.log("addTracker")
-        this.db.get(user.id).get('utc_streak_hour').once((hour) => {
-            if(trackedUsers.has(user.id)){
-                trackedUsers.get(user.id).reschedule(`* ${hour} * * *`);
-                console.log("jobReScheduled")
-            } else {
-                let job = Schedule.scheduleJob(`* ${hour} * * *`, this.streakUpdate(user));
-                trackedUsers.set(user.id, job);
-                console.log("jobScheduled")
-            }
-        });
-    }
+    async removeFromFellowship(target, user, successHandler, failureHandler){
+        console.log("dbRemoveFromFellowship")
+        await this.client.srem(user.id, target.id).then((result) => {
+            if(result === ZERO) throw ''
 
-    /**
-     * INIT BY either targetUser or addingUser
-     * Checks if the GUN user (addingUser) is in the FELLOWSHIP of the specified GUN User (targetUser).
-     * If there is a .
-     *
-     * @param addingUser
-     * @param targetUser
-     * @param successHandler
-     * @param failureHandler
-     * @returns {Promise<void>}
-     */
-    async addToFellowship(targetUser, addingUser, successHandler, failureHandler){
-        console.log("addToFellowship");
-        let target = await this.getDBUser(targetUser);
-        let adding = await this.getDBUser(addingUser);
-        // Check if target user is already in the fellowship of the inviting.
-        await this.db.get(target.gun).get(FELLOWSHIP).get(addingUser.id).promise((resolved) => {
-            if (resolved.put === undefined) {
-                throw "";
-            } else {
-                this.db.get(target.gun).get(FELLOWSHIP).set(adding.gun);
-                this.db.get(adding.gun).get(FELLOWSHIP_MEMBER_OF).set(target.gun);
-                return addingUser;
-            }
+            return this.client.srem(target.id + "_membership", user.id);
+        }).then((result) =>{
+            if(result === ZERO) throw '';
         }).then(successHandler, failureHandler);
     }
 
-    /**
-     * INIT BY either targetUser or leavingUser
-     * Checks if the GUN user (leavingUser) is in the fellowship of the specified GUN User (targetUser).
-     * If so, the leavingUser is removed from the targetUser's fellowship.
-     *
-     * @param targetUser
-     * @param leavingUser
-     * @param successHandler
-     * @param failureHandler
-     * @returns {Promise<void>}
-     */
-    async removeFromFellowship(targetUser, leavingUser, successHandler, failureHandler){
-        let target = await this.getDBUser(targetUser);
-        let leaving = await this.getDBUser(leavingUser);
-        // Check if target user is already in the fellowship of the inviting.
-        await this.db.get(target.gun).get(FELLOWSHIP).get(leavingUser.id).promise((resolved) => {
-            if (resolved.put === undefined) {
-                throw leavingUser
-            } else {
-                this.db.get(target.gun).get(FELLOWSHIP).unset(leaving.gun);
-                this.db.get(leaving.gun).get(FELLOWSHIP_MEMBER_OF).unset(target.gun);
-                return leavingUser
+    async reset(user, successHandler, failureHandler){
+        this.isUserExists(user).then( (exists) => {
+            if(!exists){
+                throw 'Your user has not been registered in the bot.'
             }
-        }).then(successHandler, failureHandler);
+            return this.client.hget(user.id, "streak_max");
+        }).then(async (result) => {
+            const streak = parseInt(result, 10);
+            if (streak === -1) {
+                throw 'Your user options are set to silent, register again in order to get this functionality.'
+            }
+            const streak_current = await this.client.hget(user.id, "streak_current");
+            const timestamp = parseInt(streak_current, 10);
+            const streak_new = this.getDaysDifference(timestamp);
+            const streak_max = Math.max(streak, streak_new);
+            this.client.hset(user.id, "streak_current", Date.now().getTime(), "streak_max", streak_max);
+        }).then(successHandler, failureHandler)
     }
 
-    returnAllUsers(msg, bot) {
-        this.db.get(USERS).map().get('name').map(x => bot.emit("messageReturn", msg.channel.id, x));
+    async getAllUsers(){
+        await this.client.smembers(USERS)
     }
-
-    returnFellowship(id, msg, bot) {
-        this.db.get(id).get(FELLOWSHIP).map().get('name').map(x => bot.emit("messageReturn", msg.channel.id, x));
+    async getMembership(user){
+        await this.client.smembers(user.id + MEMBERSHIP)
     }
-
-    returnMembership(id, msg, bot) {
-        this.db.get(id).get(FELLOWSHIP_MEMBER_OF).map().get('name').map(x => bot.emit("messageReturn", msg.channel.id, x));
+    async getFellowship(user){
+        await this.client.smembers(user.id + FELLOWSHIP)
     }
 }
 

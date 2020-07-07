@@ -68,3 +68,4 @@ exports.LEAVE_COMMAND_ON_LEAVE = function(users) {return `You have decided to le
 "Use the reaction buttons to choose whether or not to leave.`}
 exports.LEAVE_COMMAND_SUCCESS_RESPONSE = function(username) {return `You have left ${username}'s fellowship.`}
 exports.LEAVE_COMMAND_NOT_IN_FELLOWSHIP_ERROR = function(username) {return `You were not part of ${username}'s fellowship to begin with.`}
+exports.GENERATE_RESET = function() {return "Aw shucks, trust God and you'll get em next time"}

@@ -13,7 +13,6 @@ let dbConnection;
 
 bot.on("ready", () => {
     dbConnection = new db.database();
-    getAllUsers().map(user => dbConnection.addTracker(user));
     console.log("Ready! Database initialized.");
 });
 
@@ -21,11 +20,19 @@ bot.on("messageReturn", async (id, msgToReturn) => {
     await bot.createMessage(id, msgToReturn);
 })
 
-function getSelectedUsers(args) {
+async function filter(arr, callback) {
+    const fail = Symbol()
+    return (await Promise.all(arr.map(async item => (await callback(item)) ? item : fail))).filter(i=>i!==fail)
+}
+
+
+async function getSelectedUsers(args) {
     console.log("getSelectedUsers");
     const users = bot.users;
     console.log(users);
-    return users.filter(user => args.includes(user.id) || args.includes(user.username))
+    users.filter(user => args.includes(user.id) || args.includes(user.username));
+    const dbUsers = await dbConnection.getAllUsers();
+    users.filter(value => dbUsers.includes(value))
 }
 
 const registration = bot.registerCommand(text.REGISTER_COMMAND, () => {
@@ -37,7 +44,7 @@ const registration = bot.registerCommand(text.REGISTER_COMMAND, () => {
     });
 registration.registerSubcommand(text.REGISTER_SILENT_SUBCOMMAND, (msg) => {
         console.log(text.REGISTER_SILENT_SUBCOMMAND);
-        dbConnection.addUser(msg.author, 0, 0, 0, false);
+        dbConnection.addUser(msg.author);
         return text.REGISTER_COMMAND_USER_CREATED;
     },
     {
@@ -49,17 +56,16 @@ registration.registerSubcommand(text.REGISTER_DATE_SUBCOMMAND, async (msg, args)
     const parse = args.join(" ");
     // Make a string of the text after the command label
     const results = Chrono.parse(parse);
+    const timestamp = results[0].start.date().getTime();
     // Finding the difference in milliseconds and converting to days.
-    const streak = Math.floor((results[0].ref.getTime() - results[0].start.date().getTime()) / (1000 * 3600 * 24));
+    const streak = dbConnection.getDaysDifference(results[0].start.date().getTime());
     // return date that can is stored as a reference point for restoring streak data.
-    const date = results[0].start.date();
-    const time = results[0].start.date().getTime();
-    console.log(date);
+    console.log(results[0].start.date());
     let userEventListener;
 
-    dbConnection.getDBUser(msg.author).then(() => {
+    if(await dbConnection.isUserExists(msg.author)) {
         bot.emit("messageReturn", msg.channel.id, text.REGISTER_DATE_SUBCOMMAND_ALREADY_REGISTERED_WARNING)
-    });
+    }
 
     await bot.createMessage(msg.channel.id, text.REGISTER_DATE_SUBCOMMAND_RETURN_STREAK(streak))
         .then((message) => {
@@ -73,7 +79,7 @@ registration.registerSubcommand(text.REGISTER_DATE_SUBCOMMAND, async (msg, args)
                             message.delete();
                             bot.off("messageReactionAdd", userEventListener);
                         } else if (emoji.name === '✅') {
-                            dbConnection.addUser(msg.author, streak, time, date.getUTCHours(), true);
+                            dbConnection.addUser(msg.author, streak, timestamp);
                             bot.emit("messageReturn", msg.channel.id, text.REGISTER_COMMAND_USER_CREATED);
                             message.delete();
                             bot.off("messageReactionAdd", userEventListener);
@@ -90,25 +96,28 @@ registration.registerSubcommand(text.REGISTER_DATE_SUBCOMMAND, async (msg, args)
 
 bot.registerCommand(text.RESET_COMMAND, async (msg, args) => {
     console.log(text.RESET_COMMAND);
-    const date = Date.now();
-    dbConnection.addUser(msg.author, 0, date, date.getUTCHours(), true)
+    let successHandler = function (_user) {
+        bot.emit("messageReturn", msg.channel.id, text.GENERATE_RESET());
+    }
+    let failureHandler = function (error) {
+        bot.emit("messageReturn", msg.channel.id, error);
+    }
+    await dbConnection.reset(msg.author);
 })
 
 bot.registerCommand(text.REQUEST_COMMAND, async (msg, args) => {
         console.log(text.REQUEST_COMMAND);
         //Get list of all users included in the arguments.
-        const users = getSelectedUsers(args);
+        const users = await getSelectedUsers(args);
         //Loop through all users and promisify them.
         console.log(users);
         if (users.length > 0) {
             await Promise.all(
                 users.map(async (user) => {
-                    dbConnection.getDBUserFellowship(user, msg.author)
+                    dbConnection.isUserInFellowship(msg.author, user)
                         .then((inFellowship) => {
                             if (inFellowship) {
-
                                 bot.emit("messageReturn", msg.channel.id, text.REQUEST_COMMAND_ALREADY_IN_FELLOWSHIP_ERROR_PRE(user.username));
-
                             } else {
                                 let fellowshipEventListener;
                                 let onFellowshipAdd;
@@ -158,13 +167,13 @@ bot.registerCommand(text.REQUEST_COMMAND, async (msg, args) => {
 
 bot.registerCommand(text.INVITE_COMMAND, async (msg, args) => {
         //Get list of all users included in the arguments.
-        const users = getSelectedUsers(args);
+        const users = await getSelectedUsers(args);
         //Loop through all users and promisify them.
         if (users.length > 0) {
             await Promise.all(
                 users.map(async (user) => {
 
-                    dbConnection.getDBUserFellowship(user, msg.author)
+                    dbConnection.isUserInFellowship(user, msg.author)
                         .then((inFellowship) => {
                                 if (inFellowship) {
 
