@@ -66,6 +66,7 @@ class database {
 
     async reset(user, successHandler, failureHandler){
         this.isUserExists(user).then( (exists) => {
+            console.log(exists);
             if(!exists){
                 throw 'Your user has not been registered in the bot.'
             }
