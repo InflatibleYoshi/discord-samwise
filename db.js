@@ -15,14 +15,14 @@ class database {
 
     async isUserExists(user){
         console.log("dbGetUser");
-        await this.client.exists(user.id).then((result) => {
+        await this.client.hexists(user.id, "streak_max").then((result) => {
             return result === ONE
         });
     }
 
     async isUserInFellowship(user, target){
         console.log("dbIsUserInFellowship");
-        await this.client.sismember(target.id, user.id).then((result) => {
+        await this.client.sismember(target.id + FELLOWSHIP, user.id).then((result) => {
             return result === ONE
         });
     }
@@ -47,19 +47,18 @@ class database {
         console.log("dbAddToFellowship");
         this.client.sadd(user.id + FELLOWSHIP, target.id).then((result) => {
             if(result === ZERO) throw ''
-            return this.client.sadd(target.id + "_membership", user.id);
+            return this.client.sadd(target.id + MEMBERSHIP, user.id);
         }).then((result) =>{
             if(result === ZERO) throw '';
         }).then(successHandler, failureHandler);
-
     }
 
     async removeFromFellowship(target, user, successHandler, failureHandler){
         console.log("dbRemoveFromFellowship")
-        await this.client.srem(user.id, target.id).then((result) => {
+        await this.client.srem(user.id + FELLOWSHIP, target.id).then((result) => {
             if(result === ZERO) throw ''
 
-            return this.client.srem(target.id + "_membership", user.id);
+            return this.client.srem(target.id + MEMBERSHIP, user.id);
         }).then((result) =>{
             if(result === ZERO) throw '';
         }).then(successHandler, failureHandler);
