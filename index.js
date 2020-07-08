@@ -51,6 +51,7 @@ registration.registerSubcommand(text.REGISTER_DATE_SUBCOMMAND, async (msg, args)
     // Make a string of the text after the command label
     const results = Chrono.parse(parse);
     const timestamp = results[0].start.date().getTime();
+    console.log(timestamp);
     // Finding the difference in milliseconds and converting to days.
     const streak = dbConnection.getDaysDifference(results[0].start.date().getTime());
     // return date that can is stored as a reference point for restoring streak data.
