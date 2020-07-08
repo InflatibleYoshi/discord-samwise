@@ -28,7 +28,7 @@ class database {
     }
 
     getDaysDifference(timestamp){
-        return Math.floor((Date.now().getTime() - timestamp) / (1000 * 3600 * 24));
+        return Math.floor((Date.now() - timestamp) / (1000 * 3600 * 24));
     }
 
     async addUser(user) {
