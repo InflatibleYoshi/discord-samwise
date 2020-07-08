@@ -13,14 +13,14 @@ class database {
 
     async isUserExists(user){
         console.log("dbGetUser");
-        await this.client.hexists(user.id, "streak_max").then((result) => {
+        await this.client.hexists(user.id.toString(), "streak_max").then((result) => {
             return result === 1
         });
     }
 
     async isUserInFellowship(user, target){
         console.log("dbIsUserInFellowship");
-        await this.client.sismember(target.id + FELLOWSHIP, user.id).then((result) => {
+        await this.client.sismember(target.id.toString() + FELLOWSHIP, user.id.toString()).then((result) => {
             return result === 1
         });
     }
@@ -31,21 +31,21 @@ class database {
 
     async addUser(user) {
         console.log("dbAddUser");
-        await this.client.hset(user.id, "streak_current", -1, "streak_max", -1);
-        await this.client.sadd(USERS, user.id);
+        await this.client.hset(user.id.toString(), "streak_current", -1, "streak_max", -1);
+        await this.client.sadd(USERS, user.id.toString());
     }
 
     async addUser(user, streak_start, streak_length) {
         console.log("dbAddUser");
-        await this.client.hset(user.id, "streak_current", streak_start, "streak_max", streak_length);
-        await this.client.sadd(USERS, user.id);
+        await this.client.hset(user.id.toString(), "streak_current", streak_start, "streak_max", streak_length);
+        await this.client.sadd(USERS, user.id.toString());
     }
 
     async addToFellowship(target, user, successHandler, failureHandler){
         console.log("dbAddToFellowship");
-        this.client.sadd(user.id + FELLOWSHIP, target.id).then((result) => {
+        this.client.sadd(user.id.toString() + FELLOWSHIP, target.id.toString()).then((result) => {
             if(result === 0) throw ''
-            return this.client.sadd(target.id + MEMBERSHIP, user.id);
+            return this.client.sadd(target.id.toString() + MEMBERSHIP, user.id.toString());
         }).then((result) =>{
             if(result === 0) throw '';
         }).then(successHandler, failureHandler);
@@ -53,10 +53,10 @@ class database {
 
     async removeFromFellowship(target, user, successHandler, failureHandler){
         console.log("dbRemoveFromFellowship")
-        await this.client.srem(user.id + FELLOWSHIP, target.id).then((result) => {
+        await this.client.srem(user.id.toString() + FELLOWSHIP, target.id.toString()).then((result) => {
             if(result === 0) throw ''
 
-            return this.client.srem(target.id + MEMBERSHIP, user.id);
+            return this.client.srem(target.id.toString() + MEMBERSHIP, user.id.toString());
         }).then((result) =>{
             if(result === 0) throw '';
         }).then(successHandler, failureHandler);
@@ -67,17 +67,17 @@ class database {
             if(!exists){
                 throw 'Your user has not been registered in the bot.'
             }
-            return this.client.hget(user.id, "streak_max");
+            return this.client.hget(user.id.toString(), "streak_max");
         }).then(async (result) => {
             const streak = parseInt(result, 10);
             if (streak === -1) {
                 throw 'Your user options are set to silent, register again in order to get this functionality.'
             }
-            const streak_current = await this.client.hget(user.id, "streak_current");
+            const streak_current = await this.client.hget(user.id.toString(), "streak_current");
             const timestamp = parseInt(streak_current, 10);
             const streak_new = this.getDaysDifference(timestamp);
             const streak_max = Math.max(streak, streak_new);
-            this.client.hset(user.id, "streak_current", Date.now().getTime(), "streak_max", streak_max);
+            this.client.hset(user.id.toString(), "streak_current", Date.now().getTime(), "streak_max", streak_max);
         }).then(successHandler, failureHandler)
     }
 
@@ -85,10 +85,10 @@ class database {
         await this.client.smembers(USERS)
     }
     async getMembership(user){
-        await this.client.smembers(user.id + MEMBERSHIP)
+        await this.client.smembers(user.id.toString() + MEMBERSHIP)
     }
     async getFellowship(user){
-        await this.client.smembers(user.id + FELLOWSHIP)
+        await this.client.smembers(user.id.toString() + FELLOWSHIP)
     }
 }
 
