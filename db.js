@@ -2,8 +2,6 @@ const Redis = require('ioredis');
 const USERS = 'users';
 const FELLOWSHIP = "_fellowship";
 const MEMBERSHIP = "_membership";
-const ZERO = "0";
-const ONE = "1";
 
 class database {
     constructor(){
@@ -16,14 +14,14 @@ class database {
     async isUserExists(user){
         console.log("dbGetUser");
         await this.client.hexists(user.id, "streak_max").then((result) => {
-            return result === ONE
+            return result === 1
         });
     }
 
     async isUserInFellowship(user, target){
         console.log("dbIsUserInFellowship");
         await this.client.sismember(target.id + FELLOWSHIP, user.id).then((result) => {
-            return result === ONE
+            return result === 1
         });
     }
 
@@ -46,21 +44,21 @@ class database {
     async addToFellowship(target, user, successHandler, failureHandler){
         console.log("dbAddToFellowship");
         this.client.sadd(user.id + FELLOWSHIP, target.id).then((result) => {
-            if(result === ZERO) throw ''
+            if(result === 0) throw ''
             return this.client.sadd(target.id + MEMBERSHIP, user.id);
         }).then((result) =>{
-            if(result === ZERO) throw '';
+            if(result === 0) throw '';
         }).then(successHandler, failureHandler);
     }
 
     async removeFromFellowship(target, user, successHandler, failureHandler){
         console.log("dbRemoveFromFellowship")
         await this.client.srem(user.id + FELLOWSHIP, target.id).then((result) => {
-            if(result === ZERO) throw ''
+            if(result === 0) throw ''
 
             return this.client.srem(target.id + MEMBERSHIP, user.id);
         }).then((result) =>{
-            if(result === ZERO) throw '';
+            if(result === 0) throw '';
         }).then(successHandler, failureHandler);
     }
 
