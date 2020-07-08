@@ -15,14 +15,14 @@ class database {
         console.log("dbGetUser");
         console.log(user.id.toString());
         await this.client.hexists(user.id.toString(), "streak_max").then((result) => {
-            return result === 1
+            return result == 1
         });
     }
 
     async isUserInFellowship(user, target){
         console.log("dbIsUserInFellowship");
         await this.client.sismember(target.id.toString() + FELLOWSHIP, user.id.toString()).then((result) => {
-            return result === 1
+            return result == 1
         });
     }
 
@@ -48,18 +48,18 @@ class database {
             if(result === 0) throw ''
             return this.client.sadd(target.id.toString() + MEMBERSHIP, user.id.toString());
         }).then((result) =>{
-            if(result === 0) throw '';
+            if(result == 0) throw '';
         }).then(successHandler, failureHandler);
     }
 
     async removeFromFellowship(target, user, successHandler, failureHandler){
         console.log("dbRemoveFromFellowship")
         await this.client.srem(user.id.toString() + FELLOWSHIP, target.id.toString()).then((result) => {
-            if(result === 0) throw ''
+            if(result == 0) throw ''
 
             return this.client.srem(target.id.toString() + MEMBERSHIP, user.id.toString());
         }).then((result) =>{
-            if(result === 0) throw '';
+            if(result == 0) throw '';
         }).then(successHandler, failureHandler);
     }
 
