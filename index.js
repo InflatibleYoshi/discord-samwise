@@ -20,12 +20,6 @@ bot.on("messageReturn", async (id, msgToReturn) => {
     await bot.createMessage(id, msgToReturn);
 })
 
-async function filter(arr, callback) {
-    const fail = Symbol()
-    return (await Promise.all(arr.map(async item => (await callback(item)) ? item : fail))).filter(i=>i!==fail)
-}
-
-
 async function getSelectedUsers(args) {
     console.log("getSelectedUsers");
     const users = bot.users;
@@ -102,16 +96,21 @@ bot.registerCommand(text.RESET_COMMAND, async (msg, args) => {
     let failureHandler = function (error) {
         bot.emit("messageReturn", msg.channel.id, error);
     }
-    await dbConnection.reset(msg.author);
+    await dbConnection.reset(msg.author, successHandler, failureHandler);
 })
 
 bot.registerCommand(text.REQUEST_COMMAND, async (msg, args) => {
         console.log(text.REQUEST_COMMAND);
         //Get list of all users included in the arguments.
+        if(!await dbConnection.isUserExists(msg.author.id)){
+            return text.REGISTER_RESPONSE;
+        }
         const users = await getSelectedUsers(args);
+        if (users.length === 0) {
+            return text.COMMAND_SELECT_NO_USERS_ERROR
+        }
         //Loop through all users and promisify them.
         console.log(users);
-        if (users.length > 0) {
             await Promise.all(
                 users.map(async (user) => {
                     dbConnection.isUserInFellowship(msg.author, user)
@@ -156,9 +155,6 @@ bot.registerCommand(text.REQUEST_COMMAND, async (msg, args) => {
                             }
                         })
                 }))
-        } else {
-            return text.COMMAND_SELECT_NO_USERS_ERROR
-        }
     },
     {
         description: text.REQUEST_COMMAND_DESCRIPTION,
@@ -166,10 +162,16 @@ bot.registerCommand(text.REQUEST_COMMAND, async (msg, args) => {
     });
 
 bot.registerCommand(text.INVITE_COMMAND, async (msg, args) => {
-        //Get list of all users included in the arguments.
+        console.log(text.INVITE_COMMAND);
+        if(!await dbConnection.isUserExists(msg.author.id)){
+            return text.REGISTER_RESPONSE;
+        }
         const users = await getSelectedUsers(args);
+        if (users.length === 0) {
+            return text.COMMAND_SELECT_NO_USERS_ERROR
+        }
+        //Get list of all users included in the arguments.
         //Loop through all users and promisify them.
-        if (users.length > 0) {
             await Promise.all(
                 users.map(async (user) => {
 
@@ -220,9 +222,6 @@ bot.registerCommand(text.INVITE_COMMAND, async (msg, args) => {
                         )
                 })
             )
-        } else {
-            return text.COMMAND_SELECT_NO_USERS_ERROR
-        }
     },
     {
         description: text.INVITE_COMMAND_DESCRIPTION,
@@ -230,13 +229,17 @@ bot.registerCommand(text.INVITE_COMMAND, async (msg, args) => {
     });
 
 bot.registerCommand(text.KICK_COMMAND, async (msg, args) => {
-        if (args === null) {
-            return text.COMMAND_SELECT_NO_USERS_ERROR
+        console.log(text.KICK_COMMAND);
+        if(!await dbConnection.isUserExists(msg.author.id)){
+            return text.REGISTER_RESPONSE;
         }
         //Get list of all users included in the arguments.
         const users = getSelectedUsers(args);
-        //Keep all users whose fellowships the author is already a part of.
         if (users.length > 0) {
+            return text.COMMAND_SELECT_NO_USERS_ERROR
+        }
+
+        //Keep all users whose fellowships the author is already a part of.
             await bot.createMessage(msg.channel.id, text.KICK_COMMAND_ON_KICK(users))
                 .then((message) => {
                     message.addReaction('✅');
@@ -262,9 +265,6 @@ bot.registerCommand(text.KICK_COMMAND, async (msg, args) => {
                         bot.on("messageReactionAdd", fellowshipEventListener);
                     }
                 })
-        } else {
-            return text.COMMAND_SELECT_NO_USERS_ERROR
-        }
     },
     {
         description: text.KICK_COMMAND_DESCRIPTION,
@@ -272,12 +272,15 @@ bot.registerCommand(text.KICK_COMMAND, async (msg, args) => {
     });
 
 bot.registerCommand(text.LEAVE_COMMAND, async (msg, args) => {
-        if (args === null) {
-            return text.COMMAND_SELECT_NO_USERS_ERROR
+        console.log(text.LEAVE_COMMAND);
+        if(!await dbConnection.isUserExists(msg.author.id)){
+            return text.REGISTER_RESPONSE;
         }
         //Get list of all users included in the arguments.
         const users = getSelectedUsers(args);
-        if (users.length > 0) {
+        if (users.length === 0) {
+            return text.COMMAND_SELECT_NO_USERS_ERROR
+        }
             await bot.createMessage(msg.channel.id, text.LEAVE_COMMAND_ON_LEAVE(users))
                 .then((message) => {
                     message.addReaction('✅');
@@ -302,27 +305,20 @@ bot.registerCommand(text.LEAVE_COMMAND, async (msg, args) => {
                         bot.on("messageReactionAdd", fellowshipEventListener);
                     }
                 })
-        } else {
-            return text.COMMAND_SELECT_NO_USERS_ERROR
-        }
     },
     {
         description: text.LEAVE_COMMAND_DESCRIPTION,
         fullDescription: text.LEAVE_COMMAND_FULL_DESCRIPTION
     });
 
-bot.registerCommand("getRegisteredUsers", (msg) => {
-    dbConnection.returnAllUsers(msg, bot)
-
+bot.registerCommand("getRegisteredUsers", async (msg) => {
+    return await dbConnection.getAllUsers();
 });
-
-
-bot.registerCommand("listFellowship", (msg) => {
-    dbConnection.returnFellowship(msg.author.id, msg, bot)
+bot.registerCommand("getMembership", async (msg) => {
+    return await dbConnection.getMembership(msg.author);
 });
-
-bot.registerCommand("listMemberships", (msg) => {
-    dbConnection.returnMembership(msg.author.id, msg, bot)
+bot.registerCommand("getFellowship", async (msg) => {
+    return await dbConnection.getFellowship(msg.author);
 });
 
 bot.connect();

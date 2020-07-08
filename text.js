@@ -6,6 +6,7 @@ exports.COMMAND_SELECT_CANCEL = "You have canceled the operation.";
 exports.COMMAND_ON_FELLOWSHIP_ADDING_RESPONSE = function(username) {return `You have been added to the fellowship of ${username}!`}
 exports.COMMAND_ON_FELLOWSHIP_TARGET_RESPONSE = function(username) {return `You have added ${username} to your fellowship!`}
 
+exports.REGISTER_RESPONSE = "This command is only available to registered users.";
 exports.REGISTER_COMMAND = "register";
 exports.REGISTER_COMMAND_RESPONSE = "If you would like to track the days you've spent dedicated towards a single goal such as being free from addiction or exercising daily, " +
     "\ntype '!register date \"timestamp\" filling" +
