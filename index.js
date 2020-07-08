@@ -53,9 +53,9 @@ registration.registerSubcommand(text.REGISTER_DATE_SUBCOMMAND, async (msg, args)
     const timestamp = results[0].start.date().getTime();
     console.log(timestamp);
     // Finding the difference in milliseconds and converting to days.
-    const streak = dbConnection.getDaysDifference(results[0].start.date().getTime());
+    const streak = dbConnection.getDaysDifference(timestamp);
     // return date that can is stored as a reference point for restoring streak data.
-    console.log(results[0].start.date());
+    console.log(streak);
     let userEventListener;
 
     if(await dbConnection.isUserExists(msg.author)) {
