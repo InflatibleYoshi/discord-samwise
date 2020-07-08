@@ -15,6 +15,7 @@ class database {
         console.log("dbGetUser");
         console.log(user.id.toString());
         await this.client.hexists(user.id.toString(), "streak_max").then((result) => {
+            console.log(result == 1);
             return result == 1
         });
     }
