@@ -58,11 +58,13 @@ registration.registerSubcommand(text.REGISTER_DATE_SUBCOMMAND, async (msg, args)
     console.log(results[0].start.date());
     let userEventListener;
 
-    if(await dbConnection.isUserExists(msg.author)) {
-        bot.emit("messageReturn", msg.channel.id, text.REGISTER_DATE_SUBCOMMAND_ALREADY_REGISTERED_WARNING)
-    }
+    await dbConnection.isUserExists(msg.author).then((exists) => {
+        if (exists) {
+            bot.emit("messageReturn", msg.channel.id, text.REGISTER_DATE_SUBCOMMAND_ALREADY_REGISTERED_WARNING)
+        }
 
-    await bot.createMessage(msg.channel.id, text.REGISTER_DATE_SUBCOMMAND_RETURN_STREAK(streak))
+        return bot.createMessage(msg.channel.id, text.REGISTER_DATE_SUBCOMMAND_RETURN_STREAK(streak))
+    })
         .then((message) => {
                 message.addReaction('✅');
                 message.addReaction('❌');
@@ -103,103 +105,40 @@ bot.registerCommand(text.RESET_COMMAND, async (msg, args) => {
 bot.registerCommand(text.REQUEST_COMMAND, async (msg, args) => {
         console.log(text.REQUEST_COMMAND);
         //Get list of all users included in the arguments.
-        if(!await dbConnection.isUserExists(msg.author.id)){
-            return text.REGISTER_RESPONSE;
-        }
         const users = await getSelectedUsers(args);
         if (users.length === 0) {
             return text.COMMAND_SELECT_NO_USERS_ERROR
         }
         //Loop through all users and promisify them.
         console.log(users);
-            await Promise.all(
-                users.map(async (user) => {
-                    dbConnection.isUserInFellowship(msg.author, user)
-                        .then((inFellowship) => {
-                            if (inFellowship) {
-                                bot.emit("messageReturn", msg.channel.id, text.REQUEST_COMMAND_ALREADY_IN_FELLOWSHIP_ERROR_PRE(user.username));
-                            } else {
-                                let fellowshipEventListener;
-                                let onFellowshipAdd;
-                                let failureHandler;
 
-                                bot.emit("messageReturn", msg.channel.id, text.REQUEST_COMMAND_ON_FELLOWSHIP_ADDING_REQUEST(user.username));
-
-                                return bot.getDMChannel(user.id)
-                                    .then((channel) => {
-                                        onFellowshipAdd = function (_user) {
-                                            bot.emit("messageReturn", msg.channel.id, text.COMMAND_ON_FELLOWSHIP_ADDING_RESPONSE(user.username));
-                                            bot.emit("messageReturn", channel.id, text.COMMAND_ON_FELLOWSHIP_TARGET_RESPONSE(msg.author.username));
-                                        }
-                                        failureHandler = function (_error) {
-                                            bot.emit("messageReturn", channel.id, text.REQUEST_COMMAND_ALREADY_IN_FELLOWSHIP_ERROR_POST(msg.author.username));
-                                        }
-                                        return channel.createMessage(text.REQUEST_COMMAND_ON_FELLOWSHIP_TARGET_REQUEST(msg.author.username))
-                                    })
-                                    .then((user_message) => {
-                                        user_message.addReaction('✅');
-                                        user_message.addReaction('❌');
-                                        fellowshipEventListener = async function (user_msg, emoji, id) {
-                                            if (user_msg.id === user_message.id && id === user.id) {
-                                                if (emoji.name === '❌') {
-                                                    await user_message.delete();
-                                                    bot.off("messageReactionAdd", fellowshipEventListener);
-                                                } else if (emoji.name === '✅') {
-                                                    await dbConnection.addToFellowship(user, msg.author, onFellowshipAdd, failureHandler);
-                                                    await user_message.delete();
-                                                    bot.off("messageReactionAdd", fellowshipEventListener);
-                                                }
-                                            }
-                                        }
-                                        bot.on("messageReactionAdd", fellowshipEventListener);
-                                    })
-                            }
-                        })
-                }))
-    },
-    {
-        description: text.REQUEST_COMMAND_DESCRIPTION,
-        fullDescription: text.REQUEST_COMMAND_FULL_DESCRIPTION,
-    });
-
-bot.registerCommand(text.INVITE_COMMAND, async (msg, args) => {
-        console.log(text.INVITE_COMMAND);
-        if(!await dbConnection.isUserExists(msg.author.id)){
-            return text.REGISTER_RESPONSE;
-        }
-        const users = await getSelectedUsers(args);
-        if (users.length === 0) {
-            return text.COMMAND_SELECT_NO_USERS_ERROR
-        }
-        //Get list of all users included in the arguments.
-        //Loop through all users and promisify them.
-            await Promise.all(
-                users.map(async (user) => {
-
-                    dbConnection.isUserInFellowship(user, msg.author)
-                        .then((inFellowship) => {
+        await dbConnection.isUserExists(msg.author.id).then((exists) => {
+            if (!exists) {
+                return text.REGISTER_RESPONSE;
+            } else {
+                return Promise.all(
+                    users.map(async (user) => {
+                        dbConnection.isUserInFellowship(msg.author, user)
+                            .then((inFellowship) => {
                                 if (inFellowship) {
-
-                                    bot.emit("messageReturn", msg.channel.id, text.INVITE_COMMAND_ALREADY_IN_FELLOWSHIP_ERROR_PRE(user.username));
-
+                                    bot.emit("messageReturn", msg.channel.id, text.REQUEST_COMMAND_ALREADY_IN_FELLOWSHIP_ERROR_PRE(user.username));
                                 } else {
                                     let fellowshipEventListener;
                                     let onFellowshipAdd;
                                     let failureHandler;
 
-                                    bot.emit("messageReturn", msg.channel.id, text.INVITE_COMMAND_ON_FELLOWSHIP_TARGET_INVITE(user.username));
+                                    bot.emit("messageReturn", msg.channel.id, text.REQUEST_COMMAND_ON_FELLOWSHIP_ADDING_REQUEST(user.username));
 
                                     return bot.getDMChannel(user.id)
                                         .then((channel) => {
                                             onFellowshipAdd = function (_user) {
-                                                bot.emit("messageReturn", msg.channel.id, text.COMMAND_ON_FELLOWSHIP_TARGET_RESPONSE(msg.author.username));
-                                                bot.emit("messageReturn", channel.id, text.COMMAND_ON_FELLOWSHIP_ADDING_RESPONSE(user.username));
+                                                bot.emit("messageReturn", msg.channel.id, text.COMMAND_ON_FELLOWSHIP_ADDING_RESPONSE(user.username));
+                                                bot.emit("messageReturn", channel.id, text.COMMAND_ON_FELLOWSHIP_TARGET_RESPONSE(msg.author.username));
                                             }
                                             failureHandler = function (_error) {
-                                                bot.emit("messageReturn", channel.id, text.INVITE_COMMAND_ALREADY_IN_FELLOWSHIP_ERROR_POST(msg.author.username));
+                                                bot.emit("messageReturn", channel.id, text.REQUEST_COMMAND_ALREADY_IN_FELLOWSHIP_ERROR_POST(msg.author.username));
                                             }
-
-                                            return channel.createMessage(text.INVITE_COMMAND_ON_FELLOWSHIP_ADDING_INVITE(user.username))
+                                            return channel.createMessage(text.REQUEST_COMMAND_ON_FELLOWSHIP_TARGET_REQUEST(msg.author.username))
                                         })
                                         .then((user_message) => {
                                             user_message.addReaction('✅');
@@ -210,19 +149,90 @@ bot.registerCommand(text.INVITE_COMMAND, async (msg, args) => {
                                                         await user_message.delete();
                                                         bot.off("messageReactionAdd", fellowshipEventListener);
                                                     } else if (emoji.name === '✅') {
-                                                        await dbConnection.addToFellowship(msg.author, user, onFellowshipAdd, failureHandler);
+                                                        await dbConnection.addToFellowship(user, msg.author, onFellowshipAdd, failureHandler);
                                                         await user_message.delete();
                                                         bot.off("messageReactionAdd", fellowshipEventListener);
                                                     }
                                                 }
-                                                bot.on("messageReactionAdd", fellowshipEventListener);
                                             }
+                                            bot.on("messageReactionAdd", fellowshipEventListener);
                                         })
                                 }
-                            }
-                        )
-                })
-            )
+                            })
+                    }))
+            }
+        })
+
+    },
+    {
+        description: text.REQUEST_COMMAND_DESCRIPTION,
+        fullDescription: text.REQUEST_COMMAND_FULL_DESCRIPTION,
+    });
+
+bot.registerCommand(text.INVITE_COMMAND, async (msg, args) => {
+        console.log(text.INVITE_COMMAND);
+        const users = await getSelectedUsers(args);
+        if (users.length === 0) {
+            return text.COMMAND_SELECT_NO_USERS_ERROR
+        }
+        //Get list of all users included in the arguments.
+        //Loop through all users and promisify them.
+
+        await dbConnection.isUserExists(msg.author.id).then((exists) => {
+            if (!exists) {
+                return text.REGISTER_RESPONSE;
+            } else {
+                Promise.all(
+                    users.map(async (user) => {
+                        dbConnection.isUserInFellowship(user, msg.author)
+                            .then((inFellowship) => {
+                                    if (inFellowship) {
+
+                                        bot.emit("messageReturn", msg.channel.id, text.INVITE_COMMAND_ALREADY_IN_FELLOWSHIP_ERROR_PRE(user.username));
+
+                                    } else {
+                                        let fellowshipEventListener;
+                                        let onFellowshipAdd;
+                                        let failureHandler;
+
+                                        bot.emit("messageReturn", msg.channel.id, text.INVITE_COMMAND_ON_FELLOWSHIP_TARGET_INVITE(user.username));
+
+                                        return bot.getDMChannel(user.id)
+                                            .then((channel) => {
+                                                onFellowshipAdd = function (_user) {
+                                                    bot.emit("messageReturn", msg.channel.id, text.COMMAND_ON_FELLOWSHIP_TARGET_RESPONSE(msg.author.username));
+                                                    bot.emit("messageReturn", channel.id, text.COMMAND_ON_FELLOWSHIP_ADDING_RESPONSE(user.username));
+                                                }
+                                                failureHandler = function (_error) {
+                                                    bot.emit("messageReturn", channel.id, text.INVITE_COMMAND_ALREADY_IN_FELLOWSHIP_ERROR_POST(msg.author.username));
+                                                }
+
+                                                return channel.createMessage(text.INVITE_COMMAND_ON_FELLOWSHIP_ADDING_INVITE(user.username))
+                                            })
+                                            .then((user_message) => {
+                                                user_message.addReaction('✅');
+                                                user_message.addReaction('❌');
+                                                fellowshipEventListener = async function (user_msg, emoji, id) {
+                                                    if (user_msg.id === user_message.id && id === user.id) {
+                                                        if (emoji.name === '❌') {
+                                                            await user_message.delete();
+                                                            bot.off("messageReactionAdd", fellowshipEventListener);
+                                                        } else if (emoji.name === '✅') {
+                                                            await dbConnection.addToFellowship(msg.author, user, onFellowshipAdd, failureHandler);
+                                                            await user_message.delete();
+                                                            bot.off("messageReactionAdd", fellowshipEventListener);
+                                                        }
+                                                    }
+                                                    bot.on("messageReactionAdd", fellowshipEventListener);
+                                                }
+                                            })
+                                    }
+                                }
+                            )
+                    })
+                )
+            }
+        })
     },
     {
         description: text.INVITE_COMMAND_DESCRIPTION,
@@ -231,9 +241,6 @@ bot.registerCommand(text.INVITE_COMMAND, async (msg, args) => {
 
 bot.registerCommand(text.KICK_COMMAND, async (msg, args) => {
         console.log(text.KICK_COMMAND);
-        if(!await dbConnection.isUserExists(msg.author.id)){
-            return text.REGISTER_RESPONSE;
-        }
         //Get list of all users included in the arguments.
         const users = getSelectedUsers(args);
         if (users.length > 0) {
@@ -241,31 +248,37 @@ bot.registerCommand(text.KICK_COMMAND, async (msg, args) => {
         }
 
         //Keep all users whose fellowships the author is already a part of.
-            await bot.createMessage(msg.channel.id, text.KICK_COMMAND_ON_KICK(users))
-                .then((message) => {
-                    message.addReaction('✅');
-                    message.addReaction('❌');
-                    let onFellowshipRemove = function (user) {
-                        bot.emit("messageReturn", msg.channel.id, text.KICK_COMMAND_SUCCESS_RESPONSE(user.username));
-                    }
-                    let failureHandler = function (user) {
-                        bot.emit("messageReturn", msg.channel.id, text.KICK_COMMAND_NOT_IN_FELLOWSHIP_ERROR(user.username));
-                    }
-                    let fellowshipEventListener = async function (user_msg, emoji, id) {
-                        if (user_msg.id === message.id && id === msg.author.id) {
-                            if (emoji.name === '❌') {
-                                await message.delete();
-                                bot.off("messageReactionAdd", fellowshipEventListener);
-                            } else if (emoji.name === '✅') {
-                                await Promise.all(users.map(user => dbConnection.removeFromFellowship(msg.author, user, onFellowshipRemove, failureHandler)));
-                                await message.delete();
-                                bot.off("messageReactionAdd", fellowshipEventListener);
-
-                            }
+        await dbConnection.isUserExists(msg.author.id).then((exists) => {
+            if (!exists) {
+                return text.REGISTER_RESPONSE;
+            } else {
+                return bot.createMessage(msg.channel.id, text.KICK_COMMAND_ON_KICK(users))
+                    .then((message) => {
+                        message.addReaction('✅');
+                        message.addReaction('❌');
+                        let onFellowshipRemove = function (user) {
+                            bot.emit("messageReturn", msg.channel.id, text.KICK_COMMAND_SUCCESS_RESPONSE(user.username));
                         }
-                        bot.on("messageReactionAdd", fellowshipEventListener);
-                    }
-                })
+                        let failureHandler = function (user) {
+                            bot.emit("messageReturn", msg.channel.id, text.KICK_COMMAND_NOT_IN_FELLOWSHIP_ERROR(user.username));
+                        }
+                        let fellowshipEventListener = async function (user_msg, emoji, id) {
+                            if (user_msg.id === message.id && id === msg.author.id) {
+                                if (emoji.name === '❌') {
+                                    await message.delete();
+                                    bot.off("messageReactionAdd", fellowshipEventListener);
+                                } else if (emoji.name === '✅') {
+                                    await Promise.all(users.map(user => dbConnection.removeFromFellowship(msg.author, user, onFellowshipRemove, failureHandler)));
+                                    await message.delete();
+                                    bot.off("messageReactionAdd", fellowshipEventListener);
+
+                                }
+                            }
+                            bot.on("messageReactionAdd", fellowshipEventListener);
+                        }
+                    })
+            }
+        });
     },
     {
         description: text.KICK_COMMAND_DESCRIPTION,
@@ -274,15 +287,15 @@ bot.registerCommand(text.KICK_COMMAND, async (msg, args) => {
 
 bot.registerCommand(text.LEAVE_COMMAND, async (msg, args) => {
         console.log(text.LEAVE_COMMAND);
-        if(!await dbConnection.isUserExists(msg.author.id)){
-            return text.REGISTER_RESPONSE;
-        }
         //Get list of all users included in the arguments.
         const users = getSelectedUsers(args);
         if (users.length === 0) {
             return text.COMMAND_SELECT_NO_USERS_ERROR
         }
-            await bot.createMessage(msg.channel.id, text.LEAVE_COMMAND_ON_LEAVE(users))
+        if (!exists) {
+            return text.REGISTER_RESPONSE;
+        } else {
+            return bot.createMessage(msg.channel.id, text.LEAVE_COMMAND_ON_LEAVE(users))
                 .then((message) => {
                     message.addReaction('✅');
                     message.addReaction('❌');
@@ -306,6 +319,7 @@ bot.registerCommand(text.LEAVE_COMMAND, async (msg, args) => {
                         bot.on("messageReactionAdd", fellowshipEventListener);
                     }
                 })
+        }
     },
     {
         description: text.LEAVE_COMMAND_DESCRIPTION,

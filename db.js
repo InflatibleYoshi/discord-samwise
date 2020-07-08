@@ -21,7 +21,7 @@ class database {
     }
 
     async isUserInFellowship(user, target){
-        console.log("dbGetUser");
+        console.log("dbIsUserInFellowship");
         await this.client.sismember(target.id, user.id).then((result) => {
             return result === ONE
         });
