@@ -80,7 +80,7 @@ class database {
             const streak_new = this.getDaysDifference(timestamp);
             const streak_max = Math.max(streak, streak_new);
             console.log('3');
-            return this.client.hset(user.id.toString(), "streak_current", Date.now().getTime(), "streak_max", streak_max);
+            return this.client.hset(user.id.toString(), "streak_current", Date.now(), "streak_max", streak_max);
         }).then(successHandler, failureHandler)
     }
 
