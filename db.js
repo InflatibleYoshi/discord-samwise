@@ -13,16 +13,14 @@ class database {
 
     async isUserExists(user){
         console.log("dbGetUser");
-        console.log(user.id.toString());
         return this.client.hexists(user.id.toString(), "streak_max").then((result) => {
-            console.log(result == 1);
             return result == 1
         });
     }
 
     async isUserInFellowship(user, target){
         console.log("dbIsUserInFellowship");
-        await this.client.sismember(target.id.toString() + FELLOWSHIP, user.id.toString()).then((result) => {
+        return this.client.sismember(target.id.toString() + FELLOWSHIP, user.id.toString()).then((result) => {
             return result == 1
         });
     }
@@ -45,7 +43,7 @@ class database {
 
     async addToFellowship(target, user, successHandler, failureHandler){
         console.log("dbAddToFellowship");
-        this.client.sadd(user.id.toString() + FELLOWSHIP, target.id.toString()).then((result) => {
+        await this.client.sadd(user.id.toString() + FELLOWSHIP, target.id.toString()).then((result) => {
             if(result === 0) throw ''
             return this.client.sadd(target.id.toString() + MEMBERSHIP, user.id.toString());
         }).then((result) =>{
@@ -65,8 +63,7 @@ class database {
     }
 
     async reset(user, successHandler, failureHandler){
-        this.isUserExists(user).then( (exists) => {
-            console.log(exists);
+        await this.isUserExists(user).then( (exists) => {
             if(!exists){
                 throw 'Your user has not been registered in the bot.'
             }
