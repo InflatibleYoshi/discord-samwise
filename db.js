@@ -67,9 +67,11 @@ class database {
             if(!exists){
                 throw 'Your user has not been registered in the bot.'
             }
+            console.log('1');
             return this.client.hget(user.id.toString(), "streak_max");
         }).then(async (result) => {
             const streak = parseInt(result, 10);
+            console.log('2');
             if (streak === -1) {
                 throw 'Your user options are set to silent, register again in order to get this functionality.'
             }
@@ -77,7 +79,8 @@ class database {
             const timestamp = parseInt(streak_current, 10);
             const streak_new = this.getDaysDifference(timestamp);
             const streak_max = Math.max(streak, streak_new);
-            this.client.hset(user.id.toString(), "streak_current", Date.now().getTime(), "streak_max", streak_max);
+            console.log('3');
+            return this.client.hset(user.id.toString(), "streak_current", Date.now().getTime(), "streak_max", streak_max);
         }).then(successHandler, failureHandler)
     }
 

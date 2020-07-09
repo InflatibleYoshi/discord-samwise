@@ -76,7 +76,7 @@ registration.registerSubcommand(text.REGISTER_DATE_SUBCOMMAND, async (msg, args)
                             message.delete();
                             bot.off("messageReactionAdd", userEventListener);
                         } else if (emoji.name === '✅') {
-                            dbConnection.addUser(msg.author, streak, timestamp);
+                            dbConnection.addUser(msg.author, timestamp, streak);
                             bot.emit("messageReturn", msg.channel.id, text.REGISTER_COMMAND_USER_CREATED);
                             message.delete();
                             bot.off("messageReactionAdd", userEventListener);
