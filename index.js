@@ -20,13 +20,16 @@ bot.on("messageReturn", async (id, msgToReturn) => {
     await bot.createMessage(id, msgToReturn);
 })
 
+async function filter(arr, callback) {
+    const fail = Symbol()
+    return (await Promise.all(arr.map(async item => (await callback(item)) ? item : fail))).filter(i=>i!==fail)
+}
+
 async function getSelectedUsers(args) {
     console.log("getSelectedUsers");
     const users = bot.users;
-    console.log(users);
     users.filter(user => args.includes(user.id) || args.includes(user.username));
-    const dbUsers = await dbConnection.getAllUsers();
-    users.filter(value => dbUsers.includes(value))
+    return filter(users, dbConnection.isUserExists);
 }
 
 const registration = bot.registerCommand(text.REGISTER_COMMAND, () => {
