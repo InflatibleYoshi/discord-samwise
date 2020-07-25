@@ -162,7 +162,7 @@ bot.registerCommand(text.REQUEST_COMMAND,async (msg, args) => {
             }
         })
 
-    }, text.REQUEST_COMMAND,
+    },
     {
         description: text.REQUEST_COMMAND_DESCRIPTION,
         fullDescription: text.REQUEST_COMMAND_FULL_DESCRIPTION,
