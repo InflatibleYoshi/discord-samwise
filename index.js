@@ -104,7 +104,7 @@ bot.registerCommand(text.RESET_COMMAND, async (msg, args) => {
     await dbConnection.reset(msg.author, successHandler, failureHandler);
 })
 
-bot.registerCommand(async (msg, args) => {
+bot.registerCommand(text.REQUEST_COMMAND,async (msg, args) => {
         console.log(text.REQUEST_COMMAND);
         //Get first command.
         if (args == null) {
