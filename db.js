@@ -12,7 +12,7 @@ class database {
     }
 
     async isUserExists(user){
-        console.log("dbGetUser");
+        console.log("dbisUserExists");
         return this.client.hexists(user.id.toString(), "streak_max").then((result) => {
             return result == 1
         });
