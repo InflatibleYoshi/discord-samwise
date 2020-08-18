@@ -107,7 +107,7 @@ bot.registerCommand(text.RESET_COMMAND, async (msg, args) => {
 bot.registerCommand(text.REQUEST_COMMAND,async (msg, args) => {
         console.log(text.REQUEST_COMMAND);
         //Get first command.
-        if (args == null) {
+        if (args.length === 0) {
             bot.emit("messageReturn", msg.channel.id, text.COMMAND_SELECT_NO_USERS_ERROR);
             return;
         }
