@@ -21,8 +21,8 @@ bot.on("messageReturn", async (id, msgToReturn) => {
 })
 
 function getUser(args){
-    let users = bot.users;
     console.log("getUser");
+    let users = bot.users;
     let returningUser = null;
     let user = users.filter(user => args.includes(user.id) || args.includes(user.username));
     if(user.size > 0) {
@@ -112,7 +112,8 @@ bot.registerCommand(text.REQUEST_COMMAND,async (msg, args) => {
             return;
         }
         const raw_user = args.join(" ").get(0);
-        const user = getUser(raw_user);
+        console.log(raw_user);
+        let user = getUser(raw_user);
         if (user == null) {
             bot.emit("messageReturn", msg.channel.id, text.COMMAND_SELECT_NO_USERS_ERROR);
             return;
