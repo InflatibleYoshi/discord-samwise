@@ -8,7 +8,6 @@ const bot = new Eris.CommandClient(token, {}, {
     owner: text.BOT_OWNER,
     prefix: "!"
 });
-const users = bot.users;
 
 let dbConnection;
 
@@ -22,6 +21,7 @@ bot.on("messageReturn", async (id, msgToReturn) => {
 })
 
 function getUser(args){
+    let users = bot.users;
     console.log("getUser");
     let returningUser = null;
     let user = users.filter(user => args.includes(user.id) || args.includes(user.username));
@@ -108,12 +108,14 @@ bot.registerCommand(text.REQUEST_COMMAND,async (msg, args) => {
         console.log(text.REQUEST_COMMAND);
         //Get first command.
         if (args == null) {
-            return text.COMMAND_SELECT_NO_USERS_ERROR
+            bot.emit("messageReturn", msg.channel.id, text.COMMAND_SELECT_NO_USERS_ERROR);
+            return;
         }
         const raw_user = args.join(" ").get(0);
         const user = getUser(raw_user);
         if (user == null) {
-            return text.COMMAND_SELECT_NO_USERS_ERROR
+            bot.emit("messageReturn", msg.channel.id, text.COMMAND_SELECT_NO_USERS_ERROR);
+            return;
         }
         console.log(user.username);
         await dbConnection.isUserExists(user).then((exists) => {
