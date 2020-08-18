@@ -115,6 +115,7 @@ bot.registerCommand(text.REQUEST_COMMAND,async (msg, args) => {
         if (user == null) {
             return text.COMMAND_SELECT_NO_USERS_ERROR
         }
+        console.log(user.username);
         await dbConnection.isUserExists(user).then((exists) => {
             if (!exists) {
                 bot.emit("messageReturn", msg.channel.id, text.COMMAND_SELECT_NO_USERS_ERROR);
