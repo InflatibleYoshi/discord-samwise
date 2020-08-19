@@ -111,9 +111,7 @@ bot.registerCommand(text.REQUEST_COMMAND,async (msg, args) => {
             bot.emit("messageReturn", msg.channel.id, text.COMMAND_SELECT_NO_USERS_ERROR);
             return;
         }
-        const raw_user = args.join(" ").get(0);
-        console.log(raw_user);
-        let user = getUser(raw_user);
+        let user = getUser(args);
         if (user == null) {
             bot.emit("messageReturn", msg.channel.id, text.COMMAND_SELECT_NO_USERS_ERROR);
             return;
