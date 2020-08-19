@@ -25,8 +25,7 @@ function getUser(args){
     let users = bot.users;
     let returningUser = null;
     let user = users.filter(user => args.includes(user.id) || args.includes(user.username));
-    console.log(user);
-    if(user.size > 0) {
+    if(user.length > 0) {
         returningUser = user.get(0);
         console.log(returningUser.username);
     }
