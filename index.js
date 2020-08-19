@@ -27,6 +27,7 @@ function getUser(args){
     let user = users.filter(user => args.includes(user.id) || args.includes(user.username));
     if(user.size > 0) {
         returningUser = user.get(0);
+        console.log(returningUser.username);
     }
     return returningUser
 }
