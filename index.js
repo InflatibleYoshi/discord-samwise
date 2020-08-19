@@ -23,7 +23,6 @@ bot.on("messageReturn", async (id, msgToReturn) => {
 function getUser(args){
     console.log("getUser");
     let users = bot.users;
-    console.log(users);
     let returningUser = null;
     let user = users.filter(user => args.includes(user.id) || args.includes(user.username));
     if(user.size > 0) {
