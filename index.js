@@ -26,7 +26,7 @@ function getUser(args){
     let returningUser = null;
     let user = users.filter(user => args.includes(user.id) || args.includes(user.username));
     if(user.length > 0) {
-        returningUser = user.get(0);
+        returningUser = user[0];
         console.log(returningUser.username);
     }
     return returningUser
