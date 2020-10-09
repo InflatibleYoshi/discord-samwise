@@ -1,41 +1,36 @@
-exports.BOT_DESCRIPTION = "A discord bot that brings community within arm's reach when dealing with destructive habits, or just for giving life updates.";
+exports.BOT_DESCRIPTION = "A discord bot that brings community within arm's reach when dealing with the lowest lows to giving life updates.";
 exports.BOT_OWNER = "InflatibleYoshi";
 
-exports.COMMAND_SELECT_NO_USERS_ERROR = "You did not match any registered users with your command.";
+exports.COMMAND_SELECT_NO_USERS_ERROR = "You did not match any users with your command.";
 exports.COMMAND_SELECT_CANCEL = "You have canceled the operation.";
 exports.COMMAND_ON_FELLOWSHIP_ADDING_RESPONSE = function(username) {return `You have been added to the fellowship of ${username}!`}
 exports.COMMAND_ON_FELLOWSHIP_TARGET_RESPONSE = function(username) {return `You have added ${username} to your fellowship!`}
 
-exports.REGISTER_RESPONSE = "This command is only available to registered users.";
-exports.REGISTER_COMMAND = "register";
-exports.REGISTER_COMMAND_RESPONSE = "If you would like to track the days you've spent dedicated towards a single goal such as being free from addiction or exercising daily, " +
-    "\ntype '!register date \"timestamp\" filling" +
-    "\n\"timestamp\" with the last day you partook in your habit or forgot a day in the format: " +
-    "\n'DD Mon YYYY HH:mm:ss TZ' (!register date 01 Jan 1970 00:00:00 GMT).\"" +
-    "Otherwise, type '!register silent' to register without tracking your day.";
-exports.REGISTER_COMMAND_DESCRIPTION = "Register User";
-exports.REGISTER_COMMAND_FULL_DESCRIPTION = "Register user to the database managed by the Samwise bot which contains all fellowship data.";
-exports.REGISTER_SILENT_SUBCOMMAND = "silent";
-exports.REGISTER_SILENT_SUBCOMMAND_DESCRIPTION = "Register user with tracking.";
-exports.REGISTER_SILENT_SUBCOMMAND_FULL_DESCRIPTION = "Register user to the Samwise bot without tracking.";
-exports.REGISTER_DATE_SUBCOMMAND = "date";
-exports.REGISTER_DATE_SUBCOMMAND_DESCRIPTION = "Register user with date selection.";
-exports.REGISTER_DATE_SUBCOMMAND_FULL_DESCRIPTION = "If you would like to track the days you've spent dedicated towards a single goal such as being free from addiction or exercising daily, " +
-    "\ntype '!register date \"timestamp\" filling" +
-    "\n\"timestamp\" with the last day you partook in your habit or forgot a day in the format: " +
-    "\n'DD Mon YYYY HH:mm:ss TZ' (!register date 01 Jan 1970 00:00:00 GMT).";
-exports.REGISTER_DATE_SUBCOMMAND_ALREADY_REGISTERED_WARNING = "You have already registered so this command will only overwrite your settings and not your current fellowship data.";
-exports.REGISTER_DATE_SUBCOMMAND_RETURN_STREAK = function(streak) {return `This puts your current streak at ${streak} days.\n Do you want to proceed with these options?`}
-exports.REGISTER_COMMAND_USER_CREATED = "Your user has been created/configured." +
-    "\nInvite people to join your fellowship and/or ask people to join theirs!";
-exports.REGISTER_COMMAND_USER_ABORTED = "The creation/configuration of your user was rejected.";
-
-exports.RESET_COMMAND = "reset";
+exports.TRACK_RESPONSE = "This command is only available to tracked users.";
+exports.TRACK_COMMAND = "track";
+exports.TRACK_COMMAND_DESCRIPTION = "The two subcommands available are \'date\' and \'reset\'.";
+exports.TRACK_COMMAND_FULL_DESCRIPTION = "The two subcommands available are \'date\' and \'reset\'. " +
+    "\nThe date command allows the user to track the days spent dedicated towards a single goal." +
+    "\nThe reset command allows the user to reset the date in the case of a relapse.";
+exports.TRACK_DATE_SUBCOMMAND = "date";
+exports.TRACK_DATE_SUBCOMMAND_DESCRIPTION = "Track user with user-entered start date.";
+exports.TRACK_DATE_SUBCOMMAND_FULL_DESCRIPTION = "If you would like to track the days you've spent dedicated towards a single goal such as being free from addiction, " +
+    "\ntype '!track date \"timestamp\" filling" +
+    "\n\"timestamp\" with your Day 1 as: \'DD Mon YYYY HH:mm:ss TZ\'" +
+    "e.g. !track date 01 Jan 1970 00:00:00 GMT";
+exports.TRACK_DATE_SUBCOMMAND_ALREADY_TRACKED_WARNING = "You are already tracked so this command will overwrite your maximum streak.";
+exports.TRACK_DATE_SUBCOMMAND_RETURN_STREAK = function(streak) {return `This puts your current streak at ${streak} days.\n Do you want to proceed with these options?`}
+exports.TRACK_DATE_SUBCOMMAND_USER_ABORTED = "Your tracking configuration was not saved.";
+exports.TRACK_DATE_SUBCOMMAND_USER_CONFIRMED = "Your tracking configuration was saved.";
+exports.TRACK_RESET_SUBCOMMAND = "reset";
+exports.TRACK_RESET_SUBCOMMAND_DESCRIPTION = "Reset tracked user's streak.";
+exports.TRACK_RESET_SUBCOMMAND_FULL_DESCRIPTION = "This command resets the tracked user's streak. This command requires no arguments.";
+exports.GENERATE_RESET = function() {return "Aw shucks, trust God and you'll get em next time."}
 
 exports.REQUEST_COMMAND = "request";
 exports.REQUEST_COMMAND_DESCRIPTION = "Request to join a user's fellowship.";
-exports.REQUEST_COMMAND_FULL_DESCRIPTION = "Request to join another user's fellowship by typing any amount " +
-    "of user id's or usernames separated by space to the right of the !request command";
+exports.REQUEST_COMMAND_FULL_DESCRIPTION = "Request to join another user's fellowship by typing" +
+    "!request <user-id/username>";
 exports.REQUEST_COMMAND_ON_FELLOWSHIP_ADDING_REQUEST = function(username) {return `You have sent your request to ${username}!`}
 exports.REQUEST_COMMAND_ON_FELLOWSHIP_TARGET_REQUEST = function(username) {return `${username} has requested to join your fellowship!\n
 Use the reaction buttons to choose whether or not to accept or decline the request.`}
@@ -56,7 +51,7 @@ exports.KICK_COMMAND = "kick";
 exports.KICK_COMMAND_DESCRIPTION = "Kick a user from your fellowship";
 exports.KICK_COMMAND_FULL_DESCRIPTION = "Kick a user from your fellowship by typing any amount " +
     "of user id's or usernames separated by space to the right of the !kick command";
-exports.KICK_COMMAND_ON_KICK = function(users) {return `You have decided to remove ${users.toString()} from your fellowship.\n" +
+exports.KICK_COMMAND_ON_KICK = function(username) {return `You have decided to remove ${username} from your fellowship.\n" +
 "Use the reaction buttons to choose whether or not to go through with the kick.`}
 exports.KICK_COMMAND_SUCCESS_RESPONSE = function(username) {return `You have removed ${username} from your fellowship.`}
 exports.KICK_COMMAND_NOT_IN_FELLOWSHIP_ERROR = function(username) {return `${username} was not part of your fellowship to begin with.`}
@@ -65,7 +60,7 @@ exports.LEAVE_COMMAND = "leave";
 exports.LEAVE_COMMAND_DESCRIPTION = "Leave a fellowship";
 exports.LEAVE_COMMAND_FULL_DESCRIPTION = "Leave a fellowships fellowship by typing any amount " +
     "of user id's or usernames separated by space to the right of the !leave command";
-exports.LEAVE_COMMAND_ON_LEAVE = function(users) {return `You have decided to leave the fellowship(s) of ${users.toString()}.\n" +
+exports.LEAVE_COMMAND_ON_LEAVE = function(username) {return `You have decided to leave the fellowship(s) of ${username}.\n" +
 "Use the reaction buttons to choose whether or not to leave.`}
 exports.LEAVE_COMMAND_SUCCESS_RESPONSE = function(username) {return `You have left ${username}'s fellowship.`}
 exports.LEAVE_COMMAND_NOT_IN_FELLOWSHIP_ERROR = function(username) {return `You were not part of ${username}'s fellowship to begin with.`}

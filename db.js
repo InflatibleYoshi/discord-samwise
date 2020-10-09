@@ -19,6 +19,9 @@ class database {
     }
 
     async isUserInFellowship(user, target){
+        if(user.id === target.id){
+            return false;
+        }
         console.log("dbIsUserInFellowship");
         return this.client.sismember(target.id.toString() + FELLOWSHIP, user.id.toString()).then((result) => {
             return result == 1
@@ -41,22 +44,22 @@ class database {
         await this.client.sadd(USERS, user.id.toString());
     }
 
-    async addToFellowship(target, user, successHandler, failureHandler){
+    async addToFellowship(user, owner, successHandler, failureHandler){
         console.log("dbAddToFellowship");
-        await this.client.sadd(user.id.toString() + FELLOWSHIP, target.id.toString()).then((result) => {
+        await this.client.sadd(owner.id.toString() + FELLOWSHIP, user.id.toString()).then((result) => {
             if(result === 0) throw ''
-            return this.client.sadd(target.id.toString() + MEMBERSHIP, user.id.toString());
+            return this.client.sadd(user.id.toString() + MEMBERSHIP, owner.id.toString());
         }).then((result) =>{
             if(result == 0) throw '';
         }).then(successHandler, failureHandler);
     }
 
-    async removeFromFellowship(target, user, successHandler, failureHandler){
+    async removeFromFellowship(user, owner, successHandler, failureHandler){
         console.log("dbRemoveFromFellowship")
-        await this.client.srem(user.id.toString() + FELLOWSHIP, target.id.toString()).then((result) => {
+        await this.client.srem(owner.id.toString() + FELLOWSHIP, user.id.toString()).then((result) => {
             if(result == 0) throw ''
 
-            return this.client.srem(target.id.toString() + MEMBERSHIP, user.id.toString());
+            return this.client.srem(user.id.toString() + MEMBERSHIP, owner.id.toString());
         }).then((result) =>{
             if(result == 0) throw '';
         }).then(successHandler, failureHandler);
