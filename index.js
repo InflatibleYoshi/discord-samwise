@@ -18,13 +18,13 @@ bot.on("ready", () => {
 
 bot.on("messageReturn", async (id, msgToReturn) => {
     await bot.createMessage(id, msgToReturn);
-})
+});
 
 function getUser(args, msg) {
     console.log("getUser");
     let users = bot.users;
     let returningUser = null;
-    let user = users.filter((user => args.includes(user.id) || args.includes(user.username)) && !args.includes(msg.author.id));
+    let user = users.filter(user => (args.includes(user.id) || args.includes(user.username)) && !args.includes(msg.author.id));
     if (user.length > 0) {
         returningUser = user[0];
         console.log(returningUser.username);
