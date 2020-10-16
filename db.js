@@ -19,12 +19,13 @@ class database {
         });
     }
 
-    async isUserInFellowship(user, target){
-        if(user.id === target.id){
+    async isUserInFellowship(user, owner){
+        if(user.id === owner.id){
             return false;
         }
         console.log("dbIsUserInFellowship");
-        return this.client.sismember(target.id.toString() + FELLOWSHIP, user.id.toString()).then((result) => {
+        console.log(`SISMEMBER ${owner.id.toString() + FELLOWSHIP} ${user.id.toString()}`);
+        return this.client.sismember(owner.id.toString() + FELLOWSHIP, user.id.toString()).then((result) => {
             return result == 1
         });
     }
