@@ -142,7 +142,7 @@ bot.registerCommand(text.REQUEST_COMMAND, async (msg, args) => {
                                         await user_message.delete();
                                         bot.off("messageReactionAdd", fellowshipEventListener);
                                     } else if (emoji.name === '✅') {
-                                        await dbConnection.addToFellowship(user, msg.author, onFellowshipAdd, failureHandler);
+                                        await dbConnection.addToFellowship(msg.author, user, onFellowshipAdd, failureHandler);
                                         await user_message.delete();
                                         bot.off("messageReactionAdd", fellowshipEventListener);
                                     }
@@ -245,7 +245,7 @@ bot.registerCommand(text.KICK_COMMAND, async (msg, args) => {
                                     await message.delete();
                                     bot.off("messageReactionAdd", fellowshipEventListener);
                                 } else if (emoji.name === '✅') {
-                                    await dbConnection.removeFromFellowship(msg.author, user, onFellowshipRemove, failureHandler);
+                                    await dbConnection.removeFromFellowship(user, msg.author, onFellowshipRemove, failureHandler);
                                     await message.delete();
                                     bot.off("messageReactionAdd", fellowshipEventListener);
 
@@ -290,7 +290,7 @@ bot.registerCommand(text.LEAVE_COMMAND, async (msg, args) => {
                                     await message.delete();
                                     bot.off("messageReactionAdd", fellowshipEventListener);
                                 } else if (emoji.name === '✅') {
-                                    await dbConnection.removeFromFellowship(user, msg.author, onFellowshipRemove, failureHandler);
+                                    await dbConnection.removeFromFellowship(msg.author, user, onFellowshipRemove, failureHandler);
                                     await message.delete();
                                     bot.off("messageReactionAdd", fellowshipEventListener);
                                 }
