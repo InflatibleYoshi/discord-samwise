@@ -309,6 +309,7 @@ bot.registerCommand(text.LEAVE_COMMAND, async (msg, args) => {
 
 bot.registerCommand(text.GET_MEMBERSHIP_COMMAND, async (msg) => {
     let successHandler = function (users) {
+        console.log(users);
         bot.emit("messageReturn", msg.channel.id, getUsernames(users));
     }
     let failureHandler = function (_error) {
@@ -323,6 +324,7 @@ bot.registerCommand(text.GET_MEMBERSHIP_COMMAND, async (msg) => {
 
 bot.registerCommand(text.GET_FELLOWSHIP_COMMAND, async (msg) => {
     let successHandler = function (users) {
+        console.log(users);
         bot.emit("messageReturn", msg.channel.id, getUsernames(users));
     }
     let failureHandler = function (_error) {

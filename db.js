@@ -90,12 +90,14 @@ class database {
         console.log(`SMEMBERS ${user.id.toString() + MEMBERSHIP}`);
         await this.client.smembers(user.id.toString() + MEMBERSHIP).then((array) =>{
             if(array.length === 0) throw ''
+            return array
         }).then(successHandler, failureHandler);
     }
     async getFellowship(user, successHandler, failureHandler){
         console.log(`SMEMBERS ${user.id.toString() + FELLOWSHIP}`);
         await this.client.smembers(user.id.toString() + FELLOWSHIP).then((array) =>{
             if(array.length === 0) throw ''
+            return array
         }).then(successHandler, failureHandler);
     }
 }
