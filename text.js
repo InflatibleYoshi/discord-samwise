@@ -42,7 +42,7 @@ exports.INVITE_COMMAND_DESCRIPTION = "Invite another user to your fellowship.";
 exports.INVITE_COMMAND_FULL_DESCRIPTION = "Invite users to your fellowship by typing any amount " +
     "of user id's or usernames separated by space to the right of the !request command. Use";
 exports.INVITE_COMMAND_ON_FELLOWSHIP_ADDING_INVITE = function(username) {return `${username} has asked you to join his/her/its fellowship!\n" +
-"Use the reaction buttons to choose whether or not to accept or decline the invite!`};
+"Use the reaction buttons to choose whether or not to accept or decline the invite!`}
 exports.INVITE_COMMAND_ON_FELLOWSHIP_TARGET_INVITE = function(username) {return `You have invited ${username} to join your fellowship!`}
 exports.INVITE_COMMAND_ALREADY_IN_FELLOWSHIP_ERROR_PRE = function(username) {return `${username} is already in your fellowship.`}
 exports.INVITE_COMMAND_ALREADY_IN_FELLOWSHIP_ERROR_POST = function(username) {return `You are already in ${username}'s fellowship.`}
@@ -51,8 +51,8 @@ exports.KICK_COMMAND = "kick";
 exports.KICK_COMMAND_DESCRIPTION = "Kick a user from your fellowship";
 exports.KICK_COMMAND_FULL_DESCRIPTION = "Kick a user from your fellowship by typing any amount " +
     "of user id's or usernames separated by space to the right of the !kick command";
-exports.KICK_COMMAND_ON_KICK = function(username) {return `You have decided to remove ${username} from your fellowship.\n" +
-"Use the reaction buttons to choose whether or not to go through with the kick.`}
+exports.KICK_COMMAND_ON_KICK = function(username) {return `You have decided to remove ${username} from your fellowship.
+Use the reaction buttons to confirm or deny.`}
 exports.KICK_COMMAND_SUCCESS_RESPONSE = function(username) {return `You have removed ${username} from your fellowship.`}
 exports.KICK_COMMAND_NOT_IN_FELLOWSHIP_ERROR = function(username) {return `${username} was not part of your fellowship to begin with.`}
 
@@ -60,8 +60,8 @@ exports.LEAVE_COMMAND = "leave";
 exports.LEAVE_COMMAND_DESCRIPTION = "Leave a fellowship";
 exports.LEAVE_COMMAND_FULL_DESCRIPTION = "Leave a fellowships fellowship by typing any amount " +
     "of user id's or usernames separated by space to the right of the !leave command";
-exports.LEAVE_COMMAND_ON_LEAVE = function(username) {return `You have decided to leave the fellowship(s) of ${username}.\n" +
-"Use the reaction buttons to choose whether or not to leave.`}
+exports.LEAVE_COMMAND_ON_LEAVE = function(username) {return `You have decided to leave the fellowship(s) of ${username}.
+Use the reaction buttons to confirm or deny.`}
 exports.LEAVE_COMMAND_SUCCESS_RESPONSE = function(username) {return `You have left ${username}'s fellowship.`}
 exports.LEAVE_COMMAND_NOT_IN_FELLOWSHIP_ERROR = function(username) {return `You were not part of ${username}'s fellowship to begin with.`}
 exports.GENERATE_RESET = function() {return "Aw shucks, trust God and you'll get em next time"}
