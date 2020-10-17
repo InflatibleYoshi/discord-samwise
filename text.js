@@ -41,8 +41,8 @@ exports.INVITE_COMMAND = "invite";
 exports.INVITE_COMMAND_DESCRIPTION = "Invite another user to your fellowship.";
 exports.INVITE_COMMAND_FULL_DESCRIPTION = "Invite users to your fellowship by typing any amount " +
     "of user id's or usernames separated by space to the right of the !request command. Use";
-exports.INVITE_COMMAND_ON_FELLOWSHIP_ADDING_INVITE = function(username) {return `${username} has asked you to join his/her/its fellowship!\n" +
-"Use the reaction buttons to choose whether or not to accept or decline the invite!`}
+exports.INVITE_COMMAND_ON_FELLOWSHIP_ADDING_INVITE = function(username) {return `${username} has asked you to join his/her/its fellowship!
+Use the reaction buttons to choose whether or not to accept or decline the invite!`}
 exports.INVITE_COMMAND_ON_FELLOWSHIP_TARGET_INVITE = function(username) {return `You have invited ${username} to join your fellowship!`}
 exports.INVITE_COMMAND_ALREADY_IN_FELLOWSHIP_ERROR_PRE = function(username) {return `${username} is already in your fellowship.`}
 exports.INVITE_COMMAND_ALREADY_IN_FELLOWSHIP_ERROR_POST = function(username) {return `You are already in ${username}'s fellowship.`}
