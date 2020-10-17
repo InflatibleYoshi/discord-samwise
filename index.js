@@ -38,6 +38,7 @@ function getUsernames(args) {
     console.log("getUsernames");
     let users = bot.users;
     let user = users.filter(user => args.includes(user.id) || args.includes(user.username));
+    console.log(user.map(user => user.username));
     return user.map(user => user.username);
 }
 
