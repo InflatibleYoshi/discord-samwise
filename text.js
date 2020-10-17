@@ -29,8 +29,8 @@ exports.GENERATE_RESET = function() {return "Aw shucks, trust God and you'll get
 
 exports.REQUEST_COMMAND = "request";
 exports.REQUEST_COMMAND_DESCRIPTION = "Request to join a user's fellowship.";
-exports.REQUEST_COMMAND_FULL_DESCRIPTION = "Request to join another user's fellowship by typing" +
-    "!request <user-id/username>";
+exports.REQUEST_COMMAND_FULL_DESCRIPTION = "Request to join another user's fellowship by typing that user's" +
+    "username or user id to the right of the !request command.";
 exports.REQUEST_COMMAND_ON_FELLOWSHIP_ADDING_REQUEST = function(username) {return `You have sent your request to ${username}!`}
 exports.REQUEST_COMMAND_ON_FELLOWSHIP_TARGET_REQUEST = function(username) {return `${username} has requested to join your fellowship!\n
 Use the reaction buttons to choose whether or not to accept or decline the request.`}
@@ -39,8 +39,8 @@ exports.REQUEST_COMMAND_ALREADY_IN_FELLOWSHIP_ERROR_POST = function(username) {r
 
 exports.INVITE_COMMAND = "invite";
 exports.INVITE_COMMAND_DESCRIPTION = "Invite another user to your fellowship.";
-exports.INVITE_COMMAND_FULL_DESCRIPTION = "Invite users to your fellowship by typing any amount " +
-    "of user id's or usernames separated by space to the right of the !request command. Use";
+exports.INVITE_COMMAND_FULL_DESCRIPTION = "Invite a user to your fellowship by typing that user's" +
+    "username or user id to the right of the !invite command.";
 exports.INVITE_COMMAND_ON_FELLOWSHIP_ADDING_INVITE = function(username) {return `${username} has asked you to join his/her/its fellowship!
 Use the reaction buttons to choose whether or not to accept or decline the invite!`}
 exports.INVITE_COMMAND_ON_FELLOWSHIP_TARGET_INVITE = function(username) {return `You have invited ${username} to join your fellowship!`}
@@ -49,8 +49,8 @@ exports.INVITE_COMMAND_ALREADY_IN_FELLOWSHIP_ERROR_POST = function(username) {re
 
 exports.KICK_COMMAND = "kick";
 exports.KICK_COMMAND_DESCRIPTION = "Kick a user from your fellowship";
-exports.KICK_COMMAND_FULL_DESCRIPTION = "Kick a user from your fellowship by typing any amount " +
-    "of user id's or usernames separated by space to the right of the !kick command";
+exports.KICK_COMMAND_FULL_DESCRIPTION = "Kick a user from your fellowship by typing that user's" +
+    "username or user id to the right of the !kick command";
 exports.KICK_COMMAND_ON_KICK = function(username) {return `You have decided to remove ${username} from your fellowship.
 Use the reaction buttons to confirm or deny.`}
 exports.KICK_COMMAND_SUCCESS_RESPONSE = function(username) {return `You have removed ${username} from your fellowship.`}
@@ -58,10 +58,20 @@ exports.KICK_COMMAND_NOT_IN_FELLOWSHIP_ERROR = function(username) {return `${use
 
 exports.LEAVE_COMMAND = "leave";
 exports.LEAVE_COMMAND_DESCRIPTION = "Leave a fellowship";
-exports.LEAVE_COMMAND_FULL_DESCRIPTION = "Leave a fellowships fellowship by typing any amount " +
-    "of user id's or usernames separated by space to the right of the !leave command";
+exports.LEAVE_COMMAND_FULL_DESCRIPTION = "Leave a user's fellowship by typing that user's" +
+    "username or user id to the right of the !leave command";
 exports.LEAVE_COMMAND_ON_LEAVE = function(username) {return `You have decided to leave the fellowship(s) of ${username}.
 Use the reaction buttons to confirm or deny.`}
 exports.LEAVE_COMMAND_SUCCESS_RESPONSE = function(username) {return `You have left ${username}'s fellowship.`}
 exports.LEAVE_COMMAND_NOT_IN_FELLOWSHIP_ERROR = function(username) {return `You were not part of ${username}'s fellowship to begin with.`}
 exports.GENERATE_RESET = function() {return "Aw shucks, trust God and you'll get em next time"}
+
+exports.GET_MEMBERSHIP_COMMAND = "getMembership";
+exports.GET_MEMBERSHIP_COMMAND_DESCRIPTION = " Get a list of your membership.";
+exports.GET_MEMBERSHIP_COMMAND_FULL_DESCRIPTION = " Get a list of all the peoples' fellowships that you are a part of.";
+exports.GET_MEMBERSHIP_COMMAND_ERROR = "You are not a part of any user's fellowships."
+
+exports.GET_FELLOWSHIP_COMMAND = "getFellowship";
+exports.GET_FELLOWSHIP_COMMAND_DESCRIPTION = "Get a list of users in your fellowship.";
+exports.GET_FELLOWSHIP_COMMAND_FULL_DESCRIPTION = "Get a list of all the users in your fellowship.";
+exports.GET_FELLOWSHIP_COMMAND_ERROR = "Your fellowship is empty."

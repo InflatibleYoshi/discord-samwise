@@ -36,7 +36,7 @@ class database {
 
     async addUser(user, streak_start, streak_length) {
         console.log("dbAddUser");
-        console.log(`HSET ${user.id.toString()} streak_current -1 streak_max -1`);
+        console.log(`HSET ${user.id.toString()} streak_current ${streak_start} streak_max ${streak_length}`);
         await this.client.hset(user.id.toString(), "streak_current", streak_start, "streak_max", streak_length);
         console.log(`SADD users ${user.id.toString()}`);
         await this.client.sadd(USERS, user.id.toString());
@@ -86,11 +86,17 @@ class database {
         }).then(successHandler, failureHandler);
     }
 
-    async getMembership(user){
-        await this.client.smembers(user.id.toString() + MEMBERSHIP);
+    async getMembership(user, successHandler, failureHandler){
+        console.log(`SMEMBERS ${user.id.toString() + MEMBERSHIP}`);
+        await this.client.smembers(user.id.toString() + MEMBERSHIP).then((array) =>{
+            if(array.length === 0) throw ''
+        }).then(successHandler, failureHandler);
     }
-    async getFellowship(user){
-        await this.client.smembers(user.id.toString() + FELLOWSHIP);
+    async getFellowship(user, successHandler, failureHandler){
+        console.log(`SMEMBERS ${user.id.toString() + FELLOWSHIP}`);
+        await this.client.smembers(user.id.toString() + FELLOWSHIP).then((array) =>{
+            if(array.length === 0) throw ''
+        }).then(successHandler, failureHandler);
     }
 }
 

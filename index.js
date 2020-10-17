@@ -35,7 +35,7 @@ function getUser(args, msg) {
 }
 
 function getUsernames(args) {
-    console.log("getUser");
+    console.log("getUsernames");
     let users = bot.users;
     let user = users.filter(user => args.includes(user.id) || args.includes(user.username));
     return user.map(user => user.username);
@@ -82,7 +82,6 @@ tracking.registerSubcommand(text.TRACK_DATE_SUBCOMMAND, async (msg, args) => {
                 message.addReaction('✅');
                 message.addReaction('❌');
                 userEventListener = function (user_msg, emoji, id) {
-                    console.log(emoji);
                     if (user_msg.id === message.id && id === msg.author.id) {
                         if (emoji.name === '❌') {
                             bot.emit("messageReturn", msg.channel.id, text.TRACK_DATE_SUBCOMMAND_USER_ABORTED);
@@ -137,7 +136,6 @@ bot.registerCommand(text.REQUEST_COMMAND, async (msg, args) => {
                             user_message.addReaction('✅');
                             user_message.addReaction('❌');
                             fellowshipEventListener = async function (user_msg, emoji, id) {
-                                console.log(emoji);
                                 if (user_msg.id === user_message.id && id === user.id) {
                                     if (emoji.name === '❌') {
                                         await user_message.delete();
@@ -182,8 +180,8 @@ bot.registerCommand(text.INVITE_COMMAND, async (msg, args) => {
                     return bot.getDMChannel(user.id)
                         .then((channel) => {
                             onFellowshipAdd = function (_user) {
-                                bot.emit("messageReturn", msg.channel.id, text.COMMAND_ON_FELLOWSHIP_TARGET_RESPONSE(msg.author.username));
-                                bot.emit("messageReturn", channel.id, text.COMMAND_ON_FELLOWSHIP_ADDING_RESPONSE(user.username));
+                                bot.emit("messageReturn", msg.channel.id, text.COMMAND_ON_FELLOWSHIP_TARGET_RESPONSE(user.username));
+                                bot.emit("messageReturn", channel.id, text.COMMAND_ON_FELLOWSHIP_ADDING_RESPONSE(msg.author.username));
                             };
                             failureHandler = function (_error) {
                                 bot.emit("messageReturn", channel.id, text.INVITE_COMMAND_ALREADY_IN_FELLOWSHIP_ERROR_POST(msg.author.username));
@@ -195,7 +193,6 @@ bot.registerCommand(text.INVITE_COMMAND, async (msg, args) => {
                             user_message.addReaction('✅');
                             user_message.addReaction('❌');
                             fellowshipEventListener = async function (user_msg, emoji, id) {
-                                console.log(emoji);
                                 if (user_msg.id === user_message.id && id === user.id) {
                                     if (emoji.name === '❌') {
                                         await user_message.delete();
@@ -242,7 +239,6 @@ bot.registerCommand(text.KICK_COMMAND, async (msg, args) => {
                                 bot.emit("messageReturn", msg.channel.id, text.KICK_COMMAND_NOT_IN_FELLOWSHIP_ERROR(user.username));
                             };
                             let fellowshipEventListener = async function (user_msg, emoji, id) {
-                                console.log(emoji);
                                 if (user_msg.id === message.id && id === msg.author.id) {
                                     if (emoji.name === '❌') {
                                         await message.delete();
@@ -289,7 +285,6 @@ bot.registerCommand(text.LEAVE_COMMAND, async (msg, args) => {
                                 bot.emit("messageReturn", msg.channel.id, text.LEAVE_COMMAND_NOT_IN_FELLOWSHIP_ERROR(user.username));
                             }
                             let fellowshipEventListener = async function (user_msg, emoji, id) {
-                                console.log(emoji);
                                 if (user_msg.id === message.id && id === msg.author.id) {
                                     if (emoji.name === '❌') {
                                         await message.delete();
@@ -311,12 +306,32 @@ bot.registerCommand(text.LEAVE_COMMAND, async (msg, args) => {
         fullDescription: text.LEAVE_COMMAND_FULL_DESCRIPTION
     });
 
-bot.registerCommand("getMembership", async (msg) => {
-    bot.emit("messageReturn", msg.channel.id, getUsernames(await dbConnection.getMembership(msg.author)));
-});
+bot.registerCommand(text.GET_MEMBERSHIP_COMMAND, async (msg) => {
+    let successHandler = function (users) {
+        bot.emit("messageReturn", msg.channel.id, getUsernames(users));
+    }
+    let failureHandler = function (_error) {
+        bot.emit("messageReturn", msg.channel.id, text.GET_MEMBERSHIP_COMMAND_ERROR);
+    }
+    await dbConnection.getMembership(msg.author, successHandler, failureHandler)
+},
+    {
+        description: text.GET_MEMBERSHIP_DESCRIPTION,
+        fullDescription: text.GET_MEMBERSHIP_FULL_DESCRIPTION
+    });
 
-bot.registerCommand("getFellowship", async (msg) => {
-    bot.emit("messageReturn", msg.channel.id, getUsernames(await dbConnection.getFellowship(msg.author)));
-});
+bot.registerCommand(text.GET_FELLOWSHIP_COMMAND, async (msg) => {
+    let successHandler = function (users) {
+        bot.emit("messageReturn", msg.channel.id, getUsernames(users));
+    }
+    let failureHandler = function (_error) {
+        bot.emit("messageReturn", msg.channel.id, text.GET_FELLOWSHIP_COMMAND_ERROR);
+    }
+    await dbConnection.getFellowship(msg.author, successHandler, failureHandler)
+},
+    {
+        description: text.GET_FELLOWSHIP_DESCRIPTION,
+        fullDescription: text.GET_FELLOWSHIP_FULL_DESCRIPTION
+    });
 
 bot.connect();
