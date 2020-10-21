@@ -1,17 +1,17 @@
 export function Error(command, text) {
-    return embedGenerator(sentenceTruncation(text), color.RED, command)
+    return embedGenerator(sentenceTruncation(text), color.RED, command);
 }
 export function Command(command, text) {
-    return embedGenerator(sentenceTruncation(text), color.YELLOW, command)
+    return embedGenerator(sentenceTruncation(text), color.YELLOW, command);
 }
 export function Response(command, text) {
-    return embedGenerator(sentenceTruncation(text), color.GREEN, command)
+    return embedGenerator(sentenceTruncation(text), color.GREEN, command);
 }
 export function Alert(username, text) {
-    return embedGenerator(sentenceTruncation(text), color.ORANGE, username)
+    return embedGenerator(sentenceTruncation(text), color.ORANGE, username);
 }
 
-const embed = {
+const color = {
     RED: 16711680,
     YELLOW: 16776960,
     GREEN: 65280,
