@@ -324,10 +324,10 @@ bot.registerCommand(text.GET_MEMBERSHIP_COMMAND, async (msg) => {
 
 bot.registerCommand(text.GET_FELLOWSHIP_COMMAND, async (msg) => {
     let successHandler = function (users) {
-        bot.emit("messageReturn", msg.channel.id, embed.Response(text.GET_FELLOWSHIP_COMMAND, getUsernames(users).toString()));
+        bot.emit("messageReturn", msg.channel.id, embed.response(text.GET_FELLOWSHIP_COMMAND, getUsernames(users).toString()));
     }
     let failureHandler = function (_error) {
-        bot.emit("messageReturn", msg.channel.id, embed.Response(text.GET_FELLOWSHIP_COMMAND, text.GET_FELLOWSHIP_COMMAND_ERROR));
+        bot.emit("messageReturn", msg.channel.id, embed.response(text.GET_FELLOWSHIP_COMMAND, text.GET_FELLOWSHIP_COMMAND_ERROR));
     }
     await dbConnection.getFellowship(msg.author, successHandler, failureHandler)
 },

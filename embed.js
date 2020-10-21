@@ -1,15 +1,15 @@
-export function Error(command, text) {
+exports.error = function(command, text) {
     return embedGenerator(sentenceTruncation(text), color.RED, command);
-}
-export function Command(command, text) {
+};
+exports.command = function(command, text) {
     return embedGenerator(sentenceTruncation(text), color.YELLOW, command);
-}
-export function Response(command, text) {
+};
+exports.response = function(command, text) {
     return embedGenerator(sentenceTruncation(text), color.GREEN, command);
-}
-export function Alert(username, text) {
+};
+exports.alert = function(username, text) {
     return embedGenerator(sentenceTruncation(text), color.ORANGE, username);
-}
+};
 
 const color = {
     RED: 16711680,
