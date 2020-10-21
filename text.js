@@ -75,3 +75,11 @@ exports.GET_FELLOWSHIP_COMMAND = "getFellowship";
 exports.GET_FELLOWSHIP_COMMAND_DESCRIPTION = "Get a list of users in your fellowship.";
 exports.GET_FELLOWSHIP_COMMAND_FULL_DESCRIPTION = "Get a list of all the users in your fellowship.";
 exports.GET_FELLOWSHIP_COMMAND_ERROR = "Your fellowship is empty."
+
+exports.NOTIFY_COMMAND = "notify";
+exports.NOTIFY_COMMAND_DESCRIPTION = "Notify all the members of your fellowship";
+exports.NOTIFY_COMMAND_FULL_DESCRIPTION = "When you have a struggle or fun thing to share with your fellowship, use the !notify command to initiate the message."
+exports.NOTIFY_COMMAND_INITIALIZATION =  "Type in the chat below to the bot and once you are finished writing your message," +
+    " click on the check emoji to finalize the message. You'll have a chance to review it before sending."
+exports.NOTIFY_COMMAND_FINALIZATION = "You have finished your message, do you want to send it?"
+exports.NOTIFY_COMMAND_SUCCESS = "You have successfully sent your message to your fellowship!"

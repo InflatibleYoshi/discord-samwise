@@ -1,6 +1,7 @@
 const Eris = require('eris');
 const Chrono = require('chrono-node');
-const text = require('./text.js')
+const embed = require('./embed.js');
+const text = require('./text.js');
 const db = require('./db.js');
 const {token} = require('./variables');
 const bot = new Eris.CommandClient(token, {}, {
@@ -16,7 +17,7 @@ bot.on("ready", () => {
     console.log("Ready! Database initialized.");
 });
 
-bot.on("messageReturn", async (id, msgToReturn) => {
+bot.on("messageReturn", async (id, msgToReturn, color) => {
     await bot.createMessage(id, msgToReturn);
 });
 
@@ -323,10 +324,10 @@ bot.registerCommand(text.GET_MEMBERSHIP_COMMAND, async (msg) => {
 
 bot.registerCommand(text.GET_FELLOWSHIP_COMMAND, async (msg) => {
     let successHandler = function (users) {
-        bot.emit("messageReturn", msg.channel.id, getUsernames(users).toString());
+        bot.emit("messageReturn", msg.channel.id, embed.Response(text.GET_FELLOWSHIP_COMMAND, getUsernames(users).toString()));
     }
     let failureHandler = function (_error) {
-        bot.emit("messageReturn", msg.channel.id, text.GET_FELLOWSHIP_COMMAND_ERROR);
+        bot.emit("messageReturn", msg.channel.id, embed.Response(text.GET_FELLOWSHIP_COMMAND, text.GET_FELLOWSHIP_COMMAND_ERROR));
     }
     await dbConnection.getFellowship(msg.author, successHandler, failureHandler)
 },
@@ -334,5 +335,34 @@ bot.registerCommand(text.GET_FELLOWSHIP_COMMAND, async (msg) => {
         description: text.GET_FELLOWSHIP_DESCRIPTION,
         fullDescription: text.GET_FELLOWSHIP_FULL_DESCRIPTION
     });
+
+// bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
+//     bot.emit("messageReturn", msg.channel.id, text.NOTIFY);
+//     let userMessageList = [];
+//     let notifyMessageIngest = async function (user_msg, emoji, id) {
+//         if (user_msg.id === user_message.id && id === user.id) {
+//             if (emoji.name === '❌') {
+//                 await user_message.delete();
+//                 bot.off("messageReactionAdd", notifyMessageIngest);
+//             } else if (emoji.name === '✅') {
+//
+//                 await user_message.delete();
+//                 bot.off("messageReactionAdd", notifyMessageIngest);
+//             }
+//         }
+//     }
+//     bot.on("messageCreate", notifyMessageIngest);
+//     let messageIngest = async function (message) {
+//         userMessageList.push(message);
+//         if (message.content.startsWith("!")) {
+//             await Promise.all(userMessageList).delete();
+//             bot.off("messageCreate", messageIngest);
+//         }
+//     }
+//     bot.on("messageCreate", messageIngest);
+// })
+
+
+
 
 bot.connect();
