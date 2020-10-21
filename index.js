@@ -220,7 +220,7 @@ bot.registerCommand(text.KICK_COMMAND, async (msg, args) => {
         console.log(text.KICK_COMMAND);
         //Get list of all users included in the arguments.
         if (args.length === 0) {
-            bot.emit("messageReturn", msg.channel.id, embed.error(text.KICK_COMMAND, text.COMMAND_SELECT_NO_USERS_ERROR);
+            bot.emit("messageReturn", msg.channel.id, embed.error(text.KICK_COMMAND, text.COMMAND_SELECT_NO_USERS_ERROR));
             return;
         }
         let user = getUser(args, msg);
