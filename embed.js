@@ -1,11 +1,11 @@
 exports.error = function(command, text) {
-    return embedGenerator(sentenceTruncation(text), color.RED, command);
+    return embedGenerator([text], color.RED, command);
 };
 exports.command = function(command, text) {
-    return embedGenerator(sentenceTruncation(text), color.YELLOW, command);
+    return embedGenerator([text], color.YELLOW, command);
 };
 exports.response = function(command, text) {
-    return embedGenerator(sentenceTruncation(text), color.GREEN, command);
+    return embedGenerator([text], color.GREEN, command);
 };
 exports.alert = function(username, text) {
     return embedGenerator(sentenceTruncation(text), color.ORANGE, username);
@@ -22,7 +22,7 @@ function sentenceTruncation(paragraph){
     let chars = 0;
     let subsections = [];
     var section = '';
-    for (sentence of paragraph.split('.').map(x => x + '.')){
+    for (sentence of paragraph.split(' ').map(x => x + ' ')){
         chars += sentence.length;
         if(chars > 999){
             subsections.push(section.trim());
