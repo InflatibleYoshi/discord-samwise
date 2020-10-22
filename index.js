@@ -390,7 +390,7 @@ bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
                 handlerList.push("messageReactionAdd", messageSendTrigger);
             });
     };
-    dbConnection.getMembership(msg.author.id, fellowshipNotEmpty, fellowshipEmpty);
+    await dbConnection.getMembership(msg.author.id, fellowshipNotEmpty, fellowshipEmpty);
 });
 
 bot.connect();
