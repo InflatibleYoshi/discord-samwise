@@ -345,16 +345,18 @@ bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
     };
     let fellowshipNotEmpty = function (users) {
         console.log("fellowship not empty");
+        console.log(users);
         let userMessageList = [];
         let handlerList = {};
         let messageIngest = async function (message) {
-            userMessageList.push(message);
             if (message.content.startsWith("!")) {
                 await Promise.all(userMessageList).delete();
-                bot.emit("messageReturn", msg.channel.id, embed.response(text.NOTIFY_COMMAND, getUsernames(users).toString()));
+                bot.emit("messageReturn", msg.channel.id, embed.response(text.NOTIFY_COMMAND, text.NOTIFY_COMMAND_OVERRIDDEN_CANCELLATION));
                 for(const[key, value] of Object.entries(handlerList)){
                     bot.off(key, value)
                 }
+            } else{
+                userMessageList.push(message);
             }
         };
         bot.on("messageCreate", messageIngest);
@@ -370,7 +372,7 @@ bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
                         if (emoji.name === '❌') {
                             await Promise.all(userMessageList).delete();
                             for(const[key, value] of Object.entries(handlerList)){
-                                bot.off(key, value)
+                                bot.off(key, value);
                             }
                         } else if (emoji.name === '✅') {
                             let userNotification = ""
@@ -384,7 +386,7 @@ bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
                             }
                             await Promise.all(userMessageList).delete();
                             for(const[key, value] of Object.entries(handlerList)){
-                               bot.off(key, value)
+                               bot.off(key, value);
                             }
                         }
                     }
