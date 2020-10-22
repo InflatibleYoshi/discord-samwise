@@ -384,6 +384,7 @@ bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
                             for (userMessage of userMessageList) {
                                 userNotification.concat(userMessage.content);
                             }
+                            console.log(userNotification);
                             for(user of users) {
                                 await bot.getDMChannel(user).then((channel) => {
                                     bot.emit("messageReturn", channel.id, embed.alert(msg.author.username, userNotification));
