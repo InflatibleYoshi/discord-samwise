@@ -377,18 +377,20 @@ bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
                             for(const[key, value] of Object.entries(handlerList)){
                                 bot.off(key, value);
                             }
+                            user_msg.delete();
                             bot.emit("messageReturn", msg.channel.id, embed.response(text.NOTIFY_COMMAND, text.NOTIFY_COMMAND_CANCELLATION));
                         } else if (emoji.name === '✅') {
                             let userNotification = "";
                             for (userMessage of userMessageList) {
                                 userNotification = userNotification + "\n" + userMessage.content;
                             }
-                            console.log(userNotification);
                             for(user of users) {
                                 await bot.getDMChannel(user).then((channel) => {
                                     bot.emit("messageReturn", channel.id, embed.alert(msg.author.username, userNotification));
                                 });
                             }
+                            user_msg.delete();
+                            bot.emit("messageReturn", msg.channel.id, embed.response(text.NOTIFY_COMMAND, text.NOTIFY_COMMAND_SUCCESS));
                             for(const[key, value] of Object.entries(handlerList)){
                                bot.off(key, value);
                             }
