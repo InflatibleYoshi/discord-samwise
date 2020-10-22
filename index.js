@@ -338,10 +338,13 @@ bot.registerCommand(text.GET_FELLOWSHIP_COMMAND, async (msg) => {
 
 bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
     //initial check for empty fellowship.
+    console.log(text.NOTIFY_COMMAND);
     let fellowshipEmpty = function (_error) {
+        console.log("fellowship empty");
         bot.emit("messageReturn", msg.channel.id, embed.error(text.NOTIFY_COMMAND, text.NOTIFY_COMMAND_NO_FELLOWSHIP_ERROR));
     };
     let fellowshipNotEmpty = function (users) {
+        console.log("fellowship not empty");
         let userMessageList = [];
         let handlerList = {};
         let messageIngest = async function (message) {
@@ -390,6 +393,7 @@ bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
                 handlerList.push("messageReactionAdd", messageSendTrigger);
             });
     };
+    console.log("an attempt was made");
     await dbConnection.getMembership(msg.author.id, fellowshipNotEmpty, fellowshipEmpty);
 });
 
