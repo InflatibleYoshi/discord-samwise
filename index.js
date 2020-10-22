@@ -362,7 +362,8 @@ bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
         console.log("messageIngest defined");
         bot.on("messageCreate", messageIngest);
         console.log("messageIngest added to bot");
-        handlerList.put("messageCreate", messageIngest);
+        //figure out how to add to dict
+        handlerList.push({"messageCreate": messageIngest});
         console.log("messageIngest added to list");
         //command initialization
         bot.createMessage(msg.channel.id, embed.command(text.NOTIFY_COMMAND, text.NOTIFY_COMMAND_INITIALIZATION))
@@ -395,7 +396,7 @@ bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
                     }
                 };
                 bot.on("messageReactionAdd", messageSendTrigger);
-                handlerList.push("messageReactionAdd", messageSendTrigger);
+                handlerList.push({"messageReactionAdd": messageSendTrigger});
             });
     };
     console.log("an attempt was made");
