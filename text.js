@@ -84,4 +84,4 @@ exports.NOTIFY_COMMAND_INITIALIZATION =  "Type in the chat below to the bot and 
 exports.NOTIFY_COMMAND_FINALIZATION = "You have finished your message, do you want to send it?";
 exports.NOTIFY_COMMAND_SUCCESS = "You have successfully sent your message to your fellowship!";
 exports.NOTIFY_COMMAND_NO_FELLOWSHIP_ERROR = "Your fellowship is empty.";
-exports.NOTIFY_COMMAND_OVERRIDDEN_CANCELLATION = "You've cancelled writing your message by entering a command.";
+exports.NOTIFY_COMMAND_CANCELLATION = "You've cancelled writing your message.";

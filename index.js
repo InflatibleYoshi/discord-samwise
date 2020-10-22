@@ -351,7 +351,7 @@ bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
         let messageIngest = async function (message) {
             if (message.content.startsWith("!")) {
                 await Promise.all(userMessageList).delete();
-                bot.emit("messageReturn", msg.channel.id, embed.response(text.NOTIFY_COMMAND, text.NOTIFY_COMMAND_OVERRIDDEN_CANCELLATION));
+                bot.emit("messageReturn", msg.channel.id, embed.response(text.NOTIFY_COMMAND, text.NOTIFY_COMMAND_CANCELLATION));
                 for(const[key, value] of Object.entries(handlerList)){
                     bot.off(key, value)
                 }
@@ -378,6 +378,7 @@ bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
                             for(const[key, value] of Object.entries(handlerList)){
                                 bot.off(key, value);
                             }
+                            bot.emit("messageReturn", msg.channel.id, embed.response(text.NOTIFY_COMMAND, text.NOTIFY_COMMAND_CANCELLATION));
                         } else if (emoji.name === '✅') {
                             let userNotification = "";
                             for (userMessage of userMessageList) {
