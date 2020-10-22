@@ -347,7 +347,7 @@ bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
         console.log("fellowship not empty");
         console.log(users);
         let userMessageList = [];
-        let handlerList = {};
+        var handlerList = {};
         let messageIngest = async function (message) {
             if (message.content.startsWith("!")) {
                 await Promise.all(userMessageList).delete();
@@ -363,7 +363,7 @@ bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
         bot.on("messageCreate", messageIngest);
         console.log("messageIngest added to bot");
         //figure out how to add to dict
-        handlerList.push({"messageCreate": messageIngest});
+        handlerList["messageCreate"] = messageIngest;
         console.log("messageIngest added to list");
         //command initialization
         bot.createMessage(msg.channel.id, embed.command(text.NOTIFY_COMMAND, text.NOTIFY_COMMAND_INITIALIZATION))
@@ -396,7 +396,7 @@ bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
                     }
                 };
                 bot.on("messageReactionAdd", messageSendTrigger);
-                handlerList.push({"messageReactionAdd": messageSendTrigger});
+                handlerList["messageReactionAdd"] = messageSendTrigger;
             });
     };
     console.log("an attempt was made");
