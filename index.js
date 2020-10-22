@@ -374,7 +374,7 @@ bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
                 let messageSendTrigger = async function (user_msg, emoji, id) {
                     if (user_msg.id === message.id && id === msg.author.id) {
                         if (emoji.name === '❌') {
-                            await Promise.all(userMessageList).delete();
+                            await Promise.all( userMessageList.map(x => x.delete()) );
                             for(const[key, value] of Object.entries(handlerList)){
                                 bot.off(key, value);
                             }
@@ -388,7 +388,7 @@ bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
                                     bot.emit("messageReturn", channel.id, embed.alert(msg.author.username, userNotification));
                                 });
                             }
-                            await Promise.all(userMessageList).delete();
+                            await Promise.all( userMessageList.map(x => x.delete()) );
                             for(const[key, value] of Object.entries(handlerList)){
                                bot.off(key, value);
                             }
