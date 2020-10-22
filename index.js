@@ -359,8 +359,11 @@ bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
                 userMessageList.push(message);
             }
         };
+        console.log("messageIngest defined");
         bot.on("messageCreate", messageIngest);
+        console.log("messageIngest added to bot");
         handlerList.push("messageCreate", messageIngest);
+        console.log("messageIngest added to list");
         //command initialization
         bot.createMessage(msg.channel.id, embed.command(text.NOTIFY_COMMAND, text.NOTIFY_COMMAND_INITIALIZATION))
             .then((message) => {
@@ -375,12 +378,12 @@ bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
                                 bot.off(key, value);
                             }
                         } else if (emoji.name === '✅') {
-                            let userNotification = ""
+                            let userNotification = "";
                             for (userMessage of userMessageList) {
                                 userNotification.concat(userMessage.content);
                             }
                             for(user of users) {
-                                await bot.getDMChannel(user.id).then((channel) => {
+                                await bot.getDMChannel(user).then((channel) => {
                                     bot.emit("messageReturn", channel.id, embed.alert(msg.author.username, userNotification));
                                 });
                             }
