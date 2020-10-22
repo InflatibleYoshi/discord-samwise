@@ -362,7 +362,7 @@ bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
         console.log("messageIngest defined");
         bot.on("messageCreate", messageIngest);
         console.log("messageIngest added to bot");
-        handlerList.push("messageCreate", messageIngest);
+        handlerList.put("messageCreate", messageIngest);
         console.log("messageIngest added to list");
         //command initialization
         bot.createMessage(msg.channel.id, embed.command(text.NOTIFY_COMMAND, text.NOTIFY_COMMAND_INITIALIZATION))
