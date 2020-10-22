@@ -394,7 +394,7 @@ bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
             });
     };
     console.log("an attempt was made");
-    await dbConnection.getMembership(msg.author, fellowshipNotEmpty, fellowshipEmpty);
+    await dbConnection.getFellowship(msg.author, fellowshipNotEmpty, fellowshipEmpty);
 });
 
 bot.connect();
