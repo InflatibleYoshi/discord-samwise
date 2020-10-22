@@ -381,7 +381,7 @@ bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
                         } else if (emoji.name === '✅') {
                             let userNotification = "";
                             for (userMessage of userMessageList) {
-                                userNotification.concat(userMessage.content);
+                                userNotification = userNotification + "\n" + userMessage.content;
                             }
                             console.log(userNotification);
                             for(user of users) {
