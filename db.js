@@ -1,5 +1,4 @@
 const Redis = require('ioredis');
-const USERS = 'users';
 const FELLOWSHIP = "_fellowship";
 const MEMBERSHIP = "_membership";
 const THRESHOLD = "_threshold";
@@ -39,8 +38,6 @@ class database {
         console.log("dbTrackUser");
         console.log(`HSET ${user.id.toString()} streak_current ${streak_start} streak_max ${streak_length}`);
         await this.client.hset(user.id.toString(), "streak_current", streak_start, "streak_max", streak_length);
-        console.log(`SADD users ${user.id.toString()}`);
-        await this.client.sadd(USERS, user.id.toString());
     }
 
     async setFocus(user, focus, successHandler, failureHandler){
@@ -70,7 +67,8 @@ class database {
             memberList = array;
             return Promise.all(memberList.map((member) => this.client.hmget(member, "streak_current", "threshold")))
         }).then((list) => {
-            memberList = memberList.filter((member, i) => list[2 * i] < list[2 * i + 1]);
+            //The oneliner filters out all the entries for which the threshold is not greater than streak_current.
+            memberList = memberList.filter((member, i) => parseInt(list[2 * i], 10) < parseInt(list[2 * i + 1], 10));
             if(memberList.length === 0){
                 throw 'None of the fellowships you are a part of are tracked and within the threshold.'
             }
@@ -91,7 +89,10 @@ class database {
             const streak_max = Math.max(streak, streak_new);
             console.log(`HSET ${user.id.toString()} streak_current ${Date.now()} streak_max ${streak_max}`);
             return this.client.hset(user.id.toString(), "streak_current", Date.now(), "streak_max", streak_max);
-        }).then(async () => {
+        }).then(async (isSet) => {
+            if(isSet == 0){
+                throw 'There was an error in resetting the streak.'
+            }
             console.log(`HGET ${user.id.toString()} focus`);
             return this.client.hget(user.id.toString(), "focus");
         }).then(successHandler, failureHandler);
