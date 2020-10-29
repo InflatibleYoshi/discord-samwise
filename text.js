@@ -76,7 +76,7 @@ exports.KICK_COMMAND_SUCCESS_RESPONSE = function(username) {return `You have rem
 exports.KICK_COMMAND_NOT_IN_FELLOWSHIP_ERROR = function(username) {return `${username} was not part of your fellowship to begin with.`};
 
 exports.LEAVE_COMMAND = "leave";
-exports.LEAVE_COMMAND_DESCRIPTION = "Leave a fellowship";
+exports.LEAVE_COMMAND_DESCRIPTION = "Leave a fellowship.";
 exports.LEAVE_COMMAND_FULL_DESCRIPTION = "Leave a user's fellowship by typing that user's" +
     "username or user id to the right of the !leave command";
 exports.LEAVE_COMMAND_ON_LEAVE = function(username) {return `You have decided to leave the fellowship(s) of ${username}.
@@ -96,7 +96,7 @@ exports.GET_FELLOWSHIP_COMMAND_FULL_DESCRIPTION = "Get a list of all the users i
 exports.GET_FELLOWSHIP_COMMAND_ERROR = "Your fellowship is empty.";
 
 exports.NOTIFY_COMMAND = "notify";
-exports.NOTIFY_COMMAND_DESCRIPTION = "Notify all the members of your fellowship";
+exports.NOTIFY_COMMAND_DESCRIPTION = "Notify all the members of your fellowship.";
 exports.NOTIFY_COMMAND_FULL_DESCRIPTION = "When you have a struggle or fun thing to share with your fellowship, use the !notify command to initiate the message.";
 exports.NOTIFY_COMMAND_INITIALIZATION =  "Type in the chat below to the bot and once you are finished writing your message," +
     " click on the check emoji to finalize the message. You'll have a chance to review it before sending.";

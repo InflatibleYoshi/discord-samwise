@@ -68,7 +68,7 @@ class database {
             return Promise.all(memberList.map((member) => this.client.hmget(member, "streak_current", "threshold")))
         }).then((list) => {
             //The oneliner filters out all the entries for which the threshold is not greater than streak_current.
-            memberList = memberList.filter((member, i) => parseInt(list[2 * i], 10) < parseInt(list[2 * i + 1], 10));
+            memberList = memberList.filter((member, i) => parseInt(this.getDaysDifference(list[2 * i], 10)) < parseInt(list[2 * i + 1], 10));
             if(memberList.length === 0){
                 throw 'None of the fellowships you are a part of are tracked and within the threshold.'
             }
@@ -80,20 +80,20 @@ class database {
             if (!exists) {
                 throw 'Your user has not been tracked. Type !track help for more information.';
             }
-            console.log(`HMGET ${user.id.toString()} streak_max streak_current`);
+            console.log(`HMGET ${user.id.toString()} "streak_max" "streak_current"`);
             return this.client.hmget(user.id.toString(), "streak_max", "streak_current");
         }).then(async (result) => {
             const streak = parseInt(result[0], 10);
-            const timestamp = parseInt(streak_current[1], 10);
+            const timestamp = parseInt(result[1], 10);
             const streak_new = this.getDaysDifference(timestamp);
             const streak_max = Math.max(streak, streak_new);
-            console.log(`HSET ${user.id.toString()} streak_current ${Date.now()} streak_max ${streak_max}`);
+            console.log(`HSET ${user.id.toString()} "streak_current" ${Date.now()} "streak_max" ${streak_max}`);
             return this.client.hset(user.id.toString(), "streak_current", Date.now(), "streak_max", streak_max);
         }).then(async (isSet) => {
             if(isSet == 0){
                 throw 'There was an error in resetting the streak.'
             }
-            console.log(`HGET ${user.id.toString()} focus`);
+            console.log(`HGET ${user.id.toString()} "focus"`);
             return this.client.hget(user.id.toString(), "focus");
         }).then(successHandler, failureHandler);
     }
