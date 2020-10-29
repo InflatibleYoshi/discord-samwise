@@ -116,7 +116,8 @@ tracking.registerSubcommand(text.TRACK_FOCUS_SUBCOMMAND, async (msg, args) => {
 tracking.registerSubcommand(text.TRACK_THRESHOLD_SUBCOMMAND, async (msg, args) => {
     console.log(text.TRACK_THRESHOLD_SUBCOMMAND);
     const threshold = parseInt(args.join(" "), 10);
-    if(threshold > 0){
+    console.log(threshold);
+    if(!isNaN(threshold) && threshold > 0){
         bot.emit("messageReturn", msg.channel.id, embed.error(text.TRACK_THRESHOLD_SUBCOMMAND, TRACK_THRESHOLD_SUBCOMMAND_INPUT_ERROR));
     } else {
         let successHandler = function (users) {
