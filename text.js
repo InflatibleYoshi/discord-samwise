@@ -8,7 +8,7 @@ exports.COMMAND_ON_FELLOWSHIP_TARGET_RESPONSE = function(username) {return `You 
 
 exports.TRACK_RESPONSE = "This command is only available to tracked users.";
 exports.TRACK_COMMAND = "track";
-exports.TRACK_COMMAND_DESCRIPTION = "The four subcommands available are \'date\', \'reset\', \'focus\' and \'threshold\'.";
+exports.TRACK_COMMAND_DESCRIPTION = "The four subcommands available are \'date\', \'reset\', \'focus\', \'list\', and \'threshold\'.";
 exports.TRACK_COMMAND_FULL_DESCRIPTION = "The date command allows the user to track the days spent dedicated towards a single goal." +
     "The reset command allows the user to reset the date in the case of a relapse." +
     "The focus command allows the user to set their personal focus." +
@@ -43,8 +43,6 @@ exports.TRACK_THRESHOLD_SUBCOMMAND_DESCRIPTION = "Use this command if you would 
     "by setting an amount of days since last reset in which you would need the most moral support. If you are within this threshold, you'll be mentoned on the danger zone table.";
 exports.TRACK_THRESHOLD_SUBCOMMAND_FULL_DESCRIPTION = "";
 exports.TRACK_LIST_SUBCOMMAND = "list";
-exports.TRACK_LIST_SUBCOMMAND_NO_MEMBERSHIP_ERROR = "You are not part of any memberships so this list will always be empty.";
-exports.TRACK_LIST_SUBCOMMAND_NO_TRACKING = "None of the users you're following are tracked.";
 exports.TRACK_LIST_SUBCOMMAND_DESCRIPTION = "This command will list all the users you know that are in their threshold.";
 exports.TRACK_LIST_SUBCOMMAND_FULL_DESCRIPTION = "This command will list check your personal membership and list all the users that are in their threshold.";
 

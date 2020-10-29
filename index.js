@@ -53,7 +53,7 @@ const tracking = bot.registerCommand(text.TRACK_COMMAND, () => {
 
 tracking.registerSubcommand(text.TRACK_RESET_SUBCOMMAND, async (msg, args) => {
         console.log(text.TRACK_RESET_SUBCOMMAND);
-        let successHandler = function (focus) {
+        let successHandler = async function (focus) {
             bot.emit("messageReturn", msg.channel.id, embed.response(text.TRACK_RESET_SUBCOMMAND, text.TRACK_RESET_SUBCOMMAND_RESPONSE));
             let fellowshipNotEmpty = function(users){
                 //3. If fellowship not empty, send message asking if you would like to notify your fellowship of your reset.
@@ -81,7 +81,7 @@ tracking.registerSubcommand(text.TRACK_RESET_SUBCOMMAND, async (msg, args) => {
             }
             if(focus !== null){
                 //2. if focus exists then try to get the fellowship
-                dbConnection.getFellowship(msg.author, fellowshipNotEmpty, );
+                await dbConnection.getFellowship(msg.author, fellowshipNotEmpty, );
             }
         };
         let failureHandler = function (error) {
@@ -105,7 +105,7 @@ tracking.registerSubcommand(text.TRACK_FOCUS_SUBCOMMAND, async (msg, args) => {
     let failureHandler = function (error) {
         bot.emit("messageReturn", msg.channel.id, embed.error(text.TRACK_FOCUS_SUBCOMMAND, error));
     };
-    dbConnection.setFocus(msg.author.id, focus, successHandler, failureHandler);
+    await dbConnection.setFocus(msg.author.id, focus, successHandler, failureHandler);
 }, {
     description: text.TRACK_FOCUS_SUBCOMMAND_DESCRIPTION,
     fullDescription: text.TRACK_FOCUS_SUBCOMMAND_FULL_DESCRIPTION
@@ -125,11 +125,24 @@ tracking.registerSubcommand(text.TRACK_THRESHOLD_SUBCOMMAND, async (msg, args) =
         };
         dbConnection.setThreshold(msg.author.id, threshold, successHandler, failureHandler);
     }
-
 }, {
     description: text.TRACK_THRESHOLD_SUBCOMMAND_DESCRIPTION,
     fullDescription: text.TRACK_THRESHOLD_SUBCOMMAND_FULL_DESCRIPTION
 });
+
+tracking.registerSubcommand(text.TRACK_LIST_SUBCOMMAND, async (msg, args) => {
+    console.log(text.TRACK_LIST_SUBCOMMAND);
+    let successHandler = function (users) {
+        bot.emit("messageReturn", msg.channel.id, embed.response(text.TRACK_LIST_SUBCOMMAND, users));
+    };
+    let failureHandler = function (error) {
+        bot.emit("messageReturn", msg.channel.id, embed.error(text.TRACK_LIST_SUBCOMMAND, error));
+    };
+    await dbConnection.trackedList(msg.author.id, successHandler, failureHandler);
+}, {
+    description: text.TRACK_LIST_SUBCOMMAND_DESCRIPTION,
+    fullDescription: text.TRACK_LIST_SUBCOMMAND_FULL_DESCRIPTION
+})
 
 tracking.registerSubcommand(text.TRACK_DATE_SUBCOMMAND, async (msg, args) => {
     console.log(text.TRACK_DATE_SUBCOMMAND);
