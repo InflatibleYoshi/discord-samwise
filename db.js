@@ -12,8 +12,8 @@ class database {
     }
 
     async isUserTracked(user){
-        console.log("dbisUserTracked");
-        console.log(`HEXISTS ${user.id.toString()} "streak_max"`);
+        console.log("dbIsUserTracked");
+        console.log(`HEXISTS ${user.id.toString()} streak_max`);
         return this.client.hexists(user.id.toString(), "streak_max").then((result) => {
             return result == 1
         });
