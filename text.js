@@ -8,10 +8,12 @@ exports.COMMAND_ON_FELLOWSHIP_TARGET_RESPONSE = function(username) {return `You 
 
 exports.TRACK_RESPONSE = "This command is only available to tracked users.";
 exports.TRACK_COMMAND = "track";
-exports.TRACK_COMMAND_DESCRIPTION = "The two subcommands available are \'date\' and \'reset\'.";
-exports.TRACK_COMMAND_FULL_DESCRIPTION = "The two subcommands available are \'date\' and \'reset\'. " +
-    "\nThe date command allows the user to track the days spent dedicated towards a single goal." +
-    "\nThe reset command allows the user to reset the date in the case of a relapse.";
+exports.TRACK_COMMAND_DESCRIPTION = "The four subcommands available are \'date\', \'reset\', \'focus\' and \'threshold\'.";
+exports.TRACK_COMMAND_FULL_DESCRIPTION = "The date command allows the user to track the days spent dedicated towards a single goal." +
+    "The reset command allows the user to reset the date in the case of a relapse." +
+    "The focus command allows the user to set their personal focus." +
+    "The threshold command allows the user to set an amount of days since last reset in which you would need the most moral support."
+    "The list command will list all the users you know that are in their threshold.";
 exports.TRACK_DATE_SUBCOMMAND = "date";
 exports.TRACK_DATE_SUBCOMMAND_DESCRIPTION = "Track user with user-entered start date.";
 exports.TRACK_DATE_SUBCOMMAND_FULL_DESCRIPTION = "If you would like to track the days you've spent dedicated towards a single goal such as being free from addiction, " +
@@ -24,8 +26,27 @@ exports.TRACK_DATE_SUBCOMMAND_USER_ABORTED = "Your tracking configuration was no
 exports.TRACK_DATE_SUBCOMMAND_USER_CONFIRMED = "Your tracking configuration was saved.";
 exports.TRACK_RESET_SUBCOMMAND = "reset";
 exports.TRACK_RESET_SUBCOMMAND_DESCRIPTION = "Reset tracked user's streak.";
-exports.TRACK_RESET_SUBCOMMAND_FULL_DESCRIPTION = "This command resets the tracked user's streak. This command requires no arguments.";
-exports.GENERATE_RESET = function() {return "Aw shucks, trust God and you'll get em next time."};
+exports.TRACK_RESET_SUBCOMMAND_FULL_DESCRIPTION = "This command resets the tracked user's streak. And can optionally notify the rest of the user's fellowship.";
+exports.TRACK_RESET_SUBCOMMAND_RESPONSE = "Aw shucks, you'll get em next time.";
+exports.TRACK_RESET_SUBCOMMAND_FOLLOWUP = "Would you like to notify the rest of your fellowship?";
+exports.TRACK_RESET_SUBCOMMAND_FOLLOWUP_SUCCESS = "You have notified the rest of your fellowship.";
+exports.TRACK_RESET_SUBCOMMAND_FOLLOWUP_TEXT = function(focus, username) {return `Please pray for/support ${username}, he is dealing with issues of ${focus}`};
+exports.TRACK_FOCUS_SUBCOMMAND = "focus";
+exports.TRACK_FOCUS_SUBCOMMAND_SUCCESS = "You have set your focus successfully.";
+exports.TRACK_FOCUS_SUBCOMMAND_DESCRIPTION = "This command defines what you are tracking.";
+exports.TRACK_FOCUS_SUBCOMMAND_FULL_DESCRIPTION = "Use this command if you would like to notify your fellowship when you have a reset." +
+    "e.g. !track focus alcoholism";
+exports.TRACK_THRESHOLD_SUBCOMMAND = "threshold";
+exports.TRACK_THRESHOLD_SUBCOMMAND_INPUT_ERROR = "Please set your threshold to a number and make sure that you only type 1 number."
+exports.TRACK_THRESHOLD_SUBCOMMAND_SUCCESS = "You have set your threshold successfully.";
+exports.TRACK_THRESHOLD_SUBCOMMAND_DESCRIPTION = "Use this command if you would like your fellowship to know when you're struggling especially with your focus" +
+    "by setting an amount of days since last reset in which you would need the most moral support. If you are within this threshold, you'll be mentoned on the danger zone table.";
+exports.TRACK_THRESHOLD_SUBCOMMAND_FULL_DESCRIPTION = "";
+exports.TRACK_LIST_SUBCOMMAND = "list";
+exports.TRACK_LIST_SUBCOMMAND_NO_MEMBERSHIP_ERROR = "You are not part of any memberships so this list will always be empty.";
+exports.TRACK_LIST_SUBCOMMAND_NO_TRACKING = "None of the users you're following are tracked.";
+exports.TRACK_LIST_SUBCOMMAND_DESCRIPTION = "This command will list all the users you know that are in their threshold.";
+exports.TRACK_LIST_SUBCOMMAND_FULL_DESCRIPTION = "This command will list check your personal membership and list all the users that are in their threshold.";
 
 exports.REQUEST_COMMAND = "request";
 exports.REQUEST_COMMAND_DESCRIPTION = "Request to join a user's fellowship.";
@@ -64,7 +85,7 @@ exports.LEAVE_COMMAND_ON_LEAVE = function(username) {return `You have decided to
 Use the reaction buttons to confirm or deny.`};
 exports.LEAVE_COMMAND_SUCCESS_RESPONSE = function(username) {return `You have left ${username}'s fellowship.`};
 exports.LEAVE_COMMAND_NOT_IN_FELLOWSHIP_ERROR = function(username) {return `You were not part of ${username}'s fellowship to begin with.`};
-exports.GENERATE_RESET = function() {return "Aw shucks, trust God and you'll get em next time"};
+exports.GENERATE_RESET = "Aw shucks, trust God and you'll get em next time.";
 
 exports.GET_MEMBERSHIP_COMMAND = "getMembership";
 exports.GET_MEMBERSHIP_COMMAND_DESCRIPTION = " Get a list of your membership.";

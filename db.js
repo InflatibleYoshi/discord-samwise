@@ -2,6 +2,7 @@ const Redis = require('ioredis');
 const USERS = 'users';
 const FELLOWSHIP = "_fellowship";
 const MEMBERSHIP = "_membership";
+const THRESHOLD = "_threshold";
 
 class database {
     constructor(){
@@ -11,8 +12,8 @@ class database {
         });
     }
 
-    async isUserExists(user){
-        console.log("dbisUserExists");
+    async isUserTracked(user){
+        console.log("dbisUserTracked");
         console.log(`HEXISTS ${user.id.toString()} "streak_max"`);
         return this.client.hexists(user.id.toString(), "streak_max").then((result) => {
             return result == 1
@@ -34,13 +35,66 @@ class database {
         return Math.floor((Date.now() - timestamp) / (1000 * 3600 * 24));
     }
 
-    async addUser(user, streak_start, streak_length) {
-        console.log("dbAddUser");
+    async trackUser(user, streak_start, streak_length) {
+        console.log("dbTrackUser");
         console.log(`HSET ${user.id.toString()} streak_current ${streak_start} streak_max ${streak_length}`);
         await this.client.hset(user.id.toString(), "streak_current", streak_start, "streak_max", streak_length);
         console.log(`SADD users ${user.id.toString()}`);
         await this.client.sadd(USERS, user.id.toString());
+    }
 
+    async setFocus(user, focus, successHandler, failureHandler){
+        await this.isUserTracked(user).then((exists) => {
+            if (!exists) {
+                throw 'Your user has not been tracked. Type !track help for more information.';
+            }
+            console.log(`HSET ${user.id.toString()} focus`);
+            this.client.hset(user.id.toString(), "focus");
+        }).then(successHandler, failureHandler);
+    }
+
+    async setThreshold(user, focus, successHandler, failureHandler){
+        await this.isUserTracked(user).then((exists) => {
+            if (!exists) {
+                throw 'Your user has not been tracked. Type !track help for more information.';
+            }
+            console.log(`HSET ${user.id.toString()} threshold`);
+            return this.client.hset(user.id.toString(), "threshold");
+        }).then(successHandler, failureHandler);
+    }
+
+    async trackedList(user, successHandler, failureHandler){
+        let memberList;
+        await this.client.smembers(user.id.toString() + MEMBERSHIP).then((array) =>{
+            if(array.length === 0) throw 'You are not a part of any fellowships.'
+            memberList = array;
+            return Promise.all(memberList.map((member) => this.client.hmget(member, "streak_current", "threshold")))
+        }).then((list) => {
+            memberList = memberList.filter((member, i) => list[2 * i] < list[2 * i + 1]);
+            if(memberList.length === 0){
+                throw 'None of the fellowships you are a part of are tracked and within the threshold.'
+            }
+        }).then(successHandler, failureHandler);
+    }
+
+    async reset(user, successHandler, failureHandler) {
+        await this.isUserTracked(user).then((exists) => {
+            if (!exists) {
+                throw 'Your user has not been tracked. Type !track help for more information.';
+            }
+            console.log(`HMGET ${user.id.toString()} streak_max streak_current`);
+            return this.client.hmget(user.id.toString(), "streak_max", "streak_current");
+        }).then(async (result) => {
+            const streak = parseInt(result[0], 10);
+            const timestamp = parseInt(streak_current[1], 10);
+            const streak_new = this.getDaysDifference(timestamp);
+            const streak_max = Math.max(streak, streak_new);
+            console.log(`HSET ${user.id.toString()} streak_current ${Date.now()} streak_max ${streak_max}`);
+            return this.client.hset(user.id.toString(), "streak_current", Date.now(), "streak_max", streak_max);
+        }).then(async () => {
+            console.log(`HGET ${user.id.toString()} focus`);
+            return this.client.hget(user.id.toString(), "focus");
+        }).then(successHandler, failureHandler);
     }
 
     async addToFellowship(user, owner, successHandler, failureHandler){
@@ -67,25 +121,6 @@ class database {
         }).then(successHandler, failureHandler);
     }
 
-    async reset(user, successHandler, failureHandler) {
-        await this.isUserExists(user).then((exists) => {
-            if (!exists) {
-                throw 'Your user has not been tracked. Type !track help for more information.';
-            }
-            console.log(`HGET ${user.id.toString()} streak_max`);
-            return this.client.hget(user.id.toString(), "streak_max");
-        }).then(async (result) => {
-            const streak = parseInt(result, 10);
-            console.log(`HGET ${user.id.toString()} streak_current`);
-            const streak_current = await this.client.hget(user.id.toString(), "streak_current");
-            const timestamp = parseInt(streak_current, 10);
-            const streak_new = this.getDaysDifference(timestamp);
-            const streak_max = Math.max(streak, streak_new);
-            console.log(`HSET ${user.id.toString()} streak_current ${Date.now()} streak_max ${streak_max}`);
-            return this.client.hset(user.id.toString(), "streak_current", Date.now(), "streak_max", streak_max);
-        }).then(successHandler, failureHandler);
-    }
-
     async getMembership(user, successHandler, failureHandler){
         console.log(`SMEMBERS ${user.id.toString() + MEMBERSHIP}`);
         await this.client.smembers(user.id.toString() + MEMBERSHIP).then((array) =>{
@@ -93,6 +128,7 @@ class database {
             return array
         }).then(successHandler, failureHandler);
     }
+
     async getFellowship(user, successHandler, failureHandler){
         console.log(`SMEMBERS ${user.id.toString() + FELLOWSHIP}`);
         await this.client.smembers(user.id.toString() + FELLOWSHIP).then((array) =>{
