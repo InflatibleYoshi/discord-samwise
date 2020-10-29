@@ -98,14 +98,16 @@ tracking.registerSubcommand(text.TRACK_RESET_SUBCOMMAND, async (msg, args) => {
 
 tracking.registerSubcommand(text.TRACK_FOCUS_SUBCOMMAND, async (msg, args) => {
     console.log(text.TRACK_FOCUS_SUBCOMMAND);
-    const focus = args.join(" ");
-    let successHandler = function (_user) {
-        bot.emit("messageReturn", msg.channel.id, embed.response(text.TRACK_FOCUS_SUBCOMMAND, text.TRACK_FOCUS_SUBCOMMAND_SUCCESS));
-    };
-    let failureHandler = function (error) {
-        bot.emit("messageReturn", msg.channel.id, embed.error(text.TRACK_FOCUS_SUBCOMMAND, error));
-    };
-    await dbConnection.setFocus(msg.author.id, focus, successHandler, failureHandler);
+    if(args.length !== 0){
+        const focus = args.join(" ");
+        let successHandler = function (_user) {
+            bot.emit("messageReturn", msg.channel.id, embed.response(text.TRACK_FOCUS_SUBCOMMAND, text.TRACK_FOCUS_SUBCOMMAND_SUCCESS));
+        };
+        let failureHandler = function (error) {
+            bot.emit("messageReturn", msg.channel.id, embed.error(text.TRACK_FOCUS_SUBCOMMAND, error));
+        };
+        await dbConnection.setFocus(msg.author.id, focus, successHandler, failureHandler);
+    }
 }, {
     description: text.TRACK_FOCUS_SUBCOMMAND_DESCRIPTION,
     fullDescription: text.TRACK_FOCUS_SUBCOMMAND_FULL_DESCRIPTION
@@ -114,7 +116,7 @@ tracking.registerSubcommand(text.TRACK_FOCUS_SUBCOMMAND, async (msg, args) => {
 tracking.registerSubcommand(text.TRACK_THRESHOLD_SUBCOMMAND, async (msg, args) => {
     console.log(text.TRACK_THRESHOLD_SUBCOMMAND);
     const threshold = parseInt(args.join(" "), 10);
-    if(isNan(threshold)){
+    if(threshold > 0){
         bot.emit("messageReturn", msg.channel.id, embed.error(text.TRACK_THRESHOLD_SUBCOMMAND, TRACK_THRESHOLD_SUBCOMMAND_INPUT_ERROR));
     } else {
         let successHandler = function (users) {

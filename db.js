@@ -41,6 +41,7 @@ class database {
     }
 
     async setFocus(user, focus, successHandler, failureHandler){
+        console.log("dbSetFocus");
         await this.isUserTracked(user).then((exists) => {
             if (!exists) {
                 throw 'Your user has not been tracked. Type !track help for more information.';
@@ -51,6 +52,7 @@ class database {
     }
 
     async setThreshold(user, focus, successHandler, failureHandler){
+        console.log("dbSetThreshold");
         await this.isUserTracked(user).then((exists) => {
             if (!exists) {
                 throw 'Your user has not been tracked. Type !track help for more information.';
@@ -90,6 +92,7 @@ class database {
             console.log(`HSET ${user.id.toString()} "streak_current" ${Date.now()} "streak_max" ${streak_max}`);
             return this.client.hset(user.id.toString(), "streak_current", Date.now(), "streak_max", streak_max);
         }).then(async (isSet) => {
+            console.log(isSet);
             if(isSet == 0){
                 throw 'There was an error in resetting the streak.'
             }
