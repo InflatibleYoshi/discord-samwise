@@ -51,13 +51,13 @@ const tracking = bot.registerCommand(text.TRACK_COMMAND, () => {
         fullDescription: text.TRACK_COMMAND_FULL_DESCRIPTION,
     });
 
-tracking.registerSubcommand(text.TRACK_RESET_SUBCOMMAND, async (msg, args) => {
+tracking.registerSubcommand(text.TRACK_RESET_SUBCOMMAND, async (msg) => {
         console.log(text.TRACK_RESET_SUBCOMMAND);
         let successHandler = async function (focus) {
             bot.emit("messageReturn", msg.channel.id, embed.response(text.TRACK_RESET_SUBCOMMAND, text.TRACK_RESET_SUBCOMMAND_RESPONSE));
-            let fellowshipNotEmpty = function(users){
+            let fellowshipNotEmpty = function (users) {
                 //3. If fellowship not empty, send message asking if you would like to notify your fellowship of your reset.
-                bot.createMessage(msg.channel.id, embed.command(text.TRACK_RESET_SUBCOMMAND, text.TRACK_RESET_SUBCOMMAND_FOLLOWUP)).then((message) =>{
+                bot.createMessage(msg.channel.id, embed.command(text.TRACK_RESET_SUBCOMMAND, text.TRACK_RESET_SUBCOMMAND_FOLLOWUP)).then((message) => {
                     userEventListener = async function (user_msg, emoji, id) {
                         if (user_msg.id === message.id && id === msg.author.id) {
                             if (emoji.name === '❌') {
@@ -79,9 +79,9 @@ tracking.registerSubcommand(text.TRACK_RESET_SUBCOMMAND, async (msg, args) => {
                     bot.on("messageReactionAdd", userEventListener);
                 })
             }
-            if(focus !== null){
+            if (focus !== null) {
                 //2. if focus exists then try to get the fellowship
-                await dbConnection.getFellowship(msg.author, fellowshipNotEmpty, );
+                await dbConnection.getFellowship(msg.author, fellowshipNotEmpty,);
             }
         };
         let failureHandler = function (error) {
@@ -98,7 +98,7 @@ tracking.registerSubcommand(text.TRACK_RESET_SUBCOMMAND, async (msg, args) => {
 
 tracking.registerSubcommand(text.TRACK_FOCUS_SUBCOMMAND, async (msg, args) => {
     console.log(text.TRACK_FOCUS_SUBCOMMAND);
-    if(args.length !== 0){
+    if (args.length !== 0) {
         const focus = args.join(" ");
         let successHandler = function (_user) {
             bot.emit("messageReturn", msg.channel.id, embed.response(text.TRACK_FOCUS_SUBCOMMAND, text.TRACK_FOCUS_SUBCOMMAND_SUCCESS));
@@ -107,6 +107,8 @@ tracking.registerSubcommand(text.TRACK_FOCUS_SUBCOMMAND, async (msg, args) => {
             bot.emit("messageReturn", msg.channel.id, embed.error(text.TRACK_FOCUS_SUBCOMMAND, error));
         };
         await dbConnection.setFocus(msg.author.id, focus, successHandler, failureHandler);
+    } else {
+        bot.emit("messageReturn", msg.channel.id, embed.error(text.TRACK_FOCUS_SUBCOMMAND, text.TRACK_FOCUS_SUBCOMMAND_INPUT_ERROR));
     }
 }, {
     description: text.TRACK_FOCUS_SUBCOMMAND_DESCRIPTION,
@@ -117,9 +119,7 @@ tracking.registerSubcommand(text.TRACK_THRESHOLD_SUBCOMMAND, async (msg, args) =
     console.log(text.TRACK_THRESHOLD_SUBCOMMAND);
     const threshold = parseInt(args.join(" "), 10);
     console.log(threshold);
-    if(!isNaN(threshold) && threshold > 0){
-        bot.emit("messageReturn", msg.channel.id, embed.error(text.TRACK_THRESHOLD_SUBCOMMAND, TRACK_THRESHOLD_SUBCOMMAND_INPUT_ERROR));
-    } else {
+    if (!isNaN(threshold) || threshold > 0) {
         let successHandler = function (users) {
             bot.emit("messageReturn", msg.channel.id, embed.response(text.TRACK_THRESHOLD_SUBCOMMAND, users));
         };
@@ -127,6 +127,8 @@ tracking.registerSubcommand(text.TRACK_THRESHOLD_SUBCOMMAND, async (msg, args) =
             bot.emit("messageReturn", msg.channel.id, embed.error(text.TRACK_THRESHOLD_SUBCOMMAND, error));
         };
         dbConnection.setThreshold(msg.author.id, threshold, successHandler, failureHandler);
+    } else {
+        bot.emit("messageReturn", msg.channel.id, embed.error(text.TRACK_THRESHOLD_SUBCOMMAND, TRACK_THRESHOLD_SUBCOMMAND_INPUT_ERROR));
     }
 }, {
     description: text.TRACK_THRESHOLD_SUBCOMMAND_DESCRIPTION,
@@ -151,6 +153,10 @@ tracking.registerSubcommand(text.TRACK_DATE_SUBCOMMAND, async (msg, args) => {
     console.log(text.TRACK_DATE_SUBCOMMAND);
     const parse = args.join(" ");
     // Make a string of the text after the command label
+    if(!parse){
+        bot.emit("messageReturn", msg.channel.id, embed.error(text.TRACK_DATE_SUBCOMMAND, text.TRACK_DATE_SUBCOMMAND_INVALID_DATE));
+        return;
+    }
     const results = Chrono.parse(parse);
     const timestamp = results[0].start.date().getTime();
     console.log(timestamp);

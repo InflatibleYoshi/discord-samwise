@@ -20,6 +20,7 @@ exports.TRACK_DATE_SUBCOMMAND_FULL_DESCRIPTION = "If you would like to track the
     "\ntype '!track date \"timestamp\" filling" +
     "\n\"timestamp\" with your Day 1 as: \'DD Mon YYYY HH:mm:ss TZ\'" +
     "e.g. !track date 01 Jan 1970 00:00:00 GMT";
+exports.TRACK_DATE_SUBCOMMAND_INVALID_DATE = "Invalid date entered."
 exports.TRACK_DATE_SUBCOMMAND_ALREADY_TRACKED_WARNING = "You are already tracked so this command will overwrite your maximum streak.";
 exports.TRACK_DATE_SUBCOMMAND_RETURN_STREAK = function(streak) {return `This puts your current streak at ${streak} days.\n Do you want to proceed with these options?`};
 exports.TRACK_DATE_SUBCOMMAND_USER_ABORTED = "Your tracking configuration was not saved.";
@@ -34,14 +35,15 @@ exports.TRACK_RESET_SUBCOMMAND_FOLLOWUP_TEXT = function(focus, username) {return
 exports.TRACK_FOCUS_SUBCOMMAND = "focus";
 exports.TRACK_FOCUS_SUBCOMMAND_SUCCESS = "You have set your focus successfully.";
 exports.TRACK_FOCUS_SUBCOMMAND_DESCRIPTION = "This command defines what you are tracking.";
+exports.TRACK_FOCUS_SUBCOMMAND_INPUT_ERROR = "Please type a focus for yourself."
 exports.TRACK_FOCUS_SUBCOMMAND_FULL_DESCRIPTION = "Use this command if you would like to notify your fellowship when you have a reset." +
     "e.g. !track focus alcoholism";
 exports.TRACK_THRESHOLD_SUBCOMMAND = "threshold";
 exports.TRACK_THRESHOLD_SUBCOMMAND_INPUT_ERROR = "Please set your threshold to a number and make sure that you only type 1 number."
 exports.TRACK_THRESHOLD_SUBCOMMAND_SUCCESS = "You have set your threshold successfully.";
-exports.TRACK_THRESHOLD_SUBCOMMAND_DESCRIPTION = "Use this command if you would like your fellowship to know when you're struggling especially with your focus" +
+exports.TRACK_THRESHOLD_SUBCOMMAND_DESCRIPTION = "Set a threshold of days in which you would like more moral support.";
+exports.TRACK_THRESHOLD_SUBCOMMAND_FULL_DESCRIPTION = "Use this command if you would like your fellowship to know when you're struggling especially with your focus" +
     "by setting an amount of days since last reset in which you would need the most moral support. If you are within this threshold, you'll be mentoned on the danger zone table.";
-exports.TRACK_THRESHOLD_SUBCOMMAND_FULL_DESCRIPTION = "";
 exports.TRACK_LIST_SUBCOMMAND = "list";
 exports.TRACK_LIST_SUBCOMMAND_DESCRIPTION = "This command will list all the users you know that are in their threshold.";
 exports.TRACK_LIST_SUBCOMMAND_FULL_DESCRIPTION = "This command will list check your personal membership and list all the users that are in their threshold.";
