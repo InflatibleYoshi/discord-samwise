@@ -84,6 +84,8 @@ tracking.registerSubcommand(text.TRACK_RESET_SUBCOMMAND, async (msg) => {
             if (focus !== null) {
                 //2. if focus exists then try to get the fellowship
                 await dbConnection.getFellowship(msg.author, fellowshipNotEmpty,);
+            } else {
+                bot.emit("messageReturn", msg.channel.id, embed.response(text.TRACK_RESET_SUBCOMMAND, error));
             }
         };
         let failureHandler = function (error) {

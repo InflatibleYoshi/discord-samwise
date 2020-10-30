@@ -92,7 +92,7 @@ class database {
             console.log(`HSET ${user.id.toString()} "streak_current" ${Date.now()} "streak_max" ${streak_max}`);
             this.client.hset(user.id.toString(), "streak_current", Date.now(), "streak_max", streak_max);
             console.log(`HGET ${user.id.toString()} "focus"`);
-            this.client.hget(user.id.toString(), "focus");
+            return this.client.hget(user.id.toString(), "focus");
         }).then(successHandler, failureHandler);
     }
 
