@@ -129,7 +129,7 @@ tracking.registerSubcommand(text.TRACK_THRESHOLD_SUBCOMMAND, async (msg, args) =
     let failureHandler = function (error) {
         bot.emit("messageReturn", msg.channel.id, embed.error(text.TRACK_THRESHOLD_SUBCOMMAND, error));
     };
-    dbConnection.setThreshold(msg.author.id, threshold, successHandler, failureHandler);
+    await dbConnection.setThreshold(msg.author.id, threshold, successHandler, failureHandler);
 }, {
     description: text.TRACK_THRESHOLD_SUBCOMMAND_DESCRIPTION,
     fullDescription: text.TRACK_THRESHOLD_SUBCOMMAND_FULL_DESCRIPTION
@@ -158,6 +158,10 @@ tracking.registerSubcommand(text.TRACK_DATE_SUBCOMMAND, async (msg, args) => {
         return;
     }
     const results = Chrono.parse(parse);
+    if(!results){
+        bot.emit("messageReturn", msg.channel.id, embed.error(text.TRACK_DATE_SUBCOMMAND, text.TRACK_DATE_SUBCOMMAND_INVALID_DATE));
+        return;
+    }
     const timestamp = results[0].start.date().getTime();
     console.log(timestamp);
     // Finding the difference in milliseconds and converting to days.
