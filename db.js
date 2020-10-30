@@ -46,19 +46,19 @@ class database {
             if (!exists) {
                 throw 'Your user has not been tracked. Type !track help for more information.';
             }
-            console.log(`HSET ${user.id.toString()} focus`);
-            this.client.hset(user.id.toString(), "focus");
+            console.log(`HSET ${user.id.toString()} focus ${focus}`);
+            this.client.hset(user.id.toString(), "focus", focus);
         }).then(successHandler, failureHandler);
     }
 
-    async setThreshold(user, focus, successHandler, failureHandler){
+    async setThreshold(user, threshold, successHandler, failureHandler){
         console.log("dbSetThreshold");
         await this.isUserTracked(user).then((exists) => {
             if (!exists) {
                 throw 'Your user has not been tracked. Type !track help for more information.';
             }
-            console.log(`HSET ${user.id.toString()} threshold`);
-            return this.client.hset(user.id.toString(), "threshold");
+            console.log(`HSET ${user.id.toString()} threshold ${threshold}`);
+            return this.client.hset(user.id.toString(), "threshold", threshold);
         }).then(successHandler, failureHandler);
     }
 
