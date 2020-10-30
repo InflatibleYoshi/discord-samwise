@@ -79,10 +79,11 @@ class database {
             console.log(this.getDaysDifference(list[0][0]))
             console.log(list[0][1]);
             memberList = memberList.filter((member, i) => parseInt(this.getDaysDifference(list[i][0], 10)) < parseInt(list[i][1], 10));
+            console.log(memberList);
             if(memberList.length === 0){
                 throw 'None of the fellowships you are a part of are tracked and within the threshold.'
             }
-            return memberList.map(x => x + '\n');
+            return memberList
         }).then(successHandler, failureHandler);
     }
 
