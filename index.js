@@ -58,6 +58,8 @@ tracking.registerSubcommand(text.TRACK_RESET_SUBCOMMAND, async (msg) => {
             let fellowshipNotEmpty = function (users) {
                 //3. If fellowship not empty, send message asking if you would like to notify your fellowship of your reset.
                 bot.createMessage(msg.channel.id, embed.command(text.TRACK_RESET_SUBCOMMAND, text.TRACK_RESET_SUBCOMMAND_FOLLOWUP)).then((message) => {
+                    message.addReaction('✅');
+                    message.addReaction('❌');
                     userEventListener = async function (user_msg, emoji, id) {
                         if (user_msg.id === message.id && id === msg.author.id) {
                             if (emoji.name === '❌') {
@@ -67,10 +69,10 @@ tracking.registerSubcommand(text.TRACK_RESET_SUBCOMMAND, async (msg) => {
                                 //4. Send to all users
                                 for (user of users) {
                                     await bot.getDMChannel(user).then((channel) => {
-                                        bot.emit("messageReturn", channel.id, embed.alert(text.TRACK_RESET_SUBCOMMAND, TRACK_RESET_SUBCOMMAND_FOLLOWUP_TEXT(msg.author.username, focus)));
+                                        bot.emit("messageReturn", channel.id, embed.alert(text.TRACK_RESET_SUBCOMMAND, text.TRACK_RESET_SUBCOMMAND_FOLLOWUP_TEXT(msg.author.username, focus)));
                                     });
                                 }
-                                bot.emit("messageReturn", msg.channel.id, embed.response(text.TRACK_RESET_SUBCOMMAND, TRACK_RESET_SUBCOMMAND_FOLLOWUP_SUCCESS));
+                                bot.emit("messageReturn", msg.channel.id, embed.response(text.TRACK_RESET_SUBCOMMAND, text.TRACK_RESET_SUBCOMMAND_FOLLOWUP_SUCCESS));
                                 message.delete();
                                 bot.off("messageReactionAdd", userEventListener);
                             }
