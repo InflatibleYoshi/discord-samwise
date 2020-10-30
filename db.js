@@ -83,7 +83,7 @@ class database {
             if(memberList.length === 0){
                 throw 'None of the fellowships you are a part of are tracked and within the threshold.'
             }
-            return memberList
+            return memberList;
         }).then(successHandler, failureHandler);
     }
 
