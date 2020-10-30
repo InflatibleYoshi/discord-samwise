@@ -119,17 +119,17 @@ tracking.registerSubcommand(text.TRACK_THRESHOLD_SUBCOMMAND, async (msg, args) =
     console.log(text.TRACK_THRESHOLD_SUBCOMMAND);
     const threshold = parseInt(args.join(" "), 10);
     console.log(threshold);
-    if (!isNaN(threshold) || threshold > 0) {
-        let successHandler = function (users) {
-            bot.emit("messageReturn", msg.channel.id, embed.response(text.TRACK_THRESHOLD_SUBCOMMAND, users));
-        };
-        let failureHandler = function (error) {
-            bot.emit("messageReturn", msg.channel.id, embed.error(text.TRACK_THRESHOLD_SUBCOMMAND, error));
-        };
-        dbConnection.setThreshold(msg.author.id, threshold, successHandler, failureHandler);
-    } else {
+    if(isNaN(threshold) && threshold > 0){
         bot.emit("messageReturn", msg.channel.id, embed.error(text.TRACK_THRESHOLD_SUBCOMMAND, TRACK_THRESHOLD_SUBCOMMAND_INPUT_ERROR));
+        return;
     }
+    let successHandler = function (users) {
+        bot.emit("messageReturn", msg.channel.id, embed.response(text.TRACK_THRESHOLD_SUBCOMMAND, users));
+    };
+    let failureHandler = function (error) {
+        bot.emit("messageReturn", msg.channel.id, embed.error(text.TRACK_THRESHOLD_SUBCOMMAND, error));
+    };
+    dbConnection.setThreshold(msg.author.id, threshold, successHandler, failureHandler);
 }, {
     description: text.TRACK_THRESHOLD_SUBCOMMAND_DESCRIPTION,
     fullDescription: text.TRACK_THRESHOLD_SUBCOMMAND_FULL_DESCRIPTION
