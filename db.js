@@ -58,7 +58,7 @@ class database {
                 throw 'Your user has not been tracked. Type !track help for more information.';
             }
             console.log(`HSET ${user.id.toString()} threshold ${threshold}`);
-            return this.client.hset(user.id.toString(), "threshold", threshold);
+            this.client.hset(user.id.toString(), "threshold", threshold);
         }).then(successHandler, failureHandler);
     }
 
@@ -90,14 +90,9 @@ class database {
             const streak_new = this.getDaysDifference(timestamp);
             const streak_max = Math.max(streak, streak_new);
             console.log(`HSET ${user.id.toString()} "streak_current" ${Date.now()} "streak_max" ${streak_max}`);
-            return this.client.hset(user.id.toString(), "streak_current", Date.now(), "streak_max", streak_max);
-        }).then(async (isSet) => {
-            console.log(isSet);
-            if(isSet == 0){
-                throw 'There was an error in resetting the streak.'
-            }
+            this.client.hset(user.id.toString(), "streak_current", Date.now(), "streak_max", streak_max);
             console.log(`HGET ${user.id.toString()} "focus"`);
-            return this.client.hget(user.id.toString(), "focus");
+            this.client.hget(user.id.toString(), "focus");
         }).then(successHandler, failureHandler);
     }
 
@@ -126,6 +121,7 @@ class database {
     }
 
     async getMembership(user, successHandler, failureHandler){
+        console.log("dbGetMembership");
         console.log(`SMEMBERS ${user.id.toString() + MEMBERSHIP}`);
         await this.client.smembers(user.id.toString() + MEMBERSHIP).then((array) =>{
             if(array.length === 0) throw ''
@@ -134,6 +130,7 @@ class database {
     }
 
     async getFellowship(user, successHandler, failureHandler){
+        console.log("dbGetFellowship");
         console.log(`SMEMBERS ${user.id.toString() + FELLOWSHIP}`);
         await this.client.smembers(user.id.toString() + FELLOWSHIP).then((array) =>{
             if(array.length === 0) throw ''

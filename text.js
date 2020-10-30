@@ -70,9 +70,9 @@ exports.INVITE_COMMAND_ALREADY_IN_FELLOWSHIP_ERROR_PRE = function(username) {ret
 exports.INVITE_COMMAND_ALREADY_IN_FELLOWSHIP_ERROR_POST = function(username) {return `You are already in ${username}'s fellowship.`};
 
 exports.KICK_COMMAND = "kick";
-exports.KICK_COMMAND_DESCRIPTION = "Kick a user from your fellowship";
+exports.KICK_COMMAND_DESCRIPTION = "Kick a user from your fellowship.";
 exports.KICK_COMMAND_FULL_DESCRIPTION = "Kick a user from your fellowship by typing that user's" +
-    "username or user id to the right of the !kick command";
+    "username or user id to the right of the !kick command.";
 exports.KICK_COMMAND_ON_KICK = function(username) {return `You have decided to remove ${username} from your fellowship.
 Use the reaction buttons to confirm or deny.`};
 exports.KICK_COMMAND_SUCCESS_RESPONSE = function(username) {return `You have removed ${username} from your fellowship.`};

@@ -126,7 +126,7 @@ tracking.registerSubcommand(text.TRACK_THRESHOLD_SUBCOMMAND, async (msg, args) =
         bot.emit("messageReturn", msg.channel.id, embed.error(text.TRACK_THRESHOLD_SUBCOMMAND, text.TRACK_THRESHOLD_SUBCOMMAND_ZERO_ERROR));
         return;
     }
-    let successHandler = function (users) {
+    let successHandler = function (_users) {
         bot.emit("messageReturn", msg.channel.id, embed.response(text.TRACK_THRESHOLD_SUBCOMMAND, text.TRACK_THRESHOLD_SUBCOMMAND_SUCCESS));
     };
     let failureHandler = function (error) {
