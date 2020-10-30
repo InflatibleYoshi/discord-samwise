@@ -40,6 +40,7 @@ exports.TRACK_FOCUS_SUBCOMMAND_FULL_DESCRIPTION = "Use this command if you would
     "e.g. !track focus alcoholism";
 exports.TRACK_THRESHOLD_SUBCOMMAND = "threshold";
 exports.TRACK_THRESHOLD_SUBCOMMAND_INPUT_ERROR = "Please set your threshold to a number and make sure that you only type 1 number."
+exports.TRACK_THRESHOLD_SUBCOMMAND_ZERO_ERROR = "Please set your threshold to a number that is not zero."
 exports.TRACK_THRESHOLD_SUBCOMMAND_SUCCESS = "You have set your threshold successfully.";
 exports.TRACK_THRESHOLD_SUBCOMMAND_DESCRIPTION = "Set a threshold of days in which you would like more moral support.";
 exports.TRACK_THRESHOLD_SUBCOMMAND_FULL_DESCRIPTION = "Use this command if you would like your fellowship to know when you're struggling especially with your focus" +
