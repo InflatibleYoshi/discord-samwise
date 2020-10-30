@@ -106,7 +106,7 @@ tracking.registerSubcommand(text.TRACK_FOCUS_SUBCOMMAND, async (msg, args) => {
         let failureHandler = function (error) {
             bot.emit("messageReturn", msg.channel.id, embed.error(text.TRACK_FOCUS_SUBCOMMAND, error));
         };
-        await dbConnection.setFocus(msg.author.id, focus, successHandler, failureHandler);
+        await dbConnection.setFocus(msg.author, focus, successHandler, failureHandler);
     } else {
         bot.emit("messageReturn", msg.channel.id, embed.error(text.TRACK_FOCUS_SUBCOMMAND, text.TRACK_FOCUS_SUBCOMMAND_INPUT_ERROR));
     }
@@ -132,7 +132,7 @@ tracking.registerSubcommand(text.TRACK_THRESHOLD_SUBCOMMAND, async (msg, args) =
     let failureHandler = function (error) {
         bot.emit("messageReturn", msg.channel.id, embed.error(text.TRACK_THRESHOLD_SUBCOMMAND, error));
     };
-    await dbConnection.setThreshold(msg.author.id, threshold, successHandler, failureHandler);
+    await dbConnection.setThreshold(msg.author, threshold, successHandler, failureHandler);
 }, {
     description: text.TRACK_THRESHOLD_SUBCOMMAND_DESCRIPTION,
     fullDescription: text.TRACK_THRESHOLD_SUBCOMMAND_FULL_DESCRIPTION
