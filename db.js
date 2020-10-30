@@ -71,7 +71,7 @@ class database {
             // HOW DO I FIX THIS BLAUGHHHHHHH
             return Promise.all(memberList.map((member) => {
                 console.log(`HMGET ${member} streak_current threshold`);
-                this.client.hmget(member, "streak_current", "threshold");
+                return this.client.hmget(member, "streak_current", "threshold");
             }));
         }).then((list) => {
             //The oneliner filters out all the entries for which the threshold is not greater than streak_current.
