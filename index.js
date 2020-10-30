@@ -145,7 +145,7 @@ tracking.registerSubcommand(text.TRACK_THRESHOLD_SUBCOMMAND, async (msg, args) =
 tracking.registerSubcommand(text.TRACK_LIST_SUBCOMMAND, async (msg, args) => {
     console.log(text.TRACK_LIST_SUBCOMMAND);
     let successHandler = function (users) {
-        bot.emit("messageReturn", msg.channel.id, embed.response(text.TRACK_LIST_SUBCOMMAND, users));
+        bot.emit("messageReturn", msg.channel.id, embed.response(text.TRACK_LIST_SUBCOMMAND, getUsernames(users).toString()));
     };
     let failureHandler = function (error) {
         bot.emit("messageReturn", msg.channel.id, embed.error(text.TRACK_LIST_SUBCOMMAND, error));
