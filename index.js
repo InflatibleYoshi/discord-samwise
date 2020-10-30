@@ -127,7 +127,7 @@ tracking.registerSubcommand(text.TRACK_THRESHOLD_SUBCOMMAND, async (msg, args) =
         return;
     }
     let successHandler = function (users) {
-        bot.emit("messageReturn", msg.channel.id, embed.response(text.TRACK_THRESHOLD_SUBCOMMAND, users));
+        bot.emit("messageReturn", msg.channel.id, embed.response(text.TRACK_THRESHOLD_SUBCOMMAND, text.TRACK_THRESHOLD_SUBCOMMAND_SUCCESS));
     };
     let failureHandler = function (error) {
         bot.emit("messageReturn", msg.channel.id, embed.error(text.TRACK_THRESHOLD_SUBCOMMAND, error));
@@ -146,7 +146,7 @@ tracking.registerSubcommand(text.TRACK_LIST_SUBCOMMAND, async (msg, args) => {
     let failureHandler = function (error) {
         bot.emit("messageReturn", msg.channel.id, embed.error(text.TRACK_LIST_SUBCOMMAND, error));
     };
-    await dbConnection.trackedList(msg.author.id, successHandler, failureHandler);
+    await dbConnection.trackedList(msg.author, successHandler, failureHandler);
 }, {
     description: text.TRACK_LIST_SUBCOMMAND_DESCRIPTION,
     fullDescription: text.TRACK_LIST_SUBCOMMAND_FULL_DESCRIPTION
