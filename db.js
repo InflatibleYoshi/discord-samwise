@@ -76,9 +76,9 @@ class database {
         }).then((list) => {
             //The oneliner filters out all the entries for which the threshold is not greater than streak_current.
             console.log(list);
-            console.log(this.getDaysDifference(list[0]))
-            console.log(list[1]);
-            memberList = memberList.filter((member, i) => parseInt(this.getDaysDifference(list[2 * i], 10)) < parseInt(list[2 * i + 1], 10));
+            console.log(this.getDaysDifference(list[0][0]))
+            console.log(list[0][1]);
+            memberList = memberList.filter((member, i) => parseInt(this.getDaysDifference(list[i][0], 10)) < parseInt(list[i][1], 10));
             if(memberList.length === 0){
                 throw 'None of the fellowships you are a part of are tracked and within the threshold.'
             }
