@@ -64,11 +64,15 @@ class database {
 
     async trackedList(user, successHandler, failureHandler){
         let memberList;
-        await this.client.smembers(user.id.toString() + MEMBERSHIP).then((array) =>{
+        await this.client.smembers(user.id.toString() + MEMBERSHIP).then((array) => {
             if(array.length === 0) throw 'You are not a part of any fellowships.'
             memberList = array;
-            console.log(memberList)
-            return Promise.all(memberList.map(member => this.client.hmget(member, "streak_current", "threshold")))
+            console.log(memberList);
+            // HOW DO I FIX THIS BLAUGHHHHHHH
+            return Promise.all(memberList.map((member) => {
+                console.log(`HMGET ${member} streak_current threshold`);
+                this.client.hmget(member, "streak_current", "threshold");
+            }));
         }).then((list) => {
             //The oneliner filters out all the entries for which the threshold is not greater than streak_current.
             console.log(this.getDaysDifference(list[0]))
