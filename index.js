@@ -39,6 +39,7 @@ function getUser(msg) {
 }
 
 const tracking = bot.registerCommand(text.TRACK_COMMAND, () => {
+        msg.delete();
         bot.emit("messageReturn", msg.author.id, embed.command(text.TRACK_COMMAND, text.TRACK_COMMAND_FULL_DESCRIPTION));
     },
     {
@@ -48,6 +49,7 @@ const tracking = bot.registerCommand(text.TRACK_COMMAND, () => {
 
 tracking.registerSubcommand(text.TRACK_RESET_SUBCOMMAND, async (msg) => {
         console.log(text.TRACK_RESET_SUBCOMMAND);
+        msg.delete();
         let successHandler = async function (focus) {
             bot.emit("messageReturn", msg.author.id, embed.response(text.TRACK_RESET_SUBCOMMAND, text.TRACK_RESET_SUBCOMMAND_RESPONSE));
             let fellowshipNotEmpty = function (users) {
@@ -95,6 +97,7 @@ tracking.registerSubcommand(text.TRACK_RESET_SUBCOMMAND, async (msg) => {
 
 tracking.registerSubcommand(text.TRACK_FOCUS_SUBCOMMAND, async (msg, args) => {
     console.log(text.TRACK_FOCUS_SUBCOMMAND);
+    msg.delete();
     if (args.length !== 0) {
         const focus = args.join(" ");
         let successHandler = function (_user) {
@@ -114,6 +117,7 @@ tracking.registerSubcommand(text.TRACK_FOCUS_SUBCOMMAND, async (msg, args) => {
 
 tracking.registerSubcommand(text.TRACK_THRESHOLD_SUBCOMMAND, async (msg, args) => {
     console.log(text.TRACK_THRESHOLD_SUBCOMMAND);
+    msg.delete();
     const threshold = parseInt(args.join(" "), 10);
     console.log(threshold);
     if(isNaN(threshold)){
@@ -137,6 +141,7 @@ tracking.registerSubcommand(text.TRACK_THRESHOLD_SUBCOMMAND, async (msg, args) =
 
 tracking.registerSubcommand(text.TRACK_LIST_SUBCOMMAND, async (msg, args) => {
     console.log(text.TRACK_LIST_SUBCOMMAND);
+    msg.delete();
     let successHandler = function (users) {
         bot.emit("messageReturn", msg.author.id, embed.response(text.TRACK_LIST_SUBCOMMAND, users));
     };
@@ -151,6 +156,7 @@ tracking.registerSubcommand(text.TRACK_LIST_SUBCOMMAND, async (msg, args) => {
 
 tracking.registerSubcommand(text.TRACK_DATE_SUBCOMMAND, async (msg, args) => {
     console.log(text.TRACK_DATE_SUBCOMMAND);
+    msg.delete();
     const parse = args.join(" ");
     // Make a string of the text after the command label
     if(!parse){
@@ -202,6 +208,8 @@ tracking.registerSubcommand(text.TRACK_DATE_SUBCOMMAND, async (msg, args) => {
 
 
 bot.registerCommand(text.GET_MEMBERSHIP_COMMAND, async (msg) => {
+        console.log(text.GET_MEMBERSHIP_COMMAND)
+        msg.delete();
         let successHandler = function (users) {
             bot.emit("messageReturn", msg.author.id, embed.response(text.GET_MEMBERSHIP_COMMAND, users));
         };
@@ -216,7 +224,9 @@ bot.registerCommand(text.GET_MEMBERSHIP_COMMAND, async (msg) => {
     });
 
 bot.registerCommand(text.GET_FELLOWSHIP_COMMAND, async (msg) => {
-        let successHandler = function (users) {
+    console.log(text.GET_FELLOWSHIP_COMMAND)
+    msg.delete();
+    let successHandler = function (users) {
             bot.emit("messageReturn", msg.author.id, embed.response(text.GET_FELLOWSHIP_COMMAND, getUsernames(users).toString()));
         };
         let failureHandler = function (_error) {
@@ -232,6 +242,7 @@ bot.registerCommand(text.GET_FELLOWSHIP_COMMAND, async (msg) => {
 bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
         //initial check for empty fellowship.
         console.log(text.NOTIFY_COMMAND);
+        msg.delete();
         let fellowshipEmpty = function (_error) {
             console.log("fellowship empty");
             bot.emit("messageReturn", msg.author.id, embed.error(text.NOTIFY_COMMAND, text.NOTIFY_COMMAND_NO_FELLOWSHIP_ERROR));
