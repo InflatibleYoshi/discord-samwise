@@ -38,15 +38,6 @@ function getUser(msg) {
     return returningUser;
 }
 
-function getUsernames(args) {
-    console.log("getUsernames");
-    let users = bot.users;
-    console.log(users);
-    let filteredUsers = users.filter(user => args.includes(user.id) || args.includes(user.username));
-    console.log(filteredUsers.map(user => user.username));
-    return filteredUsers.map(user => user.username);
-}
-
 const tracking = bot.registerCommand(text.TRACK_COMMAND, () => {
         bot.emit("messageReturn", msg.author.id, embed.command(text.TRACK_COMMAND, text.TRACK_COMMAND_FULL_DESCRIPTION));
     },
@@ -147,7 +138,7 @@ tracking.registerSubcommand(text.TRACK_THRESHOLD_SUBCOMMAND, async (msg, args) =
 tracking.registerSubcommand(text.TRACK_LIST_SUBCOMMAND, async (msg, args) => {
     console.log(text.TRACK_LIST_SUBCOMMAND);
     let successHandler = function (users) {
-        bot.emit("messageReturn", msg.author.id, embed.response(text.TRACK_LIST_SUBCOMMAND, getUsernames(users).toString()));
+        bot.emit("messageReturn", msg.author.id, embed.response(text.TRACK_LIST_SUBCOMMAND, users));
     };
     let failureHandler = function (error) {
         bot.emit("messageReturn", msg.author.id, embed.error(text.TRACK_LIST_SUBCOMMAND, error));
@@ -212,7 +203,7 @@ tracking.registerSubcommand(text.TRACK_DATE_SUBCOMMAND, async (msg, args) => {
 
 bot.registerCommand(text.GET_MEMBERSHIP_COMMAND, async (msg) => {
         let successHandler = function (users) {
-            bot.emit("messageReturn", msg.author.id, embed.response(text.GET_MEMBERSHIP_COMMAND, getUsernames(users).toString()));
+            bot.emit("messageReturn", msg.author.id, embed.response(text.GET_MEMBERSHIP_COMMAND, users));
         };
         let failureHandler = function (_error) {
             bot.emit("messageReturn", msg.author.id, embed.error(text.GET_MEMBERSHIP_COMMAND, text.GET_MEMBERSHIP_COMMAND_ERROR));
