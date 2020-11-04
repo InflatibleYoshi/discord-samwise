@@ -321,10 +321,10 @@ bot.registerCommand(text.REQUEST_COMMAND, async (msg) => {
                         .then((channel) => {
                             onFellowshipAdd = function (_user) {
                                 bot.emit("messageReturn", msg.author.id, embed.response(text.REQUEST_COMMAND, text.COMMAND_ON_FELLOWSHIP_ADDING_RESPONSE(user.username)));
-                                bot.emit("messageReturn", channel.id, embed.response(text.REQUEST_COMMAND, text.COMMAND_ON_FELLOWSHIP_TARGET_RESPONSE(msg.author.username)));
+                                bot.emit("messageReturn", user.id, embed.response(text.REQUEST_COMMAND, text.COMMAND_ON_FELLOWSHIP_TARGET_RESPONSE(msg.author.username)));
                             };
                             failureHandler = function (_error) {
-                                bot.emit("messageReturn", channel.id, embed.error(text.REQUEST_COMMAND, text.REQUEST_COMMAND_ALREADY_IN_FELLOWSHIP_ERROR_POST(msg.author.username)));
+                                bot.emit("messageReturn", user.id, embed.error(text.REQUEST_COMMAND, text.REQUEST_COMMAND_ALREADY_IN_FELLOWSHIP_ERROR_POST(msg.author.username)));
                             };
                             return channel.createMessage(embed.command(text.REQUEST_COMMAND, text.REQUEST_COMMAND_ON_FELLOWSHIP_TARGET_REQUEST(msg.author.username)))
                         })
@@ -378,10 +378,10 @@ bot.registerCommand(text.INVITE_COMMAND, async (msg) => {
                         .then((channel) => {
                             onFellowshipAdd = function (_user) {
                                 bot.emit("messageReturn", msg.author.id, embed.response(text.INVITE_COMMAND, text.COMMAND_ON_FELLOWSHIP_TARGET_RESPONSE(user.username)));
-                                bot.emit("messageReturn", channel.id, embed.response(text.INVITE_COMMAND, text.COMMAND_ON_FELLOWSHIP_ADDING_RESPONSE(msg.author.username)));
+                                bot.emit("messageReturn", user.id, embed.response(text.INVITE_COMMAND, text.COMMAND_ON_FELLOWSHIP_ADDING_RESPONSE(msg.author.username)));
                             };
                             failureHandler = function (_error) {
-                                bot.emit("messageReturn", channel.id, embed.error(text.INVITE_COMMAND, text.INVITE_COMMAND_ALREADY_IN_FELLOWSHIP_ERROR_POST(msg.author.username)));
+                                bot.emit("messageReturn", user.id, embed.error(text.INVITE_COMMAND, text.INVITE_COMMAND_ALREADY_IN_FELLOWSHIP_ERROR_POST(msg.author.username)));
                             };
 
                             return channel.createMessage(embed.command(text.INVITE_COMMAND, text.INVITE_COMMAND_ON_FELLOWSHIP_ADDING_INVITE(user.username)))

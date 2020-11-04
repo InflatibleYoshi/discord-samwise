@@ -116,9 +116,9 @@ class database {
         }).then(async (result) =>{
             if(result == 0) throw '';
             console.log(`SET ${user.id.toString() + USERNAME} ${user.username}`);
-            await that.client.set(user.id.toString() + USERNAME, user.username);
+            await this.client.set(user.id.toString() + USERNAME, user.username);
             console.log(`SET ${owner.id.toString() + USERNAME} ${owner.username}`);
-            await that.client.set(owner.id.toString() + USERNAME, owner.username);
+            await this.client.set(owner.id.toString() + USERNAME, owner.username);
         }).then(successHandler, failureHandler);
     }
 
