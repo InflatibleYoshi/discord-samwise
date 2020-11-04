@@ -26,6 +26,7 @@ bot.on("messageReturn", async (id, msgToReturn) => {
 function getUser(msg) {
     console.log("getUser");
     let users = msg.mentions;
+    console.log(msg.author.id);
     console.log(msg.mentions);
     let returningUser = null;
     let user = users.filter(user => !user.includes(msg.author.id));
