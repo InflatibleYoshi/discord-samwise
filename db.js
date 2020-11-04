@@ -2,6 +2,7 @@ const Redis = require('ioredis');
 const FELLOWSHIP = "_fellowship";
 const MEMBERSHIP = "_membership";
 const THRESHOLD = "_threshold";
+const USERNAME = "_username";
 
 class database {
     constructor(){
@@ -68,7 +69,6 @@ class database {
             if(array.length === 0) throw 'You are not a part of any fellowships.'
             memberList = array;
             console.log(memberList);
-            // HOW DO I FIX THIS BLAUGHHHHHHH
             return Promise.all(memberList.map((member) => {
                 console.log(`HMGET ${member} streak_current threshold`);
                 return this.client.hmget(member, "streak_current", "threshold");
@@ -113,8 +113,12 @@ class database {
             if(result == 0) throw '';
             console.log(`SADD ${user.id.toString() + MEMBERSHIP} ${owner.id.toString()}`);
             return this.client.sadd(user.id.toString() + MEMBERSHIP, owner.id.toString());
-        }).then((result) =>{
+        }).then(async (result) =>{
             if(result == 0) throw '';
+            console.log(`SET ${user.id.toString() + USERNAME} ${user.username}`);
+            await that.client.set(user.id.toString() + USERNAME, user.username);
+            console.log(`SET ${owner.id.toString() + USERNAME} ${owner.username}`);
+            await that.client.set(owner.id.toString() + USERNAME, owner.username);
         }).then(successHandler, failureHandler);
     }
 
@@ -136,6 +140,11 @@ class database {
         await this.client.smembers(user.id.toString() + MEMBERSHIP).then((array) =>{
             if(array.length === 0) throw ''
             return array
+        }).then((array) => {
+            usernames = [];
+            for (user of array){
+                usernames.push(this.client.get(user.id.toString() + USERNAME));
+            }
         }).then(successHandler, failureHandler);
     }
 
@@ -145,6 +154,11 @@ class database {
         await this.client.smembers(user.id.toString() + FELLOWSHIP).then((array) =>{
             if(array.length === 0) throw ''
             return array
+        }).then((array) => {
+            usernames = [];
+            for (user of array){
+                usernames.push(this.client.get(user.id.toString() + USERNAME));
+            }
         }).then(successHandler, failureHandler);
     }
 }
