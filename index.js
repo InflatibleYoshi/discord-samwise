@@ -27,7 +27,7 @@ function getUser(msg) {
     console.log("getUser");
     let users = msg.mentions;
     let returningUser = null;
-    let user = users.filter(user => !args.includes(msg.author.id));
+    let user = users.filter(user => !user.includes(msg.author.id));
     if (user.length > 0) {
         returningUser = user[0];
         console.log(returningUser.username);
