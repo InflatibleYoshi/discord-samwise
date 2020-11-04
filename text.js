@@ -8,7 +8,7 @@ exports.COMMAND_ON_FELLOWSHIP_TARGET_RESPONSE = function(username) {return `You 
 
 exports.TRACK_RESPONSE = "This command is only available to tracked users.";
 exports.TRACK_COMMAND = "track";
-exports.TRACK_COMMAND_DESCRIPTION = "The four subcommands available are \'date\', \'reset\', \'focus\', \'list\', and \'threshold\'.";
+exports.TRACK_COMMAND_DESCRIPTION = "The five subcommands available are \'date\', \'reset\', \'focus\', \'list\', and \'threshold\'.";
 exports.TRACK_COMMAND_FULL_DESCRIPTION = "The date command allows the user to track the days spent dedicated towards a single goal." +
     "The reset command allows the user to reset the date in the case of a relapse." +
     "The focus command allows the user to set their personal focus." +
