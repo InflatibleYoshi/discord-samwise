@@ -426,7 +426,7 @@ bot.registerCommand(text.KICK_COMMAND, async (msg) => {
                 if (!exists) {
                     bot.emit("messageReturn", msg.author.id, embed.error(text.KICK_COMMAND_NOT_IN_FELLOWSHIP_ERROR(user.username)));
                 } else {
-                    return bot.getDMChannel(msg.channel.id)
+                    return bot.getDMChannel(msg.author.id)
                         .then((channel) => {
                             return bot.createMessage(channel.id, embed.command(text.KICK_COMMAND, text.KICK_COMMAND_ON_KICK(user.username)));
                         })
@@ -477,7 +477,7 @@ bot.registerCommand(text.LEAVE_COMMAND, async (msg) => {
                 if (!exists) {
                     bot.emit("messageReturn", msg.author.id, text.LEAVE_COMMAND_NOT_IN_FELLOWSHIP_ERROR(user.username));
                 } else {
-                    return bot.getDMChannel(msg.channel.id)
+                    return bot.getDMChannel(msg.author.id)
                         .then((channel) => {
                             return bot.createMessage(channel.id, embed.command(text.LEAVE_COMMAND, text.LEAVE_COMMAND_ON_LEAVE(user.username)));
                         })
