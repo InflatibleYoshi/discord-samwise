@@ -206,7 +206,7 @@ tracking.registerSubcommand(text.TRACK_DATE_SUBCOMMAND, async (msg, args) => {
     fullDescription: text.TRACK_DATE_SUBCOMMAND_FULL_DESCRIPTION
 })
 
-
+//This command has some issues lool
 bot.registerCommand(text.GET_MEMBERSHIP_COMMAND, async (msg) => {
         console.log(text.GET_MEMBERSHIP_COMMAND)
         msg.delete();

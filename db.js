@@ -140,11 +140,8 @@ class database {
         await this.client.smembers(user.id.toString() + MEMBERSHIP).then((array) =>{
             if(array.length === 0) throw ''
             return array
-        }).then((array) => {
-            usernames = [];
-            for (user of array){
-                usernames.push(this.client.get(user.id.toString() + USERNAME));
-            }
+        }).then(async (array) => {
+            return Promise.all(array.map(this.client.get(user.id.toString() + USERNAME)))
         }).then(successHandler, failureHandler);
     }
 
@@ -154,11 +151,8 @@ class database {
         await this.client.smembers(user.id.toString() + FELLOWSHIP).then((array) =>{
             if(array.length === 0) throw ''
             return array
-        }).then((array) => {
-            usernames = [];
-            for (user of array){
-                usernames.push(this.client.get(user.id.toString() + USERNAME));
-            }
+        }).then(async (array) => {
+            return Promise.all(array.map(this.client.get(user.id.toString() + USERNAME)))
         }).then(successHandler, failureHandler);
     }
 }
