@@ -26,7 +26,6 @@ bot.on("messageReturn", async (id, msgToReturn) => {
 bot.on("messageDelete", async (msg) => {
     if(msg.channel instanceof Eris.PrivateChannel){
         console.log("private")
-        await msg.channel.deleteMessage(msg.id);
     } else {
         await msg.delete();
     }
