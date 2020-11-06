@@ -24,7 +24,7 @@ bot.on("messageReturn", async (id, msgToReturn) => {
 });
 
 bot.on("messageDelete", async (msg) => {
-    if(msg.channel instanceof PrivateTextableChannel){
+    if(msg.channel instanceof Eris.PrivateTextableChannel){
         console.log("cannot delete");
     } else {
         await msg.delete();
