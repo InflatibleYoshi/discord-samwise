@@ -137,23 +137,26 @@ class database {
     async getMembership(user, successHandler, failureHandler){
         console.log("dbGetMembership");
         console.log(`SMEMBERS ${user.id.toString() + MEMBERSHIP}`);
-        await this.client.smembers(user.id.toString() + MEMBERSHIP).then((array) =>{
+        await this.client.smembers(user.id.toString() + MEMBERSHIP).then((array) => {
             if(array.length === 0) throw ''
             return array
-        }).then(async (array) => {
-            return Promise.all(array.map(this.client.get(user.id.toString() + USERNAME)))
         }).then(successHandler, failureHandler);
     }
 
     async getFellowship(user, successHandler, failureHandler){
         console.log("dbGetFellowship");
         console.log(`SMEMBERS ${user.id.toString() + FELLOWSHIP}`);
-        await this.client.smembers(user.id.toString() + FELLOWSHIP).then((array) =>{
-            if(array.length === 0) throw ''
+        await this.client.smembers(user.id.toString() + FELLOWSHIP).then((array) => {
+            if (array.length === 0) throw ''
             return array
-        }).then(async (array) => {
-            return Promise.all(array.map(this.client.get(user.id.toString() + USERNAME)))
         }).then(successHandler, failureHandler);
+    }
+
+    async getUsernames(array, returnHandler){
+        await Promise.all(array.map(this.client.get(user.id.toString() + USERNAME)))
+            .then((usernames) => {
+                return usernames.fold((acc, x) => acc + x + "\n");
+            }).then(returnHandler);
     }
 }
 

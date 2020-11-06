@@ -142,8 +142,11 @@ tracking.registerSubcommand(text.TRACK_THRESHOLD_SUBCOMMAND, async (msg, args) =
 tracking.registerSubcommand(text.TRACK_LIST_SUBCOMMAND, async (msg, args) => {
     console.log(text.TRACK_LIST_SUBCOMMAND);
     msg.delete();
-    let successHandler = function (users) {
-        bot.emit("messageReturn", msg.author.id, embed.response(text.TRACK_LIST_SUBCOMMAND, users));
+    let successHandler = async function (users) {
+        let returnHandler = function (usernames) {
+            bot.emit("messageReturn", msg.author.id, embed.response(text.TRACK_LIST_SUBCOMMAND, usernames));
+        };
+        await getUsernames(users, returnHandler);
     };
     let failureHandler = function (error) {
         bot.emit("messageReturn", msg.author.id, embed.error(text.TRACK_LIST_SUBCOMMAND, error));
@@ -210,8 +213,11 @@ tracking.registerSubcommand(text.TRACK_DATE_SUBCOMMAND, async (msg, args) => {
 bot.registerCommand(text.GET_MEMBERSHIP_COMMAND, async (msg) => {
         console.log(text.GET_MEMBERSHIP_COMMAND)
         msg.delete();
-        let successHandler = function (users) {
-            bot.emit("messageReturn", msg.author.id, embed.response(text.GET_MEMBERSHIP_COMMAND, users));
+        let successHandler = async function (users) {
+            let returnHandler = function (usernames){
+                bot.emit("messageReturn", msg.author.id, embed.response(text.GET_MEMBERSHIP_COMMAND, usernames));
+            };
+            await getUsernames(users, returnHandler);
         };
         let failureHandler = function (_error) {
             bot.emit("messageReturn", msg.author.id, embed.error(text.GET_MEMBERSHIP_COMMAND, text.GET_MEMBERSHIP_COMMAND_ERROR));
@@ -226,12 +232,15 @@ bot.registerCommand(text.GET_MEMBERSHIP_COMMAND, async (msg) => {
 bot.registerCommand(text.GET_FELLOWSHIP_COMMAND, async (msg) => {
     console.log(text.GET_FELLOWSHIP_COMMAND)
     msg.delete();
-    let successHandler = function (users) {
-            bot.emit("messageReturn", msg.author.id, embed.response(text.GET_FELLOWSHIP_COMMAND, getUsernames(users).toString()));
+    let successHandler = async function (users) {
+        let returnHandler = function (usernames) {
+            bot.emit("messageReturn", msg.author.id, embed.response(text.GET_FELLOWSHIP_COMMAND, usernames));
         };
-        let failureHandler = function (_error) {
-            bot.emit("messageReturn", msg.author.id, embed.error(text.GET_FELLOWSHIP_COMMAND, text.GET_FELLOWSHIP_COMMAND_ERROR));
-        };
+        await getUsernames(users, returnHandler);
+    };
+    let failureHandler = function (_error) {
+        bot.emit("messageReturn", msg.author.id, embed.error(text.GET_FELLOWSHIP_COMMAND, text.GET_FELLOWSHIP_COMMAND_ERROR));
+    };
         await dbConnection.getFellowship(msg.author, successHandler, failureHandler)
     },
     {
