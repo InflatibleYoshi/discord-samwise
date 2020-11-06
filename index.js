@@ -54,7 +54,9 @@ tracking.registerSubcommand(text.TRACK_RESET_SUBCOMMAND, async (msg) => {
             bot.emit("messageReturn", msg.author.id, embed.response(text.TRACK_RESET_SUBCOMMAND, text.TRACK_RESET_SUBCOMMAND_RESPONSE));
             let fellowshipNotEmpty = function (users) {
                 //3. If fellowship not empty, send message asking if you would like to notify your fellowship of your reset.
-                bot.createMessage(msg.author.id, embed.command(text.TRACK_RESET_SUBCOMMAND, text.TRACK_RESET_SUBCOMMAND_FOLLOWUP)).then((message) => {
+                bot.getDMChannel(msg.author.id).then((channel) => {
+                    return bot.createMessage(channel.id, embed.command(text.TRACK_RESET_SUBCOMMAND, text.TRACK_RESET_SUBCOMMAND_FOLLOWUP));
+                }).then((message) => {
                     message.addReaction('✅');
                     message.addReaction('❌');
                     userEventListener = async function (user_msg, emoji, id) {
@@ -182,9 +184,10 @@ tracking.registerSubcommand(text.TRACK_DATE_SUBCOMMAND, async (msg, args) => {
         if (exists) {
             bot.emit("messageReturn", msg.author.id, embed.command(text.TRACK_DATE_SUBCOMMAND, text.TRACK_DATE_SUBCOMMAND_ALREADY_TRACKED_WARNING));
         }
-        return bot.createMessage(msg.channel.id, embed.command(text.TRACK_DATE_SUBCOMMAND, text.TRACK_DATE_SUBCOMMAND_RETURN_STREAK(streak)));
-    })
-        .then((message) => {
+        return bot.getDMChannel(msg.author.id)})
+        .then((channel) => {
+            return bot.createMessage(channel.id, embed.command(text.TRACK_DATE_SUBCOMMAND, text.TRACK_DATE_SUBCOMMAND_RETURN_STREAK(streak)))
+        }).then((message) => {
                 message.addReaction('✅');
                 message.addReaction('❌');
                 userEventListener = function (user_msg, emoji, id) {
@@ -214,7 +217,6 @@ bot.registerCommand(text.GET_MEMBERSHIP_COMMAND, async (msg) => {
         console.log(text.GET_MEMBERSHIP_COMMAND)
         msg.delete();
         let successHandler = async function (users) {
-            console.log("getUsernames");
             let returnHandler = function (usernames){
                 bot.emit("messageReturn", msg.author.id, embed.response(text.GET_MEMBERSHIP_COMMAND, usernames));
             };
@@ -257,12 +259,13 @@ bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
             console.log("fellowship empty");
             bot.emit("messageReturn", msg.author.id, embed.error(text.NOTIFY_COMMAND, text.NOTIFY_COMMAND_NO_FELLOWSHIP_ERROR));
         };
-        let fellowshipNotEmpty = function (users) {
+        let fellowshipNotEmpty = async function (users) {
             console.log("fellowship not empty");
             console.log(users);
             let userMessageList = [];
             var handlerList = {};
             //Aggregate all the messages that need to go into the notification.
+            console.log("messageIngest")
             let messageIngest = async function (message) {
                 if (message.content.startsWith("!")) {
                     await Promise.all(userMessageList).delete();
@@ -277,7 +280,10 @@ bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
             bot.on("messageCreate", messageIngest);
             handlerList["messageCreate"] = messageIngest;
             //Emotes will send/cancel message.
-            bot.createMessage(msg.author.id, embed.command(text.NOTIFY_COMMAND, text.NOTIFY_COMMAND_INITIALIZATION))
+            await bot.getDMChannel(msg.author.id)
+                .then((channel) => {
+                    return bot.createMessage(channel.id, embed.command(text.NOTIFY_COMMAND, text.NOTIFY_COMMAND_INITIALIZATION));
+                })
                 .then((message) => {
                     message.addReaction('✅');
                     message.addReaction('❌');
@@ -385,7 +391,7 @@ bot.registerCommand(text.INVITE_COMMAND, async (msg) => {
         let user = getUser(msg);
         console.log(user.username);
         await dbConnection.isUserInFellowship(user, msg.author)
-            .then((inFellowship) => {
+            .then(async (inFellowship) => {
                 if (inFellowship) {
                     //Will not add user to fellowship if already exists in fellowship.
                     bot.emit("messageReturn", msg.author.id, embed.error(text.INVITE_COMMAND, text.INVITE_COMMAND_ALREADY_IN_FELLOWSHIP_ERROR_PRE(user.username)));
@@ -395,7 +401,7 @@ bot.registerCommand(text.INVITE_COMMAND, async (msg) => {
                     let failureHandler;
                     bot.emit("messageReturn", msg.author.id, embed.command(text.INVITE_COMMAND, text.INVITE_COMMAND_ON_FELLOWSHIP_TARGET_INVITE(user.username)));
                     //Notify other user of intent to add to fellowship and this will be approved by emote selection.
-                    return bot.getDMChannel(user.id)
+                    await bot.getDMChannel(user.id)
                         .then((channel) => {
                             onFellowshipAdd = function (_user) {
                                 bot.emit("messageReturn", msg.author.id, embed.response(text.INVITE_COMMAND, text.COMMAND_ON_FELLOWSHIP_TARGET_RESPONSE(user.username)));
