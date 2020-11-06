@@ -214,6 +214,7 @@ bot.registerCommand(text.GET_MEMBERSHIP_COMMAND, async (msg) => {
         console.log(text.GET_MEMBERSHIP_COMMAND)
         msg.delete();
         let successHandler = async function (users) {
+            console.log("getUsernames");
             let returnHandler = function (usernames){
                 bot.emit("messageReturn", msg.author.id, embed.response(text.GET_MEMBERSHIP_COMMAND, usernames));
             };
