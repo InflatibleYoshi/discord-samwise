@@ -302,7 +302,7 @@ bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
                                     userNotification = userNotification + "\n" + userMessage.content;
                                 }
                                 for (user of users) {
-                                    bot.emit("messageReturn", user.id, embed.alert(msg.author.username, userNotification));
+                                    bot.emit("messageReturn", user, embed.alert(msg.author.username, userNotification));
                                 }
                                 user_msg.delete();
                                 bot.emit("messageReturn", msg.author.id, embed.response(text.NOTIFY_COMMAND, text.NOTIFY_COMMAND_SUCCESS));
