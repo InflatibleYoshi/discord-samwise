@@ -146,7 +146,7 @@ tracking.registerSubcommand(text.TRACK_LIST_SUBCOMMAND, async (msg, args) => {
         let returnHandler = function (usernames) {
             bot.emit("messageReturn", msg.author.id, embed.response(text.TRACK_LIST_SUBCOMMAND, usernames));
         };
-        await getUsernames(users, returnHandler);
+        await dbConnection.getUsernames(users, returnHandler);
     };
     let failureHandler = function (error) {
         bot.emit("messageReturn", msg.author.id, embed.error(text.TRACK_LIST_SUBCOMMAND, error));
@@ -218,7 +218,7 @@ bot.registerCommand(text.GET_MEMBERSHIP_COMMAND, async (msg) => {
             let returnHandler = function (usernames){
                 bot.emit("messageReturn", msg.author.id, embed.response(text.GET_MEMBERSHIP_COMMAND, usernames));
             };
-            await getUsernames(users, returnHandler);
+            await dbConnection.getUsernames(users, returnHandler);
         };
         let failureHandler = function (_error) {
             bot.emit("messageReturn", msg.author.id, embed.error(text.GET_MEMBERSHIP_COMMAND, text.GET_MEMBERSHIP_COMMAND_ERROR));
@@ -237,7 +237,7 @@ bot.registerCommand(text.GET_FELLOWSHIP_COMMAND, async (msg) => {
         let returnHandler = function (usernames) {
             bot.emit("messageReturn", msg.author.id, embed.response(text.GET_FELLOWSHIP_COMMAND, usernames));
         };
-        await getUsernames(users, returnHandler);
+        await dbConnection.getUsernames(users, returnHandler);
     };
     let failureHandler = function (_error) {
         bot.emit("messageReturn", msg.author.id, embed.error(text.GET_FELLOWSHIP_COMMAND, text.GET_FELLOWSHIP_COMMAND_ERROR));
