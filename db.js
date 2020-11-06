@@ -153,8 +153,12 @@ class database {
     }
 
     async getUsernames(array, returnHandler){
-        await Promise.all(array.map(this.client.get(user.id.toString() + USERNAME)))
+        await Promise.all(array.map((user) => {
+            console.log(`GET ${user + USERNAME}`);
+            return this.client.get(user + USERNAME)
+        }))
             .then((usernames) => {
+                console.log(usernames);
                 return usernames.fold((acc, x) => acc + x + "\n");
             }).then(returnHandler);
     }
