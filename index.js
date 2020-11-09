@@ -33,7 +33,6 @@ bot.on("messageDelete", async (msg) => {
 function getUser(msg) {
     console.log("getUser");
     let users = msg.mentions;
-    console.log(msg.mentions);
     let returningUser = null;
     let user = users.filter(user => !user.id.includes(msg.author.id));
     if (user.length > 0) {
@@ -218,10 +217,9 @@ tracking.registerSubcommand(text.TRACK_DATE_SUBCOMMAND, async (msg, args) => {
     fullDescription: text.TRACK_DATE_SUBCOMMAND_FULL_DESCRIPTION
 })
 
-//This command has some issues lool
 bot.registerCommand(text.GET_MEMBERSHIP_COMMAND, async (msg) => {
         console.log(text.GET_MEMBERSHIP_COMMAND)
-        msg.delete();
+        bot.emit("messageDelete", msg);
         let successHandler = async function (users) {
             let returnHandler = function (usernames){
                 bot.emit("messageReturn", msg.author.id, embed.response(text.GET_MEMBERSHIP_COMMAND, usernames));
