@@ -109,3 +109,23 @@ exports.NOTIFY_COMMAND_INITIALIZATION =  "Type in the chat below to the bot and 
 exports.NOTIFY_COMMAND_SUCCESS = "You have successfully sent your message to your fellowship!";
 exports.NOTIFY_COMMAND_NO_FELLOWSHIP_ERROR = "Your fellowship is empty.";
 exports.NOTIFY_COMMAND_CANCELLATION = "You've cancelled writing your message.";
+
+exports.FAQ_COMMAND = "faq";
+exports.FAQ_COMMAND_DESCRIPTION = "Frequently asked questions.";
+exports.FAQ_COMMAND_FULL_DESCRIPTION = "Answers to commonly asked questions that will help you use the bot.";
+exports.FAQ_COMMAND_QUESTION_1 = "What are fellowships and what is membership?";
+exports.FAQ_COMMAND_ANSWER_1 = "Fellowships are groups owned by one person who can give life updates through the !notify command." +
+    "You can join one by typing the !join command @'ing the person's fellowship you want to join or you can invite people into your fellowship with the !invite command." +
+    "You can check the members of your fellowship by typing in the !getFellowship command." +
+    "Membership is the list of all the fellowships you are a part of and this list can be checked by the !getMembership command.";
+exports.FAQ_COMMAND_QUESTION_2 = "Where should I start? How do I use this bot?";
+exports.FAQ_COMMAND_ANSWER_2 = "If you want to go straight to tools that help you deal with addiction, then use the" +
+    "!track date command, the !track focus command, and the !track threshold command to set this up (type !help track for more information)." +
+    "If you want a group of friends to give life updates to, use the !invite command to add people to your fellowship and the !notify command to send out an update.";
+exports.FAQ_COMMAND_QUESTION_3 = "Can I DM the bot?";
+exports.FAQ_COMMAND_ANSWER_3 = "Yes, it is actually encouraged that you DM the bot for all the commands that don't require mentioning a user for the command." +
+    "Only use the open channel for !invite, !join, !kick, and !leave";
+exports.FAQ_COMMAND_QUESTION_4 = "Wait a sec wouldn't it be really awkward if someone noticed that you kicked them out of your fellowship on the open channel?";
+exports.FAQ_COMMAND_ANSWER_4 = "Yes it would, but there's only a small chance of that happening since all open channels message commands are deleted immediately " +
+    "after you post them and followups are DM'ed to you. Make sure you turn off @mention notifications for the channel this bot is running in.";
+

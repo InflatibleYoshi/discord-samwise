@@ -543,4 +543,19 @@ bot.registerCommand(text.LEAVE_COMMAND, async (msg) => {
         fullDescription: text.LEAVE_COMMAND_FULL_DESCRIPTION
     });
 
+bot.registerCommand(text.FAQ_COMMAND, async (msg) => {
+        console.log(text.FAQ_COMMAND);
+        bot.emit("messageDelete", msg);
+        bot.emit("messageReturn", msg.author.id, embed.command(text.FAQ_COMMAND_QUESTION_1, text.FAQ_COMMAND_ANSWER_1));
+        bot.emit("messageReturn", msg.author.id, embed.command(text.FAQ_COMMAND_QUESTION_2, text.FAQ_COMMAND_ANSWER_2));
+        bot.emit("messageReturn", msg.author.id, embed.command(text.FAQ_COMMAND_QUESTION_3, text.FAQ_COMMAND_ANSWER_3));
+        bot.emit("messageReturn", msg.author.id, embed.command(text.FAQ_COMMAND_QUESTION_4, text.FAQ_COMMAND_ANSWER_4));
+        bot.emit("messageReturn", msg.author.id, embed.command(text.FAQ_COMMAND_QUESTION_5, text.FAQ_COMMAND_ANSWER_5));
+    },
+    {
+        description: text.FAQ_COMMAND_DESCRIPTION,
+        fullDescription: text.FAQ_COMMAND_FULL_DESCRIPTION
+    });
+
 bot.connect();
+
