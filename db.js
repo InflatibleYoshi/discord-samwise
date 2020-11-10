@@ -41,6 +41,17 @@ class database {
         await this.client.hset(user.id.toString(), "streak_current", streak_start, "streak_max", streak_length);
     }
 
+    async getStreak(user, successHandler, failureHandler){
+        console.log("dbGetStreak");
+        await this.isUserTracked(user).then((exists) => {
+            if (!exists) {
+                throw 'Your user has not been tracked. Type !track help for more information.';
+            }
+            console.log(`HMGET ${user.id.toString()} streak_current streak_max`);
+            this.client.hmget(user.id.toString(), "streak_current", "streak_max");
+        }).then(successHandler, failureHandler);
+    }
+
     async setFocus(user, focus, successHandler, failureHandler){
         console.log("dbSetFocus");
         await this.isUserTracked(user).then((exists) => {

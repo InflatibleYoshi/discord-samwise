@@ -102,6 +102,21 @@ tracking.registerSubcommand(text.TRACK_RESET_SUBCOMMAND, async (msg) => {
         fullDescription: text.TRACK_RESET_SUBCOMMAND_FULL_DESCRIPTION,
     });
 
+tracking.registerSubcommand(text.TRACK_STREAK_SUBCOMMAND, async (msg) => {
+    console.log(text.TRACK_STREAK_SUBCOMMAND);
+    bot.emit("messageDelete", msg);
+    let successHandler = function (streak) {
+        bot.emit("messageReturn", msg.author.id, embed.response(text.TRACK_STREAK_SUBCOMMAND, text.TRACK_DATE_SUBCOMMAND_RETURN_STREAK(streak[0], streak[1])));
+    };
+    let failureHandler = function (error) {
+        bot.emit("messageReturn", msg.author.id, embed.error(text.TRACK_STREAK_SUBCOMMAND, error));
+    };
+    await dbConnection.getStreak(msg.author, successHandler, failureHandler);
+}, {
+    description: text.TRACK_STREAK_SUBCOMMAND_DESCRIPTION,
+    fullDescription: text.TRACK_STREAK_SUBCOMMAND_FULL_DESCRIPTION
+});
+
 tracking.registerSubcommand(text.TRACK_FOCUS_SUBCOMMAND, async (msg, args) => {
     console.log(text.TRACK_FOCUS_SUBCOMMAND);
     bot.emit("messageDelete", msg);

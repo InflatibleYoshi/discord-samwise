@@ -8,12 +8,13 @@ exports.COMMAND_ON_FELLOWSHIP_TARGET_RESPONSE = function(username) {return `You 
 
 exports.TRACK_RESPONSE = "This command is only available to tracked users.";
 exports.TRACK_COMMAND = "track";
-exports.TRACK_COMMAND_DESCRIPTION = "The five subcommands available are \'date\', \'reset\', \'focus\', \'list\', and \'threshold\'.";
-exports.TRACK_COMMAND_FULL_DESCRIPTION = "The date command allows the user to track the days spent dedicated towards a single goal." +
-    "The reset command allows the user to reset the date in the case of a relapse." +
-    "The focus command allows the user to set their personal focus." +
-    "The threshold command allows the user to set an amount of days since last reset in which you would need the most moral support."
-    "The list command will list all the users you know that are in their threshold.";
+exports.TRACK_COMMAND_DESCRIPTION = "The streak subcommands available are \'date\', \'streak\', \'reset\', \'focus\', \'list\', and \'threshold\'.\n";
+exports.TRACK_COMMAND_FULL_DESCRIPTION = "The date command allows the user to track the days spent dedicated towards a single goal.\n" +
+    "The streak command allows the user to check their current and max streak.\n" +
+    "The reset command allows the user to reset the date in the case of a relapse.\n" +
+    "The focus command allows the user to set their personal focus.\n" +
+    "The threshold command allows the user to set an amount of days since last reset in which you would need the most moral support.\n"
+    "The list command will list all the users you know that are in their threshold.\n";
 exports.TRACK_DATE_SUBCOMMAND = "date";
 exports.TRACK_DATE_SUBCOMMAND_DESCRIPTION = "Track user with user-entered start date.";
 exports.TRACK_DATE_SUBCOMMAND_FULL_DESCRIPTION = "If you would like to track the days you've spent dedicated towards a single goal such as being free from addiction, " +
@@ -21,10 +22,14 @@ exports.TRACK_DATE_SUBCOMMAND_FULL_DESCRIPTION = "If you would like to track the
     "\n\"timestamp\" with your Day 1 as: \'DD Mon YYYY HH:mm:ss TZ\'" +
     "e.g. !track date 01 Jan 1970 00:00:00 GMT";
 exports.TRACK_DATE_SUBCOMMAND_INVALID_DATE = "Invalid date entered."
-exports.TRACK_DATE_SUBCOMMAND_ALREADY_TRACKED_WARNING = "You are already tracked so this command will overwrite your maximum streak.";
+exports.TRACK_DATE_SUBCOMMAND_ALREADY_TRACKED_WARNING = "You are already tracked so this command will overwrite your data including your maximum streak.";
 exports.TRACK_DATE_SUBCOMMAND_RETURN_STREAK = function(streak) {return `This puts your current streak at ${streak} days.\n Do you want to proceed with these options?`};
 exports.TRACK_DATE_SUBCOMMAND_USER_ABORTED = "Your tracking configuration was not saved.";
 exports.TRACK_DATE_SUBCOMMAND_USER_CONFIRMED = "Your tracking configuration was saved.";
+exports.TRACK_STREAK_SUBCOMMAND = "streak";
+exports.TRACK_STREAK_SUBCOMMAND_DESCRIPTION = "View your max and current streak.";
+exports.TRACK_STREAK_SUBCOMMAND_FULL_DESCRIPTION = "View your current streak and maximum streak.";
+exports.TRACK_STREAK_SUBCOMMAND_RETURN_STREAK = function(streak, max) {return `Your current streak is ${streak} days. Your max streak is ${max}`}
 exports.TRACK_RESET_SUBCOMMAND = "reset";
 exports.TRACK_RESET_SUBCOMMAND_DESCRIPTION = "Reset tracked user's streak.";
 exports.TRACK_RESET_SUBCOMMAND_FULL_DESCRIPTION = "This command resets the tracked user's streak. And can optionally notify the rest of the user's fellowship.";
