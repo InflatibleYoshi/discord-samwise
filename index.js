@@ -151,7 +151,7 @@ tracking.registerSubcommand(text.TRACK_LIST_SUBCOMMAND, async (msg, args) => {
     bot.emit("messageDelete", msg);
     let successHandler = async function (users) {
         let returnHandler = function (usernames) {
-            bot.emit("messageReturn", msg.author.id, embed.response(text.TRACK_LIST_SUBCOMMAND, usernames));
+            bot.emit("messageReturn", msg.author.id, embed.response(text.TRACK_LIST_SUBCOMMAND, text.TRACK_LIST_SUBCOMMAND_TITLE(usernames)));
         };
         await dbConnection.getUsernames(users, returnHandler);
     };
@@ -222,7 +222,7 @@ bot.registerCommand(text.GET_MEMBERSHIP_COMMAND, async (msg) => {
         bot.emit("messageDelete", msg);
         let successHandler = async function (users) {
             let returnHandler = function (usernames){
-                bot.emit("messageReturn", msg.author.id, embed.response(text.GET_MEMBERSHIP_COMMAND, usernames));
+                bot.emit("messageReturn", msg.author.id, embed.response(text.GET_MEMBERSHIP_COMMAND, text.GET_MEMBERSHIP_COMMAND_TITLE(usernames)));
             };
             await dbConnection.getUsernames(users, returnHandler);
         };
@@ -241,7 +241,7 @@ bot.registerCommand(text.GET_FELLOWSHIP_COMMAND, async (msg) => {
     bot.emit("messageDelete", msg);
     let successHandler = async function (users) {
         let returnHandler = function (usernames) {
-            bot.emit("messageReturn", msg.author.id, embed.response(text.GET_FELLOWSHIP_COMMAND, usernames));
+            bot.emit("messageReturn", msg.author.id, embed.response(text.GET_FELLOWSHIP_COMMAND, text.GET_FELLOWSHIP_COMMAND_TITLE(usernames)));
         };
         await dbConnection.getUsernames(users, returnHandler);
     };
