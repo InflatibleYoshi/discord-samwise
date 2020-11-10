@@ -128,4 +128,5 @@ exports.FAQ_COMMAND_ANSWER_3 = "Yes, it is actually encouraged that you DM the b
 exports.FAQ_COMMAND_QUESTION_4 = "Wait a sec wouldn't it be really awkward if someone noticed that you kicked them out of your fellowship on the open channel?";
 exports.FAQ_COMMAND_ANSWER_4 = "Yes it would, but there's only a small chance of that happening since all open channels message commands are deleted immediately " +
     " after you post them and followups are DM'ed to you. Make sure you turn off @mention notifications for the channel this bot is running in.";
-
+exports.FAQ_COMMAND_QUESTION_5 = "Why did you make this app?"
+exports.FAQ_COMMAND_ANSWER_5 = "Too many Christian Coomers"

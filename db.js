@@ -159,7 +159,7 @@ class database {
         }))
             .then((usernames) => {
                 console.log(usernames);
-                return usernames.reduce((acc, x) => acc + x + "\n");
+                return usernames.join("\n");
             }).then(returnHandler);
     }
 }
