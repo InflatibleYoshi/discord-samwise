@@ -48,7 +48,7 @@ exports.TRACK_THRESHOLD_SUBCOMMAND_FULL_DESCRIPTION = "Use this command if you w
 exports.TRACK_LIST_SUBCOMMAND = "list";
 exports.TRACK_LIST_SUBCOMMAND_DESCRIPTION = "This command will list all the users you know that are in their threshold.";
 exports.TRACK_LIST_SUBCOMMAND_FULL_DESCRIPTION = "This command will list check your personal membership and list all the users that are in their threshold.";
-exports.TRACK_LIST_SUBCOMMAND_TITLE = function(usernames) {return `This is the list of fellowships you're a member of that have \n${usernames}`};
+exports.TRACK_LIST_SUBCOMMAND_TITLE = function(usernames) {return `This is the list of fellowships that you're a member of that are tracked and are within their threshold of needing prayer/moral support:\n${usernames}`};
 
 exports.JOIN_COMMAND = "join";
 exports.JOIN_COMMAND_DESCRIPTION = "Request to join a user's fellowship.";
@@ -99,7 +99,7 @@ exports.GET_FELLOWSHIP_COMMAND = "getFellowship";
 exports.GET_FELLOWSHIP_COMMAND_DESCRIPTION = "Get a list of users in your fellowship.";
 exports.GET_FELLOWSHIP_COMMAND_FULL_DESCRIPTION = "Get a list of all the users in your fellowship.";
 exports.GET_FELLOWSHIP_COMMAND_ERROR = "Your fellowship is empty.";
-exports.GET_FELLOWSHIP_COMMAND_TITLE = function(usernames) {return `This is a list of users that in your fellowship: \n${usernames}`};
+exports.GET_FELLOWSHIP_COMMAND_TITLE = function(usernames) {return `This is a list of users that are in your fellowship: \n${usernames}`};
 
 exports.NOTIFY_COMMAND = "notify";
 exports.NOTIFY_COMMAND_DESCRIPTION = "Notify all the members of your fellowship.";
