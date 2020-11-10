@@ -48,7 +48,7 @@ class database {
                 throw 'Your user has not been tracked. Type !track help for more information.';
             }
             console.log(`HMGET ${user.id.toString()} streak_current streak_max`);
-            this.client.hmget(user.id.toString(), "streak_current", "streak_max");
+            return this.client.hmget(user.id.toString(), "streak_current", "streak_max");
         }).then(successHandler, failureHandler);
     }
 

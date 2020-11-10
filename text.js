@@ -8,13 +8,8 @@ exports.COMMAND_ON_FELLOWSHIP_TARGET_RESPONSE = function(username) {return `You 
 
 exports.TRACK_RESPONSE = "This command is only available to tracked users.";
 exports.TRACK_COMMAND = "track";
-exports.TRACK_COMMAND_DESCRIPTION = "The streak subcommands available are \'date\', \'streak\', \'reset\', \'focus\', \'list\', and \'threshold\'.\n";
-exports.TRACK_COMMAND_FULL_DESCRIPTION = "The date command allows the user to track the days spent dedicated towards a single goal.\n" +
-    "The streak command allows the user to check their current and max streak.\n" +
-    "The reset command allows the user to reset the date in the case of a relapse.\n" +
-    "The focus command allows the user to set their personal focus.\n" +
-    "The threshold command allows the user to set an amount of days since last reset in which you would need the most moral support.\n"
-    "The list command will list all the users you know that are in their threshold.\n";
+exports.TRACK_COMMAND_DESCRIPTION = "Type !help track to get info on the subcommands available: \'date\', \'streak\', \'reset\', \'focus\', \'list\', and \'threshold\'.\n";
+exports.TRACK_COMMAND_FULL_DESCRIPTION = "Type !help track &lt;subcommand&rt; for more information on each subcommand.";
 exports.TRACK_DATE_SUBCOMMAND = "date";
 exports.TRACK_DATE_SUBCOMMAND_DESCRIPTION = "Track user with user-entered start date.";
 exports.TRACK_DATE_SUBCOMMAND_FULL_DESCRIPTION = "If you would like to track the days you've spent dedicated towards a single goal such as being free from addiction, " +
