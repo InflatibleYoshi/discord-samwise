@@ -327,12 +327,12 @@ bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
         fullDescription: text.NOTIFY_COMMAND_FULL_DESCRIPTION
     });
 
-bot.registerCommand(text.REQUEST_COMMAND, async (msg) => {
-        console.log(text.REQUEST_COMMAND);
+bot.registerCommand(text.JOIN_COMMAND, async (msg) => {
+        console.log(text.JOIN_COMMAND);
         bot.emit("messageDelete", msg);
         //Get first command.
         if (msg.mentions.length === 0) {
-            bot.emit("messageReturn", msg.author.id, embed.error(text.REQUEST_COMMAND, text.COMMAND_SELECT_NO_USERS_ERROR));
+            bot.emit("messageReturn", msg.author.id, embed.error(text.JOIN_COMMAND, text.COMMAND_SELECT_NO_USERS_ERROR));
             return;
         }
         let user = getUser(msg);
@@ -341,23 +341,23 @@ bot.registerCommand(text.REQUEST_COMMAND, async (msg) => {
             .then((inFellowship) => {
                 if (inFellowship) {
                     //Will not add message sender to fellowship if already exists in fellowship.
-                    bot.emit("messageReturn", msg.author.id, embed.error(text.REQUEST_COMMAND, text.REQUEST_COMMAND_ALREADY_IN_FELLOWSHIP_ERROR_PRE(user.username)));
+                    bot.emit("messageReturn", msg.author.id, embed.error(text.JOIN_COMMAND, text.JOIN_COMMAND_ALREADY_IN_FELLOWSHIP_ERROR_PRE(user.username)));
                 } else {
                     let fellowshipEventListener;
                     let onFellowshipAdd;
                     let failureHandler;
-                    bot.emit("messageReturn", msg.author.id, embed.command(text.REQUEST_COMMAND, text.REQUEST_COMMAND_ON_FELLOWSHIP_ADDING_REQUEST(user.username)));
+                    bot.emit("messageReturn", msg.author.id, embed.command(text.JOIN_COMMAND, text.JOIN_COMMAND_ON_FELLOWSHIP_ADDING_REQUEST(user.username)));
                     //Notify other user of intent to join fellowship and this will be approved by emote selection.
                     return bot.getDMChannel(user.id)
                         .then((channel) => {
                             onFellowshipAdd = function (_user) {
-                                bot.emit("messageReturn", msg.author.id, embed.response(text.REQUEST_COMMAND, text.COMMAND_ON_FELLOWSHIP_ADDING_RESPONSE(user.username)));
-                                bot.emit("messageReturn", user.id, embed.response(text.REQUEST_COMMAND, text.COMMAND_ON_FELLOWSHIP_TARGET_RESPONSE(msg.author.username)));
+                                bot.emit("messageReturn", msg.author.id, embed.response(text.JOIN_COMMAND, text.COMMAND_ON_FELLOWSHIP_ADDING_RESPONSE(user.username)));
+                                bot.emit("messageReturn", user.id, embed.response(text.JOIN_COMMAND, text.COMMAND_ON_FELLOWSHIP_TARGET_RESPONSE(msg.author.username)));
                             };
                             failureHandler = function (_error) {
-                                bot.emit("messageReturn", user.id, embed.error(text.REQUEST_COMMAND, text.REQUEST_COMMAND_ALREADY_IN_FELLOWSHIP_ERROR_POST(msg.author.username)));
+                                bot.emit("messageReturn", user.id, embed.error(text.JOIN_COMMAND, text.JOIN_COMMAND_ALREADY_IN_FELLOWSHIP_ERROR_POST(msg.author.username)));
                             };
-                            return channel.createMessage(embed.command(text.REQUEST_COMMAND, text.REQUEST_COMMAND_ON_FELLOWSHIP_TARGET_REQUEST(msg.author.username)))
+                            return channel.createMessage(embed.command(text.JOIN_COMMAND, text.JOIN_COMMAND_ON_FELLOWSHIP_TARGET_REQUEST(msg.author.username)))
                         })
                         .then((user_message) => {
                             user_message.addReaction('✅');
@@ -380,8 +380,8 @@ bot.registerCommand(text.REQUEST_COMMAND, async (msg) => {
             })
     },
     {
-        description: text.REQUEST_COMMAND_DESCRIPTION,
-        fullDescription: text.REQUEST_COMMAND_FULL_DESCRIPTION,
+        description: text.JOIN_COMMAND_DESCRIPTION,
+        fullDescription: text.JOIN_COMMAND_FULL_DESCRIPTION,
     });
 
 bot.registerCommand(text.INVITE_COMMAND, async (msg) => {

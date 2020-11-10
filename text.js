@@ -49,15 +49,15 @@ exports.TRACK_LIST_SUBCOMMAND = "list";
 exports.TRACK_LIST_SUBCOMMAND_DESCRIPTION = "This command will list all the users you know that are in their threshold.";
 exports.TRACK_LIST_SUBCOMMAND_FULL_DESCRIPTION = "This command will list check your personal membership and list all the users that are in their threshold.";
 
-exports.REQUEST_COMMAND = "request";
-exports.REQUEST_COMMAND_DESCRIPTION = "Request to join a user's fellowship.";
-exports.REQUEST_COMMAND_FULL_DESCRIPTION = "Request to join another user's fellowship by typing that user's" +
-    "username or user id to the right of the !request command.";
-exports.REQUEST_COMMAND_ON_FELLOWSHIP_ADDING_REQUEST = function(username) {return `You have sent your request to ${username}!`};
-exports.REQUEST_COMMAND_ON_FELLOWSHIP_TARGET_REQUEST = function(username) {return `${username} has requested to join your fellowship!\n
+exports.JOIN_COMMAND = "join";
+exports.JOIN_COMMAND_DESCRIPTION = "Request to join a user's fellowship.";
+exports.JOIN_COMMAND_FULL_DESCRIPTION = "Request to join another user's fellowship by typing that user's" +
+    "username or user id to the right of the !join command.";
+exports.JOIN_COMMAND_ON_FELLOWSHIP_ADDING_REQUEST = function(username) {return `You have sent your request to ${username}!`};
+exports.JOIN_COMMAND_ON_FELLOWSHIP_TARGET_REQUEST = function(username) {return `${username} has requested to join your fellowship!\n
 Use the reaction buttons to choose whether or not to accept or decline the request.`};
-exports.REQUEST_COMMAND_ALREADY_IN_FELLOWSHIP_ERROR_PRE = function(username) {return `You are already in ${username}'s fellowship.`};
-exports.REQUEST_COMMAND_ALREADY_IN_FELLOWSHIP_ERROR_POST = function(username) {return `${username} is already in your fellowship.`};
+exports.JOIN_COMMAND_ALREADY_IN_FELLOWSHIP_ERROR_PRE = function(username) {return `You are already in ${username}'s fellowship.`};
+exports.JOIN_COMMAND_ALREADY_IN_FELLOWSHIP_ERROR_POST = function(username) {return `${username} is already in your fellowship.`};
 
 exports.INVITE_COMMAND = "invite";
 exports.INVITE_COMMAND_DESCRIPTION = "Invite another user to your fellowship.";
