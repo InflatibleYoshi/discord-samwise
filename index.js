@@ -106,7 +106,9 @@ tracking.registerSubcommand(text.TRACK_STREAK_SUBCOMMAND, async (msg) => {
     console.log(text.TRACK_STREAK_SUBCOMMAND);
     bot.emit("messageDelete", msg);
     let successHandler = function (streak) {
-        bot.emit("messageReturn", msg.author.id, embed.response(text.TRACK_STREAK_SUBCOMMAND, text.TRACK_DATE_SUBCOMMAND_RETURN_STREAK(streak[0], streak[1])));
+        bot.emit("messageReturn", msg.author.id, embed.response(text.TRACK_STREAK_SUBCOMMAND,
+            text.TRACK_STREAK_SUBCOMMAND_RETURN_STREAK(
+                dbConnection.getDaysDifference(streak[0]), streak[1])));
     };
     let failureHandler = function (error) {
         bot.emit("messageReturn", msg.author.id, embed.error(text.TRACK_STREAK_SUBCOMMAND, error));
