@@ -1,9 +1,9 @@
 const Eris = require('eris');
 const Chrono = require('chrono-node');
-const embed = require('./embed.js');
-const text = require('./text.js');
-const db = require('./db.js');
-const {token} = require('./variables');
+const embed = require('./app/embed.js');
+const text = require('./app/text.js');
+const db = require('./app/db.js');
+const {token} = require('./app/variables');
 const bot = new Eris.CommandClient(token, {}, {
     description: text.BOT_DESCRIPTION,
     owner: text.BOT_OWNER,
