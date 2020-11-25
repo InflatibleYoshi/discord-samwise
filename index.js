@@ -3,8 +3,7 @@ const Chrono = require('chrono-node');
 const embed = require('./app/embed.js');
 const text = require('./app/text.js');
 const db = require('./app/db.js');
-const {token} = require('./app/variables');
-const bot = new Eris.CommandClient(token, {}, {
+const bot = new Eris.CommandClient(process.env.BOT_TOKEN, {}, {
     description: text.BOT_DESCRIPTION,
     deleteCommand: true,
     owner: text.BOT_OWNER,
