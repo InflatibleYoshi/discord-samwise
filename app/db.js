@@ -6,7 +6,13 @@ const USERNAME = "_username";
 
 class database {
     constructor(){
-        this.client = new Redis();
+        this.client = new Redis({
+            port: 6379, // Redis port
+            host: "127.0.0.1", // Redis host
+            family: 4, // 4 (IPv4) or 6 (IPv6)
+            password: process.env.REDIS_PASSWORD,
+            db: 0,
+        });
         this.client.on("message", function (channel, message) {
             console.log("Receive message %s from channel %s", message, channel);
         });
