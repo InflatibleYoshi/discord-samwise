@@ -13,17 +13,19 @@ spec:
         app: samwise
       annotations:
         vault.hashicorp.com/agent-inject: "true"
-        vault.hashicorp.com/role: "web"
-        vault.hashicorp.com/agent-inject-secret-config: "secret/data/web"
-        # Environment variable export template
-        vault.hashicorp.com/agent-inject-template-config: |
-          {{ with secret "secret/data/web" -}}
-            export api_key="{{ .Data.data.payments_api_key }}"
-          {{- end }}
+        vault.hashicorp.com/vault-addr: "https://vault:8200"
+        vault.hashicorp.com/vault-tls-secret: "vault-tls"
+        vault.hashicorp.com/role: 'samwise'
+
     spec:
+      serviceAccountName: samwise
       containers:
         - name: samwise
           image: inflatibleyoshi/discord-samwise
-          args: [ "sh", "-c", "source /vault/secrets/config && <entrypoint script>" ]
           ports:
             - containerPort: 443
+          env:
+            - name: BOT_TOKEN
+              value: "vault:secret/data/samwise#BOT_TOKEN"
+            - name: REDIS_PASSWORD
+              value: "vault:secret/data/redis#PASSWORD"

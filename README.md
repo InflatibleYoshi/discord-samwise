@@ -13,7 +13,35 @@ https://developer.ibm.com/tutorials/convert-sample-web-app-to-helmchart/
 
 Deployment Steps:
 1. Install Kubernetes
-2. Setup PersistantVolume Claim in Storage: pv.yaml
+2. Install Consul {Configuration}
+3. Install Vault {Configuration}
+
+2. Create Service Account for Vault Administration
+```
+vault auth enable kubernetes
+
+vault write auth/kubernetes/config \
+        token_reviewer_jwt="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
+        kubernetes_host="https://$KUBERNETES_PORT_443_TCP_ADDR:443" \
+        kubernetes_ca_cert=@/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+
+vault policy write samwise - <<EOF
+path "secret/data/samwise/config" {
+  capabilities = ["read"]
+}
+EOF
+
+vault write auth/kubernetes/role/samwise \
+        bound_service_account_names=vault \
+        bound_service_account_namespaces=default \
+        policies=samwise \
+        ttl=24h
+``` 
+
+3.
+
+
+4. Setup PersistantVolume Claim in Storage: pv.yaml
 ```
 nano pv.yaml
 
@@ -49,18 +77,19 @@ $ kubectl apply -f pv.yaml
       requests:
         storage: 8Gi
 ```
-2. Initialize Vault to secure Bot Token.
+5. Initialize Vault to secure Bot Token.
 https://learn.hashicorp.com/tutorials/vault/kubernetes-minikube
-3. Initialize Redis:
+6. Configure auth method for vault for users/deployments to authenticate.
+7. Initialize Redis:
 ```
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm install my-release bitnami/redis
 ```
-4. Unseal Vault
-5. Create the environment variables file.
-6. Store the environment variables file in Vault
-7. Deployment of Helm chart with environment variables file
-8. Port forwarding
-9. Reseal Vault
+8. Unseal Vault
+9. Create the environment variables file.
+10. Store the environment variables file in Vault
+11. Deployment of Helm chart with environment variables file
+12. Port forwarding
+13. Reseal Vault
 
 

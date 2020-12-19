@@ -13,7 +13,7 @@ const bot = new Eris.CommandClient(process.env.BOT_TOKEN, {}, {
 let dbConnection;
 
 bot.on("ready", () => {
-    dbConnection = new db.database();
+    dbConnection = new db.database(process.env.REDIS_PASSWORD);
     console.log("Ready! Database initialized.");
 });
 

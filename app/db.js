@@ -5,12 +5,12 @@ const THRESHOLD = "_threshold";
 const USERNAME = "_username";
 
 class database {
-    constructor(){
+    constructor(pass){
         this.client = new Redis({
             port: 6379, // Redis port
             host: "127.0.0.1", // Redis host
             family: 4, // 4 (IPv4) or 6 (IPv6)
-            password: process.env.REDIS_PASSWORD,
+            password: pass,
             db: 0,
         });
         this.client.on("message", function (channel, message) {
