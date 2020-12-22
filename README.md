@@ -84,6 +84,7 @@ https://learn.hashicorp.com/tutorials/vault/kubernetes-minikube
 ```
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm install my-release bitnami/redis
+kubectl get secret --namespace default my-release-redis -o jsonpath="{.data.redis-password}"
 ```
 8. Unseal Vault
 9. Create the environment variables file.
