@@ -3,7 +3,7 @@ const Chrono = require('chrono-node');
 const embed = require('./app/embed.js');
 const text = require('./app/text.js');
 const db = require('./app/db.js');
-const bot = new Eris.CommandClient(process.env.BOT_TOKEN, {}, {
+const bot = new Eris.CommandClient(process.env.SAMWISE_BOT_TOKEN, {}, {
     description: text.BOT_DESCRIPTION,
     deleteCommand: true,
     owner: text.BOT_OWNER,
@@ -13,7 +13,7 @@ const bot = new Eris.CommandClient(process.env.BOT_TOKEN, {}, {
 let dbConnection;
 
 bot.on("ready", () => {
-    dbConnection = new db.database(process.env.REDIS_PASSWORD);
+    dbConnection = new db.database(process.env.SAMWISE_REDIS_PASSWORD);
     console.log("Ready! Database initialized.");
 });
 
