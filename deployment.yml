@@ -11,11 +11,6 @@ spec:
     metadata:
       labels:
         app: samwise
-      annotations:
-        vault.hashicorp.com/agent-inject: "true"
-        vault.hashicorp.com/vault-addr: "https://vault:8200"
-        vault.hashicorp.com/vault-tls-secret: "vault-tls"
-        vault.hashicorp.com/role: 'samwise'
 
     spec:
       serviceAccountName: samwise
@@ -25,7 +20,9 @@ spec:
           ports:
             - containerPort: 443
           env:
-            - name: BOT_TOKEN
-              value: "vault:secret/data/samwise#BOT_TOKEN"
-            - name: REDIS_PASSWORD
-              value: "vault:secret/data/redis#PASSWORD"
+            - name: VAULT_TOKEN
+              value: ""
+            - name: VAULT_PORT
+              value: "8200"
+            - name: VAULTENV_INHERIT_ENV
+              value: "yes"
