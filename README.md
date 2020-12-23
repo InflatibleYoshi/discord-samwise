@@ -26,7 +26,10 @@ vault write auth/kubernetes/config \
         kubernetes_ca_cert=@/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
 
 vault policy write samwise - <<EOF
-path "secret/data/samwise/config" {
+path "/samwise/bot/token" {
+  capabilities = ["read"]
+}
+path "/samwise/redis/password" {
   capabilities = ["read"]
 }
 EOF
