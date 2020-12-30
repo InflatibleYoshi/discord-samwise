@@ -14,6 +14,7 @@ class init{
                 config: { role_id: process.env.VAULT_ROLE_ID }
             },
         });
+        console.log("Initialized vault.");
 
         let redisClient;
 
@@ -31,6 +32,8 @@ class init{
             console.log("Receive message %s from channel %s", message, channel);
         });
 
+        console.log("Initialized redis client.");
+
         this.redis = new db.database(redisClient);
 
         vaultClient.read('samwise/bot/token').then(v => {
@@ -41,6 +44,8 @@ class init{
                 prefix: "!"
             });
         }).catch(e => console.error(e));
+
+        console.log("Initialized bot client.");
     }
 
     getDb() {

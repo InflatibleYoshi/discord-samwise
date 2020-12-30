@@ -1,3 +1,4 @@
+const Eris = require('eris');
 const Chrono = require('chrono-node');
 const embed = require('./app/embed.js');
 const text = require('./app/text.js');
@@ -6,8 +7,6 @@ const init = require('./app/init.js')
 let system = new init.init();
 const bot = system.getBot();
 const dbConnection = system.getDb();
-
-let dbConnection;
 
 bot.on("ready", () => {
     console.log("Ready to roll.");

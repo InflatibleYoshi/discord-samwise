@@ -20,9 +20,9 @@ spec:
           ports:
             - containerPort: 443
           env:
-            - name: VAULT_TOKEN
+            - name: REDIS_HOST
               value: ""
-            - name: VAULT_PORT
-              value: "8200"
-            - name: VAULTENV_INHERIT_ENV
-              value: "yes"
+            - name: VAULT_ROLE_ID
+              value: ""
+            - name: VAULT_URL
+              value: ""
