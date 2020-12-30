@@ -18,12 +18,9 @@ Deployment Steps:
 
 2. Create Service Account for Vault Administration
 ```
-vault auth enable kubernetes
+kubectl exec -it vault-0 -- /bin/sh
 
-vault write auth/kubernetes/config \
-        token_reviewer_jwt="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
-        kubernetes_host="https://$KUBERNETES_PORT_443_TCP_ADDR:443" \
-        kubernetes_ca_cert=@/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+vault auth enable approle
 
 vault policy write samwise - <<EOF
 path "/samwise/bot/token" {
@@ -34,15 +31,13 @@ path "/samwise/redis/password" {
 }
 EOF
 
-vault write auth/kubernetes/role/samwise \
-        bound_service_account_names=vault \
-        bound_service_account_namespaces=default \
-        policies=samwise \
-        ttl=24h
-``` 
-
-3.
-
+vault write auth/approle/role/samwise \
+    token_num_uses=2 \
+    token_ttl=1h \
+    token_max_ttl=1h \
+    policies=samwise \
+    ttl=24h
+```
 
 4. Setup PersistantVolume Claim in Storage: pv.yaml
 ```
@@ -82,18 +77,18 @@ $ kubectl apply -f pv.yaml
 ```
 5. Initialize Vault to secure Bot Token.
 https://learn.hashicorp.com/tutorials/vault/kubernetes-minikube
-6. Configure auth method for vault for users/deployments to authenticate.
-7. Initialize Redis:
+6. Initialize Redis:
 ```
 helm repo add bitnami https://charts.bitnami.com/bitnami
-helm install my-release bitnami/redis
+helm install my-release –set persistence.existingClaim=PVC_NAME bitnami/redis
 kubectl get secret --namespace default my-release-redis -o jsonpath="{.data.redis-password}"
+
+Add secret to vault.
+
+kubectl delete secret my-release-redis
 ```
-8. Unseal Vault
-9. Create the environment variables file.
-10. Store the environment variables file in Vault
-11. Deployment of Helm chart with environment variables file
-12. Port forwarding
-13. Reseal Vault
+7. Unseal Vault
+8. Port forwarding
+9. Reseal Vault
 
 
