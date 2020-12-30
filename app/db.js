@@ -1,21 +1,11 @@
-const Redis = require('ioredis');
 const FELLOWSHIP = "_fellowship";
 const MEMBERSHIP = "_membership";
 const THRESHOLD = "_threshold";
 const USERNAME = "_username";
 
 class database {
-    constructor(pass){
-        this.client = new Redis({
-            port: 6379, // Redis port
-            host: "127.0.0.1", // Redis host
-            family: 4, // 4 (IPv4) or 6 (IPv6)
-            password: pass,
-            db: 0,
-        });
-        this.client.on("message", function (channel, message) {
-            console.log("Receive message %s from channel %s", message, channel);
-        });
+    constructor(redis){
+        this.client = redis;
     }
 
     async isUserTracked(user){

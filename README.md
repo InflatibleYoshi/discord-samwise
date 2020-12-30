@@ -18,11 +18,11 @@ Deployment Steps:
 
 2. Create Service Account for Vault Administration
 ```
-kubectl exec -it vault-0 -- /bin/sh
+kubectl exec -it init-0 -- /bin/sh
 
-vault auth enable approle
+init auth enable approle
 
-vault policy write samwise - <<EOF
+init policy write samwise - <<EOF
 path "/samwise/bot/token" {
   capabilities = ["read"]
 }
@@ -31,7 +31,7 @@ path "/samwise/redis/password" {
 }
 EOF
 
-vault write auth/approle/role/samwise \
+init write auth/approle/role/samwise \
     token_num_uses=2 \
     token_ttl=1h \
     token_max_ttl=1h \
@@ -76,14 +76,14 @@ $ kubectl apply -f pv.yaml
         storage: 8Gi
 ```
 5. Initialize Vault to secure Bot Token.
-https://learn.hashicorp.com/tutorials/vault/kubernetes-minikube
+https://learn.hashicorp.com/tutorials/init/kubernetes-minikube
 6. Initialize Redis:
 ```
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm install my-release –set persistence.existingClaim=PVC_NAME bitnami/redis
 kubectl get secret --namespace default my-release-redis -o jsonpath="{.data.redis-password}"
 
-Add secret to vault.
+Add secret to init.
 
 kubectl delete secret my-release-redis
 ```

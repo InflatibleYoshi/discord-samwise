@@ -1,21 +1,16 @@
-const Eris = require('eris');
 const Chrono = require('chrono-node');
 const embed = require('./app/embed.js');
 const text = require('./app/text.js');
-const db = require('./app/db.js');
-const vault = require('./app/vault.js')
-const bot = new Eris.CommandClient(process.env.SAMWISE_BOT_TOKEN, {}, {
-    description: text.BOT_DESCRIPTION,
-    deleteCommand: true,
-    owner: text.BOT_OWNER,
-    prefix: "!"
-});
+const init = require('./app/init.js')
+
+let system = new init.init();
+const bot = system.getBot();
+const dbConnection = system.getDb();
 
 let dbConnection;
 
 bot.on("ready", () => {
-    dbConnection = new db.database(process.env.SAMWISE_REDIS_PASSWORD);
-    console.log("Ready! Database initialized.");
+    console.log("Ready to roll.");
 });
 
 bot.on("messageReturn", async (id, msgToReturn) => {
