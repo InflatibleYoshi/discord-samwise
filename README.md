@@ -18,11 +18,11 @@ Deployment Steps:
 
 2. Create Service Account for Vault Administration
 ```
-kubectl exec -it init-0 -- /bin/sh
+kubectl exec -it vault-0 -- /bin/sh
 
-init auth enable approle
+vault auth enable approle
 
-init policy write samwise - <<EOF
+vault policy write samwise - <<EOF
 path "/samwise/bot/token" {
   capabilities = ["read"]
 }
@@ -31,7 +31,7 @@ path "/samwise/redis/password" {
 }
 EOF
 
-init write auth/approle/role/samwise \
+vault write auth/approle/role/samwise \
     token_num_uses=2 \
     token_ttl=1h \
     token_max_ttl=1h \
@@ -87,8 +87,13 @@ Add secret to init.
 
 kubectl delete secret my-release-redis
 ```
-7. Unseal Vault
-8. Port forwarding
-9. Reseal Vault
+7. Fill Deployment.yml
+```
+kubectl get pods -o wide
+```
+
+8. Unseal Vault
+9. Deployment
+10. Reseal Vault
 
 

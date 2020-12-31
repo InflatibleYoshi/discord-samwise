@@ -10,7 +10,7 @@ class init{
         this.vault = vault.boot('main', {
             api: { url: process.env.VAULT_URL },
             auth: {
-                type: 'appRole', // or 'token', 'iam'
+                type: 'appRole',
                 config: { role_id: process.env.VAULT_ROLE_ID }
             },
         });
@@ -27,10 +27,6 @@ class init{
                 db: 0,
             });
         }).catch(e => console.error(e));
-
-        this.redis.on("message", function (channel, message) {
-            console.log("Receive message %s from channel %s", message, channel);
-        });
 
         console.log("Initialized redis client.");
 
