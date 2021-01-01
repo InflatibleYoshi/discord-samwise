@@ -7,7 +7,7 @@ class init{
     constructor(){
         const vault = require('node-vault-client');
 
-        this.vault = vault.boot('main', {
+        const vaultClient = vault.boot('main', {
             api: { url: process.env.VAULT_URL },
             auth: {
                 type: 'appRole',
