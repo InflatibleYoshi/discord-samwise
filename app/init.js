@@ -1,7 +1,7 @@
 const Eris = require('eris');
 const Redis = require('ioredis');
-const text = require('./app/text.js');
-const db = require('./app/db.js');
+const text = require('text.js');
+const db = require('db.js');
 
 class init{
     constructor(){

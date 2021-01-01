@@ -16,7 +16,14 @@ Deployment Steps:
 2. Install Consul {Configuration}
 3. Install Vault {Configuration}
 
-2. Create Service Account for Vault Administration
+4. Create Service Account for Application
+```
+
+
+```
+
+
+5. Create Vault Approle for accessing secrets
 ```
 kubectl exec -it vault-0 -- /bin/sh
 
@@ -39,7 +46,7 @@ vault write auth/approle/role/samwise \
     ttl=24h
 ```
 
-4. Setup PersistantVolume Claim in Storage: pv.yaml
+6. Setup PersistantVolume Claim in Storage: pv.yaml
 ```
 nano pv.yaml
 
@@ -75,9 +82,9 @@ $ kubectl apply -f pv.yaml
       requests:
         storage: 8Gi
 ```
-5. Initialize Vault to secure Bot Token.
+7. Initialize Vault to secure Bot Token.
 https://learn.hashicorp.com/tutorials/init/kubernetes-minikube
-6. Initialize Redis:
+8. Initialize Redis:
 ```
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm install my-release –set persistence.existingClaim=PVC_NAME bitnami/redis
@@ -87,13 +94,15 @@ Add secret to init.
 
 kubectl delete secret my-release-redis
 ```
-7. Fill Deployment.yml
+9. Fill Deployment.yml
 ```
 kubectl get pods -o wide
 ```
 
-8. Unseal Vault
-9. Deployment
-10. Reseal Vault
+10. Unseal Vault
 
-
+11. Deployment
+```
+kubectl apply -f deployment.yml
+```
+12. Reseal Vault
