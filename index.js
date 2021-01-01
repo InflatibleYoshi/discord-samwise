@@ -2,6 +2,7 @@ const Eris = require('eris');
 const Chrono = require('chrono-node');
 const vault = require('node-vault-client');
 const Redis = require('ioredis');
+const sp = require('synchronized-promise')
 const db = require('./app/db.js');
 const embed = require('./app/embed.js');
 const text = require('./app/text.js');
@@ -15,34 +16,36 @@ const vaultClient = vault.boot('main', {
 });
 console.log("Initialized vault.");
 
-let redisClient;
+const dbConnectionPromise = vaultClient.read('samwise/redis/password')
+    .then(v => {
+        console.log(v);
+        return new Redis({
+            port: 6379, // Redis port
+            host: process.env.REDIS_HOST, // Redis host
+            family: 4, // 4 (IPv4) or 6 (IPv6)
+            password: v,
+            db: 0,
+        });
+    }).then(redis => {
+        return new db.database(redis);
+    }).catch(e => console.error(e));
 
-vaultClient.read('samwise/redis/password').then(v => {
-    console.log(v);
-    redisClient = new Redis({
-        port: 6379, // Redis port
-        host: process.env.REDIS_HOST, // Redis host
-        family: 4, // 4 (IPv4) or 6 (IPv6)
-        password: v,
-        db: 0,
-    });
-}).catch(e => console.error(e));
+const dbConnection = sp(dbConnectionPromise);
 
 console.log("Initialized redis client.");
 
-const dbConnection = new db.database(redisClient);
+const botPromise = vaultClient.read('samwise/bot/token')
+    .then(v => {
+        console.log(v);
+        return new Eris.CommandClient(v, {}, {
+            description: text.BOT_DESCRIPTION,
+            deleteCommand: true,
+            owner: text.BOT_OWNER,
+            prefix: "!"
+        });
+    }).catch(e => console.error(e));
 
-let bot;
-
-vaultClient.read('samwise/bot/token').then(v => {
-    console.log(v);
-    bot = new Eris.CommandClient(v, {}, {
-        description: text.BOT_DESCRIPTION,
-        deleteCommand: true,
-        owner: text.BOT_OWNER,
-        prefix: "!"
-    });
-}).catch(e => console.error(e));
+const bot = sp(botPromise);
 
 console.log("Initialized bot client.");
 
