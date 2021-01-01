@@ -1,6 +1,7 @@
 const Eris = require('eris');
 const Chrono = require('chrono-node');
 const vault = require('node-vault-client');
+const Redis = require('ioredis');
 const db = require('./app/db.js');
 const embed = require('./app/embed.js');
 const text = require('./app/text.js');
@@ -17,6 +18,7 @@ console.log("Initialized vault.");
 let redisClient;
 
 vaultClient.read('samwise/redis/password').then(v => {
+    console.log(v);
     redisClient = new Redis({
         port: 6379, // Redis port
         host: process.env.REDIS_HOST, // Redis host
@@ -33,6 +35,7 @@ const dbConnection = new db.database(redisClient);
 let bot;
 
 vaultClient.read('samwise/bot/token').then(v => {
+    console.log(v);
     bot = new Eris.CommandClient(v, {}, {
         description: text.BOT_DESCRIPTION,
         deleteCommand: true,
