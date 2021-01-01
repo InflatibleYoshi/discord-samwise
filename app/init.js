@@ -3,8 +3,7 @@ const Redis = require('ioredis');
 const text = require('./text.js');
 const db = require('./db.js');
 
-class Init{
-
+export default class Init{
     static bot;
     static redis;
 
@@ -56,5 +55,3 @@ class Init{
         return this.bot;
     }
 }
-
-module.exports = { Init }

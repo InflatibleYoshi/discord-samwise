@@ -2,9 +2,9 @@ const Eris = require('eris');
 const Chrono = require('chrono-node');
 const embed = require('./app/embed.js');
 const text = require('./app/text.js');
-const init = require('./app/init.js')
+import Init from './app/init.js';
 
-new init.Init();
+const system = new Init();
 const bot = Init.getBot();
 const dbConnection = Init.getDb();
 
