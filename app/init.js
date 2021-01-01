@@ -57,4 +57,4 @@ class Init{
     }
 }
 
-module.exports = { init }
+module.exports = { Init }
