@@ -16,36 +16,42 @@ const vaultClient = vault.boot('main', {
 });
 console.log("Initialized vault.");
 
-const dbConnectionPromise = vaultClient.read('samwise/redis/password')
-    .then(v => {
-        console.log(v);
-        return new Redis({
-            port: 6379, // Redis port
-            host: process.env.REDIS_HOST, // Redis host
-            family: 4, // 4 (IPv4) or 6 (IPv6)
-            password: v,
-            db: 0,
-        });
-    }).then(redis => {
-        return new db.database(redis);
-    }).catch(e => console.error(e));
+const dbConnectionInit = () => {
+    return vaultClient.read('samwise/redis/password')
+        .then(v => {
+            console.log(v);
+            return new Redis({
+                port: 6379, // Redis port
+                host: process.env.REDIS_HOST, // Redis host
+                family: 4, // 4 (IPv4) or 6 (IPv6)
+                password: v,
+                db: 0,
+            });
+        }).then(redis => {
+            return new db.database(redis);
+        }).catch(e => console.error(e));
+}
 
-const dbConnection = sp(dbConnectionPromise);
+let dbConnectionPromise = sp(dbConnectionInit);
+const dbConnection = dbConnectionPromise();
 
 console.log("Initialized redis client.");
 
-const botPromise = vaultClient.read('samwise/bot/token')
-    .then(v => {
-        console.log(v);
-        return new Eris.CommandClient(v, {}, {
-            description: text.BOT_DESCRIPTION,
-            deleteCommand: true,
-            owner: text.BOT_OWNER,
-            prefix: "!"
-        });
-    }).catch(e => console.error(e));
+const botInit = () => {
+    return vaultClient.read('samwise/bot/token')
+        .then(v => {
+            console.log(v);
+            return new Eris.CommandClient(v, {}, {
+                description: text.BOT_DESCRIPTION,
+                deleteCommand: true,
+                owner: text.BOT_OWNER,
+                prefix: "!"
+            });
+        }).catch(e => console.error(e))
+};
 
-const bot = sp(botPromise);
+let botPromise = sp(botInit);
+const bot = botPromise();
 
 console.log("Initialized bot client.");
 
@@ -620,4 +626,3 @@ bot.registerCommand(text.FAQ_COMMAND, async (msg) => {
     });
 
 bot.connect();
-
