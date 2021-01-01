@@ -1,12 +1,47 @@
 const Eris = require('eris');
 const Chrono = require('chrono-node');
+const vault = require('node-vault-client');
+const db = require('./app/db.js');
 const embed = require('./app/embed.js');
 const text = require('./app/text.js');
-import Init from './app/init.js';
 
-const system = new Init();
-const bot = Init.getBot();
-const dbConnection = Init.getDb();
+const vaultClient = vault.boot('main', {
+    api: { url: process.env.VAULT_URL },
+    auth: {
+        type: 'appRole',
+        config: { role_id: process.env.VAULT_ROLE_ID }
+    },
+});
+console.log("Initialized vault.");
+
+let redisClient;
+
+vaultClient.read('samwise/redis/password').then(v => {
+    redisClient = new Redis({
+        port: 6379, // Redis port
+        host: process.env.REDIS_HOST, // Redis host
+        family: 4, // 4 (IPv4) or 6 (IPv6)
+        password: v,
+        db: 0,
+    });
+}).catch(e => console.error(e));
+
+console.log("Initialized redis client.");
+
+const dbConnection = new db.database(redisClient);
+
+let bot;
+
+vaultClient.read('samwise/bot/token').then(v => {
+    bot = new Eris.CommandClient(v, {}, {
+        description: text.BOT_DESCRIPTION,
+        deleteCommand: true,
+        owner: text.BOT_OWNER,
+        prefix: "!"
+    });
+}).catch(e => console.error(e));
+
+console.log("Initialized bot client.");
 
 bot.on("ready", () => {
     console.log("Ready to roll.");
