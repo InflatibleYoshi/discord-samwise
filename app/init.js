@@ -3,7 +3,11 @@ const Redis = require('ioredis');
 const text = require('./text.js');
 const db = require('./db.js');
 
-class init{
+class Init{
+
+    static bot;
+    static redis;
+
     constructor(){
         const vault = require('node-vault-client');
 
@@ -44,11 +48,11 @@ class init{
         console.log("Initialized bot client.");
     }
 
-    getDb() {
+    static getDb() {
         return this.redis;
     }
 
-    getBot() {
+    static getBot() {
         return this.bot;
     }
 }
