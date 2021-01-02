@@ -11,7 +11,10 @@ const vaultClient = vault.boot('main', {
     api: { url: process.env.VAULT_URL },
     auth: {
         type: 'appRole',
-        config: { role_id: process.env.VAULT_ROLE_ID }
+        config: {
+            role_id: process.env.VAULT_ROLE_ID,
+            secret_id: process.env.VAULT_SECRET_ID
+        }
     },
 });
 console.log("Initialized vault.");
