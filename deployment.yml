@@ -13,16 +13,17 @@ spec:
         app: samwise
 
     spec:
-      serviceAccountName: samwise
+      serviceAccountName: default
       containers:
         - name: samwise
-          image: inflatibleyoshi/discord-samwise
+          image: discord-samwise
+          imagePullPolicy: Never
           ports:
             - containerPort: 443
           env:
             - name: REDIS_HOST
-              value: ""
-            - name: VAULT_ROLE_ID
-              value: ""
+              value: "10.101.77.31"
             - name: VAULT_URL
-              value: ""
+              value: "http://10.108.156.3:8200/"
+            - name: VAULT_TOKEN
+              value: "s.um5VS2Npg6G9xyPHGsJaFK5p"

@@ -15,38 +15,32 @@ Deployment Steps:
 1. Install Kubernetes
 2. Install Consul {Configuration}
 3. Install Vault {Configuration}
+   https://learn.hashicorp.com/tutorials/init/kubernetes-minikube
 
-4. Create Service Account for Application
-```
-
-
-```
-
-
-5. Create Vault Approle for accessing secrets
+4. Create Vault AppRole for accessing secrets
 ```
 kubectl exec -it vault-0 -- /bin/sh
 
 vault auth enable approle
 
 vault policy write samwise - <<EOF
-path "/samwise/bot/token" {
+path "samwise/redis" {
   capabilities = ["read"]
 }
-path "/samwise/redis/password" {
+
+path "samwise/bot" {
   capabilities = ["read"]
 }
 EOF
+# The above policy was formed through much trial and error and much blood, sweat, and tears 
+# because hashicorp's dogshit documentation told me to do "secret/samwise/bot" instead
+# of what I have now
 
-vault write auth/approle/role/samwise \
-    token_num_uses=2 \
-    token_ttl=1h \
-    token_max_ttl=1h \
-    policies=samwise \
-    ttl=24h
+vault token create -policy=samwise -period=30m
+# This value provided will give you the correct token to fill into the deployment.yml
 ```
 
-6. Setup PersistantVolume Claim in Storage: pv.yaml
+5. Setup PersistentVolume Claim in Storage: pv.yaml
 ```
 nano pv.yaml
 
@@ -82,9 +76,7 @@ $ kubectl apply -f pv.yaml
       requests:
         storage: 8Gi
 ```
-7. Initialize Vault to secure Bot Token.
-https://learn.hashicorp.com/tutorials/init/kubernetes-minikube
-8. Initialize Redis:
+6. Initialize Redis:
 ```
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm install my-release –set persistence.existingClaim=PVC_NAME bitnami/redis
@@ -94,15 +86,16 @@ Add secret to init.
 
 kubectl delete secret my-release-redis
 ```
-9. Fill Deployment.yml
+7. Fill Deployment.yml with vault-active service ip and redis-master ip.
 ```
 kubectl get pods -o wide
 ```
 
-10. Unseal Vault
+8. Unseal Vault
 
-11. Deployment
+9. Deployment
 ```
+docker build -t discord-samwise .
 kubectl apply -f deployment.yml
 ```
-12. Reseal Vault
+10. Reseal Vault

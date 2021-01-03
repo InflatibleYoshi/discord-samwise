@@ -10,24 +10,20 @@ const text = require('./app/text.js');
 const vaultClient = vault.boot('main', {
     api: { url: process.env.VAULT_URL },
     auth: {
-        type: 'appRole',
-        config: {
-            role_id: process.env.VAULT_ROLE_ID,
-            secret_id: process.env.VAULT_SECRET_ID
-        }
+        type: 'token',
+        config: { token: process.env.VAULT_TOKEN }
     },
 });
 console.log("Initialized vault.");
 
 const dbConnectionInit = () => {
-    return vaultClient.read('samwise/redis/password')
+    return vaultClient.read('samwise/redis')
         .then(v => {
-            console.log(v);
             return new Redis({
                 port: 6379, // Redis port
                 host: process.env.REDIS_HOST, // Redis host
                 family: 4, // 4 (IPv4) or 6 (IPv6)
-                password: v,
+                password: v.getValue('password'),
                 db: 0,
             });
         }).then(redis => {
@@ -41,10 +37,9 @@ const dbConnection = dbConnectionPromise();
 console.log("Initialized redis client.");
 
 const botInit = () => {
-    return vaultClient.read('samwise/bot/token')
+    return vaultClient.read('samwise/bot')
         .then(v => {
-            console.log(v);
-            return new Eris.CommandClient(v, {}, {
+            return new Eris.CommandClient(v.getValue('token'), {}, {
                 description: text.BOT_DESCRIPTION,
                 deleteCommand: true,
                 owner: text.BOT_OWNER,
