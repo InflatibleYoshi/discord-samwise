@@ -13,11 +13,13 @@ https://developer.ibm.com/tutorials/convert-sample-web-app-to-helmchart/
 
 Deployment Steps:
 1. Install Kubernetes
-2. Install Consul {Configuration}
-3. Install Vault {Configuration}
-   https://learn.hashicorp.com/tutorials/init/kubernetes-minikube
+2. Install Vault
+```
+helm install vault hashicorp/vault --set server.standalone.enable=true
 
-4. Create Vault AppRole for accessing secrets
+```
+
+3. Create Vault AppRole for accessing secrets
 ```
 kubectl exec -it vault-0 -- /bin/sh
 
@@ -40,7 +42,7 @@ vault token create -policy=samwise -period=30m
 # This value provided will give you the correct token to fill into the deployment.yml
 ```
 
-5. Setup PersistentVolume Claim in Storage: pv.yaml
+4. Setup PersistentVolume Claim in Storage: pv.yaml
 ```
 nano pv.yaml
 
@@ -76,7 +78,7 @@ $ kubectl apply -f pv.yaml
       requests:
         storage: 8Gi
 ```
-6. Initialize Redis:
+5. Initialize Redis:
 ```
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm install my-release –set persistence.existingClaim=PVC_NAME bitnami/redis
@@ -86,16 +88,16 @@ Add secret to init.
 
 kubectl delete secret my-release-redis
 ```
-7. Fill Deployment.yml with vault-active service ip and redis-master ip.
+6. Fill Deployment.yml with vault-active service ip and redis-master ip.
 ```
 kubectl get pods -o wide
 ```
 
-8. Unseal Vault
+7. Unseal Vault
 
-9. Deployment
+8. Deployment
 ```
 docker build -t discord-samwise .
 kubectl apply -f deployment.yml
 ```
-10. Reseal Vault
+9. Reseal Vault
