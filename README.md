@@ -1,27 +1,99 @@
-Deploying to Production
-
-1. Dockerize Application.
-2. Create Deployment - open port 443 TCP for textchat
-https://developer.ibm.com/tutorials/convert-sample-web-app-to-helmchart/
-3. Deploy Redis Database with Persistent storage.
-
-----------------------Production Ready------------------------------
-
-1. Scale Deployment for multiple pods. 
-
-----------------------Scaling Ready-----------------------------------
-
 Deployment Steps:
-1. Install Kubernetes
-2. Install Vault
+1. Install Kubernetes (I installed microk8s on my RaspberryPis)
+
+2. Setup Storage
 ```
-helm install vault hashicorp/vault --set server.standalone.enable=true
+nano local-storage.yaml
+
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-storage
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+
+kubectl apply -f local-storage.yaml
+
+kubectl patch storageclass local-storage -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+
+nano pv-vault.yaml
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: vault
+  labels:
+    type: vault
+spec:
+  capacity:
+    storage: 1Gi
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: local-storage
+  local:
+    path: /opt/microk8s/vault
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/os
+          operator: In
+          values:
+          - linux
+```
+
+3. Install Vault - https://www.vaultproject.io/docs/platform/k8s/helm/examples/standalone-tls
 
 ```
+nano helm-vault-values.yml
 
-3. Create Vault AppRole for accessing secrets
+global:
+  enabled: true
+  tlsDisable: false
+
+server:
+  extraEnvironmentVars:
+    VAULT_CACERT: /vault/userconfig/vault-server-tls/vault.ca
+
+  extraVolumes:
+    - type: secret
+      name: vault-server-tls # Matches the ${SECRET_NAME} from above
+
+  dataStorage:
+    enabled: true
+    size: 1Gi
+
+  standalone:
+    enabled: true
+    config: |
+      listener "tcp" {
+        address = "[::]:8200"
+        cluster_address = "[::]:8201"
+        tls_cert_file = "/vault/userconfig/vault-server-tls/vault.crt"
+        tls_key_file  = "/vault/userconfig/vault-server-tls/vault.key"
+        tls_client_ca_file = "/vault/userconfig/vault-server-tls/vault.ca"
+      }
+
+      storage "file" {
+        path = "/vault/data"
+      }
+
+injector:
+  image:
+    repository: "moikot/vault-k8s"
+    tag: "0.2.0"
+    pullPolicy: IfNotPresent
+
+microk8s helm3 install vault hashicorp/vault --values helm-vault-values.yml --namespace=vault
 ```
-kubectl exec -it vault-0 -- /bin/sh
+
+4. Configure Vault  + AppRole for accessing secrets
+```
+kubectl exec vault-0 --namespace=vault -- vault operator init -key-shares=5 -key-threshold=2 -format=json > cluster-keys.json
+
+kubectl exec -it vault-0 --namespace=vault -- /bin/sh
 
 vault auth enable approle
 
@@ -35,36 +107,43 @@ path "samwise/bot" {
 }
 EOF
 # The above policy was formed through much trial and error and much blood, sweat, and tears 
-# because hashicorp's dogshit documentation told me to do "secret/samwise/bot" instead
+# because hashicorp's documentation told me to do "secret/samwise/bot" instead
 # of what I have now
 
 vault token create -policy=samwise -period=30m
 # This value provided will give you the correct token to fill into the deployment.yml
 ```
 
-4. Setup PersistentVolume Claim in Storage: pv.yaml
+5. Setup PersistentVolume Claim in Storage: pv.yaml
 ```
-nano pv.yaml
+nano pv-redis.yaml
 
-  apiVersion: v1
-  kind: PersistentVolume
-  metadata:
-    name: kube-storage-8tb
-    labels:
-      type: local
-  spec:
-    storageClassName: kube-storage-8tb 
-    capacity:
-      storage: 2000Gi
-    accessModes:
-      - ReadWriteOnce 
-    persistentVolumeReclaimPolicy: Retain
-    hostPath:
-      path: "/home/pi/storage/kube-storage" 
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: redis
+  labels:
+    type: redis
+spec:
+  capacity:
+    storage: 4Gi
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: local-storage
+  local:
+    path: /opt/microk8s/redis
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/os
+          operator: In
+          values:
+          - linux
 
-$ oc create -f pv.yaml
-or
-$ kubectl apply -f pv.yaml
+nano pvc-redis.yaml
 
   apiVersion: v1
   kind: PersistentVolumeClaim
@@ -77,8 +156,11 @@ $ kubectl apply -f pv.yaml
     resources:
       requests:
         storage: 8Gi
+
+kubectl apply -f pvc-redis.yaml
+
 ```
-5. Initialize Redis:
+6. Initialize Redis:
 ```
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm install my-release –set persistence.existingClaim=PVC_NAME bitnami/redis
@@ -88,16 +170,16 @@ Add secret to init.
 
 kubectl delete secret my-release-redis
 ```
-6. Fill Deployment.yml with vault-active service ip and redis-master ip.
+7. Fill Deployment.yml with vault-active service ip and redis-master ip.
 ```
 kubectl get pods -o wide
 ```
 
-7. Unseal Vault
+8. Unseal Vault
 
-8. Deployment
+9. Deployment
 ```
 docker build -t discord-samwise .
 kubectl apply -f deployment.yml
 ```
-9. Reseal Vault
+10. Reseal Vault
