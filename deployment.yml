@@ -27,3 +27,8 @@ spec:
               value: "http://10.108.156.3:8200/"
             - name: VAULT_TOKEN
               value: "s.um5VS2Npg6G9xyPHGsJaFK5p"
+            - name: VAULT_CA
+              valueFrom:
+                secretKeyRef:
+                  name: "samwise-vault-ca"
+                  key: "vault.ca"
