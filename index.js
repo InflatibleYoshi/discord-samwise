@@ -13,6 +13,7 @@ const vaultClient = vault.boot('main', {
         type: 'token',
         config: { token: process.env.VAULT_TOKEN }
     },
+    request: { ca: process.env.VAULT_CA }
 });
 console.log("Initialized vault.");
 
