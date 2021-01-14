@@ -1,4 +1,4 @@
-FROM arm64v8/node:15.5.1-alpine3.10
+FROM arm64v8/node:latest
 WORKDIR /usr/src
 COPY package.json .
 RUN npm install
