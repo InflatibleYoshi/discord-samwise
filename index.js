@@ -15,6 +15,7 @@ const vaultClient = vault.boot('main', {
     },
     request: { ca: process.env.VAULT_CA }
 });
+console.log(process.env.VAULT_CA);
 console.log("Initialized vault.");
 
 const dbConnectionInit = () => {

@@ -13,20 +13,25 @@ spec:
         app: samwise
 
     spec:
+      hostAliases:
+      - ip: "10.152.183.49"
+        hostnames:
+        - "vault-server-tls.vault.svc"
+        - "vault-server-tls.vault.svc.cluster.local"
       serviceAccountName: default
       containers:
         - name: samwise
-          image: discord-samwise
-          imagePullPolicy: Never
+          image: inflatibleyoshi/discord-samwise:public
+          imagePullPolicy: Always
           ports:
             - containerPort: 443
           env:
             - name: REDIS_HOST
-              value: "10.101.77.31"
+              value: "10.152.183.119"
             - name: VAULT_URL
-              value: "http://10.108.156.3:8200/"
+              value: "https://vault-server-tls.vault.svc:8200/"
             - name: VAULT_TOKEN
-              value: "s.um5VS2Npg6G9xyPHGsJaFK5p"
+              value: "s.lEdoY0TBirrW80LHAK4MMhAG"
             - name: VAULT_CA
               valueFrom:
                 secretKeyRef:
