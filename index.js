@@ -397,7 +397,6 @@ bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
 
 bot.registerCommand(text.JOIN_COMMAND, async (msg) => {
         console.log(text.JOIN_COMMAND);
-        bot.emit("messageDelete", msg);
         //Get first command.
         if (msg.mentions.length === 0) {
             bot.emit("messageReturn", msg.author.id, embed.error(text.JOIN_COMMAND, text.COMMAND_SELECT_NO_USERS_ERROR));
@@ -446,6 +445,7 @@ bot.registerCommand(text.JOIN_COMMAND, async (msg) => {
                         })
                 }
             })
+        bot.emit("messageDelete", msg);
     },
     {
         guildOnly: true,
@@ -455,7 +455,6 @@ bot.registerCommand(text.JOIN_COMMAND, async (msg) => {
 
 bot.registerCommand(text.INVITE_COMMAND, async (msg) => {
         console.log(text.INVITE_COMMAND);
-        bot.emit("messageDelete", msg);
         //Get first command.
         if (msg.mentions.length === 0) {
             bot.emit("messageReturn", msg.author.id, embed.error(text.INVITE_COMMAND, text.COMMAND_SELECT_NO_USERS_ERROR));
@@ -505,6 +504,7 @@ bot.registerCommand(text.INVITE_COMMAND, async (msg) => {
                         })
                 }
             })
+        bot.emit("messageDelete", msg);
     },
     {
         guildOnly: true,
@@ -514,7 +514,6 @@ bot.registerCommand(text.INVITE_COMMAND, async (msg) => {
 
 bot.registerCommand(text.KICK_COMMAND, async (msg) => {
         console.log(text.KICK_COMMAND);
-        bot.emit("messageDelete", msg);
         //Get list of all users included in the arguments.
         if (msg.mentions.length === 0) {
             bot.emit("messageReturn", msg.author.id, embed.error(text.KICK_COMMAND, text.COMMAND_SELECT_NO_USERS_ERROR));
@@ -557,6 +556,7 @@ bot.registerCommand(text.KICK_COMMAND, async (msg) => {
                         })
                 }
             })
+        bot.emit("messageDelete", msg);
     },
     {
         guildOnly: true,
@@ -567,7 +567,6 @@ bot.registerCommand(text.KICK_COMMAND, async (msg) => {
 bot.registerCommand(text.LEAVE_COMMAND, async (msg) => {
         console.log(text.LEAVE_COMMAND);
         //Get list of all users included in the arguments.
-        bot.emit("messageDelete", msg);
         if (msg.mentions.length === 0) {
             bot.emit("messageReturn", msg.author.id, embed.error(text.LEAVE_COMMAND, text.COMMAND_SELECT_NO_USERS_ERROR));
             return;
@@ -608,6 +607,7 @@ bot.registerCommand(text.LEAVE_COMMAND, async (msg) => {
                         })
                 }
             })
+        bot.emit("messageDelete", msg);
     },
     {
         guildOnly: true,
