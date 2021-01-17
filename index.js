@@ -122,7 +122,7 @@ tracking.registerSubcommand(text.TRACK_RESET_SUBCOMMAND, async (msg) => {
                         }
                     };
                     bot.on("messageReactionAdd", userEventListener);
-                })
+                }).catch(e => console.error(e));
             }
             if (focus !== null) {
                 //2. if focus exists then try to get the fellowship
@@ -444,7 +444,7 @@ bot.registerCommand(text.JOIN_COMMAND, async (msg) => {
                             bot.on("messageReactionAdd", fellowshipEventListener);
                         })
                 }
-            })
+            }).catch(e => console.error(e));
         bot.emit("messageDelete", msg);
     },
     {
@@ -503,7 +503,7 @@ bot.registerCommand(text.INVITE_COMMAND, async (msg) => {
                             bot.on("messageReactionAdd", fellowshipEventListener);
                         })
                 }
-            })
+            }).catch(e => console.error(e));
         bot.emit("messageDelete", msg);
     },
     {
@@ -555,7 +555,7 @@ bot.registerCommand(text.KICK_COMMAND, async (msg) => {
                             bot.on("messageReactionAdd", fellowshipEventListener);
                         })
                 }
-            })
+            }).catch(e => console.error(e));
         bot.emit("messageDelete", msg);
     },
     {
@@ -606,7 +606,7 @@ bot.registerCommand(text.LEAVE_COMMAND, async (msg) => {
                             bot.on("messageReactionAdd", fellowshipEventListener);
                         })
                 }
-            })
+            }).catch(e => console.error(e));
         bot.emit("messageDelete", msg);
     },
     {
