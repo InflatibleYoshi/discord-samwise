@@ -43,6 +43,7 @@ const botInit = () => {
             return new Eris.CommandClient(v.getValue('token'), {}, {
                 description: text.BOT_DESCRIPTION,
                 owner: text.BOT_OWNER,
+                deleteCommand: true,
                 prefix: "!"
             });
         }).catch(e => console.error(e))
@@ -63,12 +64,6 @@ bot.on("messageReturn", async (id, msgToReturn) => {
     });
 });
 
-bot.on("messageDelete", async (msg) => {
-    if(!(msg.channel instanceof Eris.PrivateChannel)){
-        await msg.delete();
-    }
-});
-
 function getUser(msg) {
     console.log("getUser");
     let users = msg.mentions;
@@ -87,13 +82,13 @@ const tracking = bot.registerCommand(text.TRACK_COMMAND, () => {
         bot.emit("messageReturn", msg.author.id, embed.command(text.TRACK_COMMAND, text.TRACK_COMMAND_FULL_DESCRIPTION));
     },
     {
+        deleteCommand: true,
         description: text.TRACK_COMMAND_DESCRIPTION,
         fullDescription: text.TRACK_COMMAND_FULL_DESCRIPTION,
     });
 
 tracking.registerSubcommand(text.TRACK_RESET_SUBCOMMAND, async (msg) => {
         console.log(text.TRACK_RESET_SUBCOMMAND);
-        bot.emit("messageDelete", msg);
         let successHandler = async function (focus) {
             bot.emit("messageReturn", msg.author.id, embed.response(text.TRACK_RESET_SUBCOMMAND, text.TRACK_RESET_SUBCOMMAND_RESPONSE));
             let fellowshipNotEmpty = function (users) {
@@ -137,13 +132,13 @@ tracking.registerSubcommand(text.TRACK_RESET_SUBCOMMAND, async (msg) => {
 
     },
     {
+        deleteCommand: true,
         description: text.TRACK_RESET_SUBCOMMAND_DESCRIPTION,
         fullDescription: text.TRACK_RESET_SUBCOMMAND_FULL_DESCRIPTION,
     });
 
 tracking.registerSubcommand(text.TRACK_STREAK_SUBCOMMAND, async (msg) => {
     console.log(text.TRACK_STREAK_SUBCOMMAND);
-    bot.emit("messageDelete", msg);
     let successHandler = function (streak) {
         bot.emit("messageReturn", msg.author.id, embed.response(text.TRACK_STREAK_SUBCOMMAND,
             text.TRACK_STREAK_SUBCOMMAND_RETURN_STREAK(
@@ -154,13 +149,13 @@ tracking.registerSubcommand(text.TRACK_STREAK_SUBCOMMAND, async (msg) => {
     };
     await dbConnection.getStreak(msg.author, successHandler, failureHandler);
 }, {
+    deleteCommand: true,
     description: text.TRACK_STREAK_SUBCOMMAND_DESCRIPTION,
     fullDescription: text.TRACK_STREAK_SUBCOMMAND_FULL_DESCRIPTION
 });
 
 tracking.registerSubcommand(text.TRACK_FOCUS_SUBCOMMAND, async (msg, args) => {
     console.log(text.TRACK_FOCUS_SUBCOMMAND);
-    bot.emit("messageDelete", msg);
     if (args.length !== 0) {
         const focus = args.join(" ");
         let successHandler = function (_user) {
@@ -174,13 +169,13 @@ tracking.registerSubcommand(text.TRACK_FOCUS_SUBCOMMAND, async (msg, args) => {
         bot.emit("messageReturn", msg.author.id, embed.error(text.TRACK_FOCUS_SUBCOMMAND, text.TRACK_FOCUS_SUBCOMMAND_INPUT_ERROR));
     }
 }, {
+    deleteCommand: true,
     description: text.TRACK_FOCUS_SUBCOMMAND_DESCRIPTION,
     fullDescription: text.TRACK_FOCUS_SUBCOMMAND_FULL_DESCRIPTION
 })
 
 tracking.registerSubcommand(text.TRACK_THRESHOLD_SUBCOMMAND, async (msg, args) => {
     console.log(text.TRACK_THRESHOLD_SUBCOMMAND);
-    bot.emit("messageDelete", msg);
     const threshold = parseInt(args.join(" "), 10);
     console.log(threshold);
     if(isNaN(threshold)){
@@ -198,13 +193,13 @@ tracking.registerSubcommand(text.TRACK_THRESHOLD_SUBCOMMAND, async (msg, args) =
     };
     await dbConnection.setThreshold(msg.author, threshold, successHandler, failureHandler);
 }, {
+    deleteCommand: true,
     description: text.TRACK_THRESHOLD_SUBCOMMAND_DESCRIPTION,
     fullDescription: text.TRACK_THRESHOLD_SUBCOMMAND_FULL_DESCRIPTION
 });
 
 tracking.registerSubcommand(text.TRACK_LIST_SUBCOMMAND, async (msg, args) => {
     console.log(text.TRACK_LIST_SUBCOMMAND);
-    bot.emit("messageDelete", msg);
     let successHandler = async function (users) {
         let returnHandler = function (usernames) {
             bot.emit("messageReturn", msg.author.id, embed.response(text.TRACK_LIST_SUBCOMMAND, text.TRACK_LIST_SUBCOMMAND_TITLE(usernames)));
@@ -216,13 +211,13 @@ tracking.registerSubcommand(text.TRACK_LIST_SUBCOMMAND, async (msg, args) => {
     };
     await dbConnection.trackedList(msg.author, successHandler, failureHandler);
 }, {
+    deleteCommand: true,
     description: text.TRACK_LIST_SUBCOMMAND_DESCRIPTION,
     fullDescription: text.TRACK_LIST_SUBCOMMAND_FULL_DESCRIPTION
 })
 
 tracking.registerSubcommand(text.TRACK_DATE_SUBCOMMAND, async (msg, args) => {
     console.log(text.TRACK_DATE_SUBCOMMAND);
-    bot.emit("messageDelete", msg);
     const parse = args.join(" ");
     // Make a string of the text after the command label
     if(!parse){
@@ -269,13 +264,13 @@ tracking.registerSubcommand(text.TRACK_DATE_SUBCOMMAND, async (msg, args) => {
             }
         );
 }, {
+    deleteCommand: true,
     description: text.TRACK_DATE_SUBCOMMAND_DESCRIPTION,
     fullDescription: text.TRACK_DATE_SUBCOMMAND_FULL_DESCRIPTION
 })
 
 bot.registerCommand(text.GET_MEMBERSHIP_COMMAND, async (msg) => {
         console.log(text.GET_MEMBERSHIP_COMMAND)
-        bot.emit("messageDelete", msg);
         let successHandler = async function (users) {
             let returnHandler = function (usernames){
                 bot.emit("messageReturn", msg.author.id, embed.response(text.GET_MEMBERSHIP_COMMAND, text.GET_MEMBERSHIP_COMMAND_TITLE(usernames)));
@@ -288,13 +283,13 @@ bot.registerCommand(text.GET_MEMBERSHIP_COMMAND, async (msg) => {
         await dbConnection.getMembership(msg.author, successHandler, failureHandler)
     },
     {
+        deleteCommand: true,
         description: text.GET_MEMBERSHIP_COMMAND_DESCRIPTION,
         fullDescription: text.GET_MEMBERSHIP_COMMAND_FULL_DESCRIPTION
     });
 
 bot.registerCommand(text.GET_FELLOWSHIP_COMMAND, async (msg) => {
         console.log(text.GET_FELLOWSHIP_COMMAND);
-        bot.emit("messageDelete", msg);
         let successHandler = async function (users) {
             let returnHandler = function (usernames) {
                 bot.emit("messageReturn", msg.author.id, embed.response(text.GET_FELLOWSHIP_COMMAND, text.GET_FELLOWSHIP_COMMAND_TITLE(usernames)));
@@ -307,6 +302,7 @@ bot.registerCommand(text.GET_FELLOWSHIP_COMMAND, async (msg) => {
         await dbConnection.getFellowship(msg.author, successHandler, failureHandler)
     },
     {
+        deleteCommand: true,
         description: text.GET_FELLOWSHIP_COMMAND_DESCRIPTION,
         fullDescription: text.GET_FELLOWSHIP_COMMAND_FULL_DESCRIPTION
     });
@@ -314,7 +310,6 @@ bot.registerCommand(text.GET_FELLOWSHIP_COMMAND, async (msg) => {
 bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
         //initial check for empty fellowship.
         console.log(text.NOTIFY_COMMAND);
-        bot.emit("messageDelete", msg);
         let fellowshipEmpty = function (_error) {
             console.log("fellowship empty");
             bot.emit("messageReturn", msg.author.id, embed.error(text.NOTIFY_COMMAND, text.NOTIFY_COMMAND_NO_FELLOWSHIP_ERROR));
@@ -379,13 +374,13 @@ bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
         await dbConnection.getFellowship(msg.author, fellowshipNotEmpty, fellowshipEmpty);
     },
     {
+        deleteCommand: true,
         description: text.NOTIFY_COMMAND_DESCRIPTION,
         fullDescription: text.NOTIFY_COMMAND_FULL_DESCRIPTION
     });
 
 bot.registerCommand(text.JOIN_COMMAND, async (msg) => {
         console.log(text.JOIN_COMMAND);
-        bot.emit("messageDelete", msg);
         //Get first command.
         if (msg.mentions.length === 0) {
             bot.emit("messageReturn", msg.author.id, embed.error(text.JOIN_COMMAND, text.COMMAND_SELECT_NO_USERS_ERROR));
@@ -436,13 +431,13 @@ bot.registerCommand(text.JOIN_COMMAND, async (msg) => {
             }).catch(e => console.error(e));
     },
     {
+        deleteCommand: true,
         description: text.JOIN_COMMAND_DESCRIPTION,
         fullDescription: text.JOIN_COMMAND_FULL_DESCRIPTION,
     });
 
 bot.registerCommand(text.INVITE_COMMAND, async (msg) => {
         console.log(text.INVITE_COMMAND);
-        bot.emit("messageDelete", msg);
         //Get first command.
         if (msg.mentions.length === 0) {
             bot.emit("messageReturn", msg.author.id, embed.error(text.INVITE_COMMAND, text.COMMAND_SELECT_NO_USERS_ERROR));
@@ -494,13 +489,13 @@ bot.registerCommand(text.INVITE_COMMAND, async (msg) => {
             }).catch(e => console.error(e));
     },
     {
+        deleteCommand: true,
         description: text.INVITE_COMMAND_DESCRIPTION,
         fullDescription: text.INVITE_COMMAND_FULL_DESCRIPTION
     });
 
 bot.registerCommand(text.KICK_COMMAND, async (msg) => {
         console.log(text.KICK_COMMAND);
-        bot.emit("messageDelete", msg);
         //Get list of all users included in the arguments.
         if (msg.mentions.length === 0) {
             bot.emit("messageReturn", msg.author.id, embed.error(text.KICK_COMMAND, text.COMMAND_SELECT_NO_USERS_ERROR));
@@ -545,13 +540,13 @@ bot.registerCommand(text.KICK_COMMAND, async (msg) => {
             }).catch(e => console.error(e));
     },
     {
+        deleteCommand: true,
         description: text.KICK_COMMAND_DESCRIPTION,
         fullDescription: text.KICK_COMMAND_FULL_DESCRIPTION
     });
 
 bot.registerCommand(text.LEAVE_COMMAND, async (msg) => {
         console.log(text.LEAVE_COMMAND);
-        bot.emit("messageDelete", msg);
         //Get list of all users included in the arguments.
         if (msg.mentions.length === 0) {
             bot.emit("messageReturn", msg.author.id, embed.error(text.LEAVE_COMMAND, text.COMMAND_SELECT_NO_USERS_ERROR));
@@ -595,6 +590,7 @@ bot.registerCommand(text.LEAVE_COMMAND, async (msg) => {
             }).catch(e => console.error(e));
     },
     {
+        deleteCommand: true,
         description: text.LEAVE_COMMAND_DESCRIPTION,
         fullDescription: text.LEAVE_COMMAND_FULL_DESCRIPTION
     });
@@ -607,6 +603,7 @@ bot.registerCommand(text.FAQ_COMMAND, async (msg) => {
         bot.emit("messageReturn", msg.author.id, embed.command(text.FAQ_COMMAND_QUESTION_4, text.FAQ_COMMAND_ANSWER_4));
     },
     {
+        deleteCommand: true,
         description: text.FAQ_COMMAND_DESCRIPTION,
         fullDescription: text.FAQ_COMMAND_FULL_DESCRIPTION
     });
