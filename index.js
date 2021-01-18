@@ -515,7 +515,7 @@ bot.registerCommand(text.KICK_COMMAND, async (msg) => {
                                 bot.emit("messageReturn", msg.author.id, embed.error(text.KICK_COMMAND, text.KICK_COMMAND_NOT_IN_FELLOWSHIP_ERROR(user.username)));
                             };
                             let fellowshipEventListener = async function (user_msg, emoji, reactor) {
-                                if (user_msg.id === message.id && reactor.id === user.id) {
+                                if (user_msg.id === message.id && reactor.id === msg.author.id) {
                                     if (emoji.name === '❌') {
                                         bot.off("messageReactionAdd", fellowshipEventListener);
                                     } else if (emoji.name === '✅') {
@@ -565,7 +565,7 @@ bot.registerCommand(text.LEAVE_COMMAND, async (msg) => {
                                 bot.emit("messageReturn", msg.author.id, embed.error(text.LEAVE_COMMAND, text.LEAVE_COMMAND_NOT_IN_FELLOWSHIP_ERROR(user.username)));
                             };
                             let fellowshipEventListener = async function (user_msg, emoji, reactor) {
-                                if (user_msg.id === message.id && reactor.id === user.id) {
+                                if (user_msg.id === message.id && reactor.id === msg.author.id) {
                                     if (emoji.name === '❌') {
                                         bot.off("messageReactionAdd", fellowshipEventListener);
                                     } else if (emoji.name === '✅') {
