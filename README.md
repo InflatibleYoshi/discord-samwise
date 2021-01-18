@@ -1,3 +1,6 @@
+Will be separated into node standalone and kubernetes distribution if I feel like putting in that effort.
+
+
 Deployment Steps:
 1. Install Kubernetes (I installed microk8s on my RaspberryPis)
 
