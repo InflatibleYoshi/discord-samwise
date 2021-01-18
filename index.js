@@ -82,7 +82,7 @@ const tracking = bot.registerCommand(text.TRACK_COMMAND, () => {
         bot.emit("messageReturn", msg.author.id, embed.command(text.TRACK_COMMAND, text.TRACK_COMMAND_FULL_DESCRIPTION));
     },
     {
-        deleteCommand: true,
+        dmOnly: true,
         description: text.TRACK_COMMAND_DESCRIPTION,
         fullDescription: text.TRACK_COMMAND_FULL_DESCRIPTION,
     });
@@ -101,7 +101,6 @@ tracking.registerSubcommand(text.TRACK_RESET_SUBCOMMAND, async (msg) => {
                     userEventListener = async function (user_msg, emoji, id) {
                         if (user_msg.id === message.id && id === msg.author.id) {
                             if (emoji.name === '❌') {
-                                message.delete();
                                 bot.off("messageReactionAdd", userEventListener);
                             } else if (emoji.name === '✅') {
                                 //4. Send to all users
@@ -109,7 +108,6 @@ tracking.registerSubcommand(text.TRACK_RESET_SUBCOMMAND, async (msg) => {
                                     bot.emit("messageReturn", user, embed.alert(text.TRACK_RESET_SUBCOMMAND, text.TRACK_RESET_SUBCOMMAND_FOLLOWUP_TEXT(msg.author.username, focus)));
                                 }
                                 bot.emit("messageReturn", msg.author.id, embed.response(text.TRACK_RESET_SUBCOMMAND, text.TRACK_RESET_SUBCOMMAND_FOLLOWUP_SUCCESS));
-                                message.delete();
                                 bot.off("messageReactionAdd", userEventListener);
                             }
                         }
@@ -132,7 +130,7 @@ tracking.registerSubcommand(text.TRACK_RESET_SUBCOMMAND, async (msg) => {
 
     },
     {
-        deleteCommand: true,
+        dmOnly: true,
         description: text.TRACK_RESET_SUBCOMMAND_DESCRIPTION,
         fullDescription: text.TRACK_RESET_SUBCOMMAND_FULL_DESCRIPTION,
     });
@@ -149,7 +147,7 @@ tracking.registerSubcommand(text.TRACK_STREAK_SUBCOMMAND, async (msg) => {
     };
     await dbConnection.getStreak(msg.author, successHandler, failureHandler);
 }, {
-    deleteCommand: true,
+    dmOnly: true,
     description: text.TRACK_STREAK_SUBCOMMAND_DESCRIPTION,
     fullDescription: text.TRACK_STREAK_SUBCOMMAND_FULL_DESCRIPTION
 });
@@ -169,7 +167,7 @@ tracking.registerSubcommand(text.TRACK_FOCUS_SUBCOMMAND, async (msg, args) => {
         bot.emit("messageReturn", msg.author.id, embed.error(text.TRACK_FOCUS_SUBCOMMAND, text.TRACK_FOCUS_SUBCOMMAND_INPUT_ERROR));
     }
 }, {
-    deleteCommand: true,
+    dmOnly: true,
     description: text.TRACK_FOCUS_SUBCOMMAND_DESCRIPTION,
     fullDescription: text.TRACK_FOCUS_SUBCOMMAND_FULL_DESCRIPTION
 })
@@ -193,7 +191,7 @@ tracking.registerSubcommand(text.TRACK_THRESHOLD_SUBCOMMAND, async (msg, args) =
     };
     await dbConnection.setThreshold(msg.author, threshold, successHandler, failureHandler);
 }, {
-    deleteCommand: true,
+    dmOnly: true,
     description: text.TRACK_THRESHOLD_SUBCOMMAND_DESCRIPTION,
     fullDescription: text.TRACK_THRESHOLD_SUBCOMMAND_FULL_DESCRIPTION
 });
@@ -211,7 +209,7 @@ tracking.registerSubcommand(text.TRACK_LIST_SUBCOMMAND, async (msg, args) => {
     };
     await dbConnection.trackedList(msg.author, successHandler, failureHandler);
 }, {
-    deleteCommand: true,
+    dmOnly: true,
     description: text.TRACK_LIST_SUBCOMMAND_DESCRIPTION,
     fullDescription: text.TRACK_LIST_SUBCOMMAND_FULL_DESCRIPTION
 })
@@ -250,12 +248,10 @@ tracking.registerSubcommand(text.TRACK_DATE_SUBCOMMAND, async (msg, args) => {
                     if (user_msg.id === message.id && id === msg.author.id) {
                         if (emoji.name === '❌') {
                             bot.emit("messageReturn", msg.author.id, embed.response(text.TRACK_DATE_SUBCOMMAND, text.TRACK_DATE_SUBCOMMAND_USER_ABORTED));
-                            message.delete();
                             bot.off("messageReactionAdd", userEventListener);
                         } else if (emoji.name === '✅') {
                             dbConnection.trackUser(msg.author, timestamp, streak);
                             bot.emit("messageReturn", msg.author.id, embed.response(text.TRACK_DATE_SUBCOMMAND, text.TRACK_DATE_SUBCOMMAND_USER_CONFIRMED));
-                            message.delete();
                             bot.off("messageReactionAdd", userEventListener);
                         }
                     }
@@ -264,6 +260,7 @@ tracking.registerSubcommand(text.TRACK_DATE_SUBCOMMAND, async (msg, args) => {
             }
         );
 }, {
+    dmOnly: true,
     deleteCommand: true,
     description: text.TRACK_DATE_SUBCOMMAND_DESCRIPTION,
     fullDescription: text.TRACK_DATE_SUBCOMMAND_FULL_DESCRIPTION
@@ -283,7 +280,7 @@ bot.registerCommand(text.GET_MEMBERSHIP_COMMAND, async (msg) => {
         await dbConnection.getMembership(msg.author, successHandler, failureHandler)
     },
     {
-        deleteCommand: true,
+        dmOnly: true,
         description: text.GET_MEMBERSHIP_COMMAND_DESCRIPTION,
         fullDescription: text.GET_MEMBERSHIP_COMMAND_FULL_DESCRIPTION
     });
@@ -302,7 +299,7 @@ bot.registerCommand(text.GET_FELLOWSHIP_COMMAND, async (msg) => {
         await dbConnection.getFellowship(msg.author, successHandler, failureHandler)
     },
     {
-        deleteCommand: true,
+        dmOnly: true,
         description: text.GET_FELLOWSHIP_COMMAND_DESCRIPTION,
         fullDescription: text.GET_FELLOWSHIP_COMMAND_FULL_DESCRIPTION
     });
@@ -349,7 +346,6 @@ bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
                                 for (const [key, value] of Object.entries(handlerList)) {
                                     bot.off(key, value);
                                 }
-                                user_msg.delete();
                                 bot.emit("messageReturn", msg.author.id, embed.response(text.NOTIFY_COMMAND, text.NOTIFY_COMMAND_CANCELLATION));
                             } else if (emoji.name === '✅') {
                                 let userNotification = "";
@@ -359,7 +355,6 @@ bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
                                 for (user of users) {
                                     bot.emit("messageReturn", user, embed.alert(msg.author.username, userNotification));
                                 }
-                                user_msg.delete();
                                 bot.emit("messageReturn", msg.author.id, embed.response(text.NOTIFY_COMMAND, text.NOTIFY_COMMAND_SUCCESS));
                                 for (const [key, value] of Object.entries(handlerList)) {
                                     bot.off(key, value);
@@ -374,7 +369,7 @@ bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
         await dbConnection.getFellowship(msg.author, fellowshipNotEmpty, fellowshipEmpty);
     },
     {
-        deleteCommand: true,
+        guildOnly: true,
         description: text.NOTIFY_COMMAND_DESCRIPTION,
         fullDescription: text.NOTIFY_COMMAND_FULL_DESCRIPTION
     });
@@ -416,11 +411,9 @@ bot.registerCommand(text.JOIN_COMMAND, async (msg) => {
                             fellowshipEventListener = async function (user_msg, emoji, id) {
                                 if (user_msg.id === user_message.id && id === user.id) {
                                     if (emoji.name === '❌') {
-                                        await user_message.delete();
                                         bot.off("messageReactionAdd", fellowshipEventListener);
                                     } else if (emoji.name === '✅') {
                                         await dbConnection.addToFellowship(msg.author, user, onFellowshipAdd, failureHandler);
-                                        await user_message.delete();
                                         bot.off("messageReactionAdd", fellowshipEventListener);
                                     }
                                 }
@@ -431,6 +424,7 @@ bot.registerCommand(text.JOIN_COMMAND, async (msg) => {
             }).catch(e => console.error(e));
     },
     {
+        guildOnly: true,
         deleteCommand: true,
         description: text.JOIN_COMMAND_DESCRIPTION,
         fullDescription: text.JOIN_COMMAND_FULL_DESCRIPTION,
@@ -474,11 +468,9 @@ bot.registerCommand(text.INVITE_COMMAND, async (msg) => {
                             fellowshipEventListener = async function (user_msg, emoji, id) {
                                 if (user_msg.id === user_message.id && id === user.id) {
                                     if (emoji.name === '❌') {
-                                        await user_message.delete();
                                         bot.off("messageReactionAdd", fellowshipEventListener);
                                     } else if (emoji.name === '✅') {
                                         await dbConnection.addToFellowship(user, msg.author, onFellowshipAdd, failureHandler);
-                                        await user_message.delete();
                                         bot.off("messageReactionAdd", fellowshipEventListener);
                                     }
                                 }
@@ -489,6 +481,7 @@ bot.registerCommand(text.INVITE_COMMAND, async (msg) => {
             }).catch(e => console.error(e));
     },
     {
+        guildOnly: true,
         deleteCommand: true,
         description: text.INVITE_COMMAND_DESCRIPTION,
         fullDescription: text.INVITE_COMMAND_FULL_DESCRIPTION
@@ -524,11 +517,9 @@ bot.registerCommand(text.KICK_COMMAND, async (msg) => {
                             let fellowshipEventListener = async function (user_msg, emoji, id) {
                                 if (user_msg.id === message.id && id === msg.author.id) {
                                     if (emoji.name === '❌') {
-                                        await message.delete();
                                         bot.off("messageReactionAdd", fellowshipEventListener);
                                     } else if (emoji.name === '✅') {
                                         await dbConnection.removeFromFellowship(user, msg.author, onFellowshipRemove, failureHandler);
-                                        await message.delete();
                                         bot.off("messageReactionAdd", fellowshipEventListener);
 
                                     }
@@ -540,6 +531,7 @@ bot.registerCommand(text.KICK_COMMAND, async (msg) => {
             }).catch(e => console.error(e));
     },
     {
+        guildOnly: true,
         deleteCommand: true,
         description: text.KICK_COMMAND_DESCRIPTION,
         fullDescription: text.KICK_COMMAND_FULL_DESCRIPTION
@@ -575,11 +567,9 @@ bot.registerCommand(text.LEAVE_COMMAND, async (msg) => {
                             let fellowshipEventListener = async function (user_msg, emoji, id) {
                                 if (user_msg.id === message.id && id === msg.author.id) {
                                     if (emoji.name === '❌') {
-                                        await message.delete();
                                         bot.off("messageReactionAdd", fellowshipEventListener);
                                     } else if (emoji.name === '✅') {
                                         await dbConnection.removeFromFellowship(msg.author, user, onFellowshipRemove, failureHandler);
-                                        await message.delete();
                                         bot.off("messageReactionAdd", fellowshipEventListener);
                                     }
                                 }
@@ -590,6 +580,7 @@ bot.registerCommand(text.LEAVE_COMMAND, async (msg) => {
             }).catch(e => console.error(e));
     },
     {
+        guildOnly: true,
         deleteCommand: true,
         description: text.LEAVE_COMMAND_DESCRIPTION,
         fullDescription: text.LEAVE_COMMAND_FULL_DESCRIPTION
@@ -603,7 +594,6 @@ bot.registerCommand(text.FAQ_COMMAND, async (msg) => {
         bot.emit("messageReturn", msg.author.id, embed.command(text.FAQ_COMMAND_QUESTION_4, text.FAQ_COMMAND_ANSWER_4));
     },
     {
-        deleteCommand: true,
         description: text.FAQ_COMMAND_DESCRIPTION,
         fullDescription: text.FAQ_COMMAND_FULL_DESCRIPTION
     });
