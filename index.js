@@ -98,8 +98,8 @@ tracking.registerSubcommand(text.TRACK_RESET_SUBCOMMAND, async (msg) => {
                 }).then((message) => {
                     message.addReaction('✅');
                     message.addReaction('❌');
-                    userEventListener = async function (user_msg, emoji, id) {
-                        if (user_msg.id === message.id && id === msg.author.id) {
+                    userEventListener = async function (user_msg, emoji, reactor) {
+                        if (user_msg.id === message.id && reactor.id === msg.author.id) {
                             if (emoji.name === '❌') {
                                 bot.off("messageReactionAdd", userEventListener);
                             } else if (emoji.name === '✅') {
@@ -244,8 +244,8 @@ tracking.registerSubcommand(text.TRACK_DATE_SUBCOMMAND, async (msg, args) => {
         }).then((message) => {
                 message.addReaction('✅');
                 message.addReaction('❌');
-                userEventListener = function (user_msg, emoji, id) {
-                    if (user_msg.id === message.id && id === msg.author.id) {
+                userEventListener = function (user_msg, emoji, reactor) {
+                    if (user_msg.id === message.id && reactor.id === msg.author.id) {
                         if (emoji.name === '❌') {
                             bot.emit("messageReturn", msg.author.id, embed.response(text.TRACK_DATE_SUBCOMMAND, text.TRACK_DATE_SUBCOMMAND_USER_ABORTED));
                             bot.off("messageReactionAdd", userEventListener);
@@ -340,8 +340,8 @@ bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
                     message.addReaction('✅');
                     message.addReaction('❌');
                     //confirm message / erase message
-                    let messageSendTrigger = async function (user_msg, emoji, id) {
-                        if (user_msg.id === message.id && id === msg.author.id) {
+                    let messageSendTrigger = async function (user_msg, emoji, reactor) {
+                        if (user_msg.id === message.id && reactor.id === msg.author.id) {
                             if (emoji.name === '❌') {
                                 for (const [key, value] of Object.entries(handlerList)) {
                                     bot.off(key, value);
@@ -369,7 +369,7 @@ bot.registerCommand(text.NOTIFY_COMMAND, async (msg) => {
         await dbConnection.getFellowship(msg.author, fellowshipNotEmpty, fellowshipEmpty);
     },
     {
-        guildOnly: true,
+        dmOnly: true,
         description: text.NOTIFY_COMMAND_DESCRIPTION,
         fullDescription: text.NOTIFY_COMMAND_FULL_DESCRIPTION
     });
@@ -408,8 +408,8 @@ bot.registerCommand(text.JOIN_COMMAND, async (msg) => {
                         .then((user_message) => {
                             user_message.addReaction('✅');
                             user_message.addReaction('❌');
-                            fellowshipEventListener = async function (user_msg, emoji, id) {
-                                if (user_msg.id === user_message.id && id === user.id) {
+                            fellowshipEventListener = async function (user_msg, emoji, reactor) {
+                                if (user_msg.id === user_message.id && reactor.id === user.id) {
                                     if (emoji.name === '❌') {
                                         bot.off("messageReactionAdd", fellowshipEventListener);
                                     } else if (emoji.name === '✅') {
@@ -465,8 +465,8 @@ bot.registerCommand(text.INVITE_COMMAND, async (msg) => {
                         .then((user_message) => {
                             user_message.addReaction('✅');
                             user_message.addReaction('❌');
-                            fellowshipEventListener = async function (user_msg, emoji, id) {
-                                if (user_msg.id === user_message.id && id === user.id) {
+                            fellowshipEventListener = async function (user_msg, emoji, reactor) {
+                                if (user_msg.id === user_message.id && reactor.id === user.id) {
                                     if (emoji.name === '❌') {
                                         bot.off("messageReactionAdd", fellowshipEventListener);
                                     } else if (emoji.name === '✅') {
@@ -514,8 +514,8 @@ bot.registerCommand(text.KICK_COMMAND, async (msg) => {
                             let failureHandler = function (_user) {
                                 bot.emit("messageReturn", msg.author.id, embed.error(text.KICK_COMMAND, text.KICK_COMMAND_NOT_IN_FELLOWSHIP_ERROR(user.username)));
                             };
-                            let fellowshipEventListener = async function (user_msg, emoji, id) {
-                                if (user_msg.id === message.id && id === msg.author.id) {
+                            let fellowshipEventListener = async function (user_msg, emoji, reactor) {
+                                if (user_msg.id === user_message.id && reactor.id === user.id) {
                                     if (emoji.name === '❌') {
                                         bot.off("messageReactionAdd", fellowshipEventListener);
                                     } else if (emoji.name === '✅') {
@@ -564,8 +564,8 @@ bot.registerCommand(text.LEAVE_COMMAND, async (msg) => {
                             let failureHandler = function (_user) {
                                 bot.emit("messageReturn", msg.author.id, embed.error(text.LEAVE_COMMAND, text.LEAVE_COMMAND_NOT_IN_FELLOWSHIP_ERROR(user.username)));
                             };
-                            let fellowshipEventListener = async function (user_msg, emoji, id) {
-                                if (user_msg.id === message.id && id === msg.author.id) {
+                            let fellowshipEventListener = async function (user_msg, emoji, reactor) {
+                                if (user_msg.id === user_message.id && reactor.id === user.id) {
                                     if (emoji.name === '❌') {
                                         bot.off("messageReactionAdd", fellowshipEventListener);
                                     } else if (emoji.name === '✅') {
