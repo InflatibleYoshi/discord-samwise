@@ -42,7 +42,6 @@ const botInit = () => {
         .then(v => {
             return new Eris.CommandClient(v.getValue('token'), {}, {
                 description: text.BOT_DESCRIPTION,
-                deleteCommand: true,
                 owner: text.BOT_OWNER,
                 prefix: "!"
             });
