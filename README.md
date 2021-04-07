@@ -1,188 +1,32 @@
-Will be separated into node standalone and kubernetes distribution if I feel like putting in that effort.
+Official page of the Samwise
 
 
-Deployment Steps:
-1. Install Kubernetes (I installed microk8s on my RaspberryPis)
+Samwise - A discord bot that brings community within arm's reach when dealing with the lowest lows to giving life updates.
+by InflatibleYoshi
 
-2. Setup Storage
-```
-nano local-storage.yaml
+Commands:
+  !help - This help text
+  !track - Type !help track to get info on the subcommands available: 'date', 'streak', 'reset', 'focus', 'list', and 'threshold'.
 
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: local-storage
-provisioner: kubernetes.io/no-provisioner
-volumeBindingMode: WaitForFirstConsumer
+  !getMembership -  Get a list of your membership.
+  !getFellowship - Get a list of users in your fellowship.
+  !notify - Notify all the members of your fellowship.
+  !join - Request to join a user's fellowship.
+  !invite - Invite another user to your fellowship.
+  !kick - Kick a user from your fellowship.
+  !leave - Leave a fellowship.
+  !faq - Frequently asked questions.
 
-kubectl apply -f local-storage.yaml
+Type !help <command> for more info on a command.
 
-kubectl patch storageclass local-storage -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+FAQ (!faq output)
 
-nano pv-vault.yaml
 
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: vault
-  labels:
-    type: vault
-spec:
-  capacity:
-    storage: 1Gi
-  volumeMode: Filesystem
-  accessModes:
-  - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Delete
-  storageClassName: local-storage
-  local:
-    path: /opt/microk8s/vault
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-      - matchExpressions:
-        - key: kubernetes.io/os
-          operator: In
-          values:
-          - linux
-```
-
-3. Install Vault - https://www.vaultproject.io/docs/platform/k8s/helm/examples/standalone-tls
-
-```
-nano helm-vault-values.yml
-
-global:
-  enabled: true
-  tlsDisable: false
-
-server:
-  extraEnvironmentVars:
-    VAULT_CACERT: /vault/userconfig/vault-server-tls/vault.ca
-
-  extraVolumes:
-    - type: secret
-      name: vault-server-tls # Matches the ${SECRET_NAME} from above
-
-  dataStorage:
-    enabled: true
-    size: 1Gi
-
-  standalone:
-    enabled: true
-    config: |
-      listener "tcp" {
-        address = "[::]:8200"
-        cluster_address = "[::]:8201"
-        tls_cert_file = "/vault/userconfig/vault-server-tls/vault.crt"
-        tls_key_file  = "/vault/userconfig/vault-server-tls/vault.key"
-        tls_client_ca_file = "/vault/userconfig/vault-server-tls/vault.ca"
-      }
-
-      storage "file" {
-        path = "/vault/data"
-      }
-
-injector:
-  image:
-    repository: "moikot/vault-k8s"
-    tag: "0.2.0"
-    pullPolicy: IfNotPresent
-
-microk8s helm3 install vault hashicorp/vault --values helm-vault-values.yml --namespace=vault
-```
-
-4. Configure Vault  + AppRole for accessing secrets
-```
-kubectl exec vault-0 --namespace=vault -- vault operator init -key-shares=5 -key-threshold=2 -format=json > cluster-keys.json
-
-kubectl exec -it vault-0 --namespace=vault -- /bin/sh
-
-vault auth enable approle
-
-vault policy write samwise - <<EOF
-path "samwise/redis" {
-  capabilities = ["read"]
-}
-
-path "samwise/bot" {
-  capabilities = ["read"]
-}
-EOF
-# The above policy was formed through much trial and error and much blood, sweat, and tears 
-# because hashicorp's documentation told me to do "secret/samwise/bot" instead
-# of what I have now
-
-vault token create -policy=samwise -period=30m
-# This value provided will give you the correct token to fill into the deployment.yml
-```
-
-5. Setup PersistentVolume Claim in Storage: pv.yaml
-```
-nano pv-redis.yaml
-
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: redis
-  labels:
-    type: redis
-spec:
-  capacity:
-    storage: 4Gi
-  volumeMode: Filesystem
-  accessModes:
-  - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Delete
-  storageClassName: local-storage
-  local:
-    path: /opt/microk8s/redis
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-      - matchExpressions:
-        - key: kubernetes.io/os
-          operator: In
-          values:
-          - linux
-
-nano pvc-redis.yaml
-
-  apiVersion: v1
-  kind: PersistentVolumeClaim
-  metadata:
-    name: redisdb-pvc
-  spec:
-    storageClassName: ""
-    accessModes:
-      - ReadWriteOnce
-    resources:
-      requests:
-        storage: 8Gi
-
-kubectl apply -f pvc-redis.yaml
-
-```
-6. Initialize Redis:
-```
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm install my-release –set persistence.existingClaim=PVC_NAME bitnami/redis
-kubectl get secret --namespace default my-release-redis -o jsonpath="{.data.redis-password}"
-
-Add secret to init.
-
-kubectl delete secret my-release-redis
-```
-7. Fill Deployment.yml with vault-active service ip and redis-master ip.
-```
-kubectl get pods -o wide
-```
-
-8. Unseal Vault
-
-9. Deployment
-```
-docker build -t discord-samwise .
-kubectl apply -f deployment.yml
-```
-10. Reseal Vault
+What are fellowships and what is membership?
+Fellowships are groups owned by one person who can give life updates through the !notify command. You can join one by typing the !join command @'ing the person's fellowship you want to join or you can invite people into your fellowship with the !invite command. You can check the members of your fellowship by typing in the !getFellowship command. Membership is the list of all the fellowships you are a part of and this list can be checked by the !getMembership command.
+Where should I start? How do I use this bot?
+If you want to go straight to tools that help you deal with addiction, then use the !track date command, the !track focus command, and the !track threshold command to set this up (type !help track for more information). If you want a group of friends to give life updates to, use the !invite command to add people to your fellowship and the !notify command to send out an update.
+Can I DM the bot?
+Yes, it is actually encouraged that you DM the bot for all the commands that don't require mentioning a user for the command. Only use the open channel for !invite, !join, !kick, and !leave
+Wait a sec wouldn't it be really awkward if someone noticed that you kicked them out of your fellowship on the open channel?
+Yes it would, but there's only a small chance of that happening since all open channels message commands are deleted immediately after you post them and followups are DM'ed to you. Make sure you turn off @mention notifications for the channel this bot is running in.
