@@ -1,7 +1,7 @@
 # Samwise
 
 
-Samwise - A discord bot that brings community within arm's reach when dealing with the lowest lows to giving life updates.
+A discord bot that brings community within arm's reach when dealing with the lowest lows to giving life updates.
 by InflatibleYoshi
 
 Commands:
