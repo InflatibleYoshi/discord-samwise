@@ -1,4 +1,4 @@
-Official page of the Samwise
+# Samwise
 
 
 Samwise - A discord bot that brings community within arm's reach when dealing with the lowest lows to giving life updates.
