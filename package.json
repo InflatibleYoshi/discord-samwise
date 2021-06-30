@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/InflatibleYoshi/discord-samwise#readme",
   "dependencies": {
-    "chrono-node": "^1.4.8",
+    "chrono-node": "^2.2.4",
     "eris": "^0.14.0",
     "eventemitter3": "^4.0.7",
     "ioredis": "^4.19.4",
